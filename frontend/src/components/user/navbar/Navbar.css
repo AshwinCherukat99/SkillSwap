@@ -1,0 +1,60 @@
+.skillswap-navbar {
+  height: 64px;
+  background-color: #e5e5e5;
+  padding: 0 12px;
+}
+
+/* SkillSwap logo */
+.skillswap-logo {
+  color: #3730d9 !important;
+  font-size: 20px;
+  font-weight: 700;
+  margin-right: 28px;
+}
+
+/* Navigation links */
+.skillswap-nav {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.skillswap-link {
+  color: #444 !important;
+  font-size: 13px;
+  padding: 8px 6px !important;
+  white-space: nowrap;
+}
+
+.skillswap-link:hover {
+  color: #3730d9 !important;
+}
+
+/* Active page */
+.skillswap-link.active {
+  color: #3730d9 !important;
+  border-bottom: 2px solid #3730d9;
+}
+
+/* Notification / Chat / Logout */
+.skillswap-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  color: #333;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  color: #3730d9;
+}

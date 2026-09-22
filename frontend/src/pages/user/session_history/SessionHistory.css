@@ -1,0 +1,762 @@
+.session-history-page {
+    min-height: 100vh;
+
+    background:
+        radial-gradient(
+            circle at top left,
+            #f8f9ff 0%,
+            #eff4ff 100%
+        );
+
+    color: #121c2a;
+}
+
+
+/* ================================= */
+/* HEADER */
+/* ================================= */
+
+.session-history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.session-history-header h1 {
+    font-size: 36px;
+    font-weight: 800;
+
+    margin-bottom: 8px;
+}
+
+.session-history-header p {
+    color: #6c757d;
+
+    margin: 0;
+
+    font-size: 16px;
+}
+
+
+/* ================================= */
+/* STATISTICS */
+/* ================================= */
+
+.session-stat-card {
+    height: 100%;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.75
+    );
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.5
+    );
+
+    border-radius: 18px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    box-shadow:
+        0 8px 32px
+        rgba(79, 70, 229, 0.06);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.session-stat-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 35px
+        rgba(79, 70, 229, 0.1);
+}
+
+.session-stat-icon {
+    width: 50px;
+    height: 50px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: rgba(
+        53,
+        37,
+        205,
+        0.1
+    );
+
+    color: #3525cd;
+}
+
+.session-stat-value {
+    font-size: 30px;
+    font-weight: 800;
+
+    color: #3525cd;
+}
+
+.session-stat-label {
+    margin-top: 5px;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    color: #6c757d;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+}
+
+
+/* ================================= */
+/* FILTERS */
+/* ================================= */
+
+.session-filters {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+.session-search {
+    width: 100%;
+    max-width: 500px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.75
+    );
+
+    border: 1px solid #ced4da;
+
+    border-radius: 30px;
+
+    padding: 11px 18px;
+
+    color: #6c757d;
+}
+
+.session-search:focus-within {
+    border-color: #3525cd;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(53, 37, 205, 0.1);
+}
+
+.session-search input {
+    width: 100%;
+
+    border: none;
+    outline: none;
+
+    background: transparent;
+
+    font-size: 14px;
+}
+
+.session-filter-group {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 8px;
+}
+
+.session-filter {
+    border: 1px solid #ced4da;
+
+    background: rgba(
+        255,
+        255,
+        255,
+        0.65
+    );
+
+    color: #495057;
+
+    padding: 9px 17px;
+
+    border-radius: 25px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.session-filter:hover {
+    border-color: #3525cd;
+
+    color: #3525cd;
+}
+
+.session-filter.active {
+    background: #3525cd;
+
+    border-color: #3525cd;
+
+    color: white;
+}
+
+
+/* ================================= */
+/* SESSION LIST */
+/* ================================= */
+
+.session-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+.session-card {
+    background: rgba(
+        255,
+        255,
+        255,
+        0.75
+    );
+
+    backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(
+        255,
+        255,
+        255,
+        0.5
+    );
+
+    border-radius: 18px;
+
+    padding: 24px;
+
+    box-shadow:
+        0 8px 32px
+        rgba(79, 70, 229, 0.05);
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.session-card:hover {
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(79, 70, 229, 0.1);
+}
+
+.session-card-top {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: flex-start;
+
+    gap: 20px;
+}
+
+.session-card-main {
+    min-width: 0;
+}
+
+.session-card-meta {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 10px;
+}
+
+.session-category {
+    display: inline-block;
+
+    background: #e2dfff;
+
+    color: #3525cd;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.06em;
+}
+
+.session-duration {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color: #6c757d;
+
+    font-size: 13px;
+}
+
+.session-card h3 {
+    margin: 0;
+
+    font-size: 21px;
+
+    font-weight: 700;
+
+    color: #121c2a;
+}
+
+.session-person {
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 9px;
+
+    color: #6c757d;
+
+    font-size: 14px;
+}
+
+.session-person svg {
+    color: #006c49;
+}
+
+
+/* ================================= */
+/* STATUS */
+/* ================================= */
+
+.session-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 6px;
+
+    height: fit-content;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+}
+
+.session-status-completed {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.session-status-cancelled {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.session-status-expired {
+    background: #fff3cd;
+    color: #664d03;
+}
+
+.session-status-scheduled {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.session-status-requested {
+    background: #e2e3e5;
+    color: #41464b;
+}
+
+.session-status-rejected {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.session-status-default {
+    background: #e9ecef;
+    color: #495057;
+}
+
+
+/* ================================= */
+/* CARD FOOTER */
+/* ================================= */
+
+.session-card-footer {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    align-items: center;
+
+    gap: 18px;
+
+    margin-top: 20px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #e9ecef;
+
+    color: #6c757d;
+
+    font-size: 13px;
+}
+
+.session-card-footer > span {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.session-message {
+    max-width: 500px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+/* ================================= */
+/* LOADING */
+/* ================================= */
+
+.session-loading {
+    min-height: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #6c757d;
+}
+
+.session-loading p {
+    margin-top: 15px;
+
+    margin-bottom: 0;
+}
+
+
+/* ================================= */
+/* EMPTY */
+/* ================================= */
+
+.session-empty {
+    min-height: 300px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    color: #6c757d;
+}
+
+.session-empty svg {
+    color: #3525cd;
+
+    margin-bottom: 15px;
+}
+
+.session-empty h4 {
+    color: #212529;
+
+    font-weight: 700;
+}
+
+.session-empty p {
+    margin-bottom: 0;
+}
+
+
+/* ================================= */
+/* MODAL */
+/* ================================= */
+
+.session-modal-backdrop {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1050;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(
+            18,
+            28,
+            42,
+            0.45
+        );
+}
+
+.session-modal {
+    width: 100%;
+
+    max-width: 550px;
+
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: white;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0, 0, 0, 0.2);
+
+    overflow: hidden;
+}
+
+.session-modal-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 20px 24px;
+
+    border-bottom: 1px solid #dee2e6;
+}
+
+.session-modal-header h4 {
+    margin: 0;
+
+    font-weight: 700;
+}
+
+.session-modal-body {
+    padding: 25px;
+}
+
+.session-modal-body h3 {
+    font-weight: 700;
+}
+
+.session-detail-row {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 15px;
+
+    color: #495057;
+}
+
+.session-detail-row svg {
+    color: #3525cd;
+
+    flex-shrink: 0;
+}
+
+
+/* ================================= */
+/* SKILL EXCHANGE DETAILS */
+/* ================================= */
+
+.session-skills-box {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 15px;
+
+    margin-top: 25px;
+}
+
+.session-skills-box > div {
+    padding: 14px;
+
+    background: #f8f9fa;
+
+    border-radius: 8px;
+}
+
+.session-skills-box strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    font-size: 12px;
+
+    color: #6c757d;
+
+    text-transform: uppercase;
+}
+
+.session-skills-box span {
+    color: #212529;
+
+    font-weight: 600;
+}
+
+
+/* ================================= */
+/* MESSAGE */
+/* ================================= */
+
+.session-detail-message {
+    margin-top: 25px;
+
+    padding: 15px;
+
+    background: #f8f9fa;
+
+    border-radius: 8px;
+}
+
+.session-detail-message strong {
+    display: block;
+
+    margin-bottom: 6px;
+}
+
+.session-detail-message p {
+    margin: 0;
+
+    color: #6c757d;
+
+    line-height: 1.6;
+}
+
+
+/* ================================= */
+/* RESPONSIVE */
+/* ================================= */
+
+@media (max-width: 768px) {
+
+    .session-history-header h1 {
+        font-size: 29px;
+    }
+
+    .session-card-top {
+        flex-direction: column;
+    }
+
+    .session-status {
+        align-self: flex-start;
+    }
+
+    .session-card {
+        padding: 18px;
+    }
+
+    .session-card h3 {
+        font-size: 18px;
+    }
+
+    .session-skills-box {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 576px) {
+
+    .session-history-header h1 {
+        font-size: 25px;
+    }
+
+    .session-search {
+        max-width: none;
+    }
+
+    .session-filter-group {
+        flex-wrap: nowrap;
+
+        overflow-x: auto;
+
+        padding-bottom: 5px;
+    }
+
+    .session-filter {
+        white-space: nowrap;
+    }
+
+    .session-card-footer {
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 10px;
+    }
+
+    .session-message {
+        max-width: 100%;
+    }
+
+}

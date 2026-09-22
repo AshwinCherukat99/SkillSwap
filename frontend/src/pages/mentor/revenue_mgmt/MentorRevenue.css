@@ -1,0 +1,238 @@
+/* =========================================================
+   Mentor Revenue Page
+   ========================================================= */
+
+.mentor-revenue-page {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+
+/* =========================================================
+   Revenue Stat Cards
+   ========================================================= */
+
+.revenue-stat-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================================
+   Revenue Analytics
+   ========================================================= */
+
+.revenue-chart-placeholder {
+    min-height: 280px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 1px dashed #dee2e6;
+    border-radius: 12px;
+
+    background-color: #f8f9fa;
+}
+
+
+/* =========================================================
+   Payout Section
+   ========================================================= */
+
+.mentor-revenue-page .card {
+    border-radius: 12px;
+}
+
+.mentor-revenue-page .card-body {
+    border-radius: 12px;
+}
+
+
+/* =========================================================
+   Tables
+   ========================================================= */
+
+.mentor-revenue-page .table {
+    margin-bottom: 0;
+}
+
+.mentor-revenue-page .table th {
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    color: #6c757d;
+
+    white-space: nowrap;
+    border-bottom-width: 1px;
+}
+
+.mentor-revenue-page .table td {
+    font-size: 0.9rem;
+    vertical-align: middle;
+
+    white-space: nowrap;
+}
+
+.mentor-revenue-page .table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* =========================================================
+   Badges
+   ========================================================= */
+
+.mentor-revenue-page .badge {
+    font-weight: 500;
+}
+
+
+/* =========================================================
+   Payout Modal
+   ========================================================= */
+
+.mentor-revenue-page .modal-content {
+    border-radius: 14px;
+}
+
+.mentor-revenue-page .modal-header {
+    padding: 1.25rem 1.5rem;
+}
+
+.mentor-revenue-page .modal-body {
+    padding: 1.5rem;
+}
+
+.mentor-revenue-page .modal-footer {
+    padding: 1rem 1.5rem;
+}
+
+
+/* =========================================================
+   Payout Information
+   ========================================================= */
+
+.mentor-revenue-page .alert {
+    border-radius: 10px;
+}
+
+.mentor-revenue-page .alert ul {
+    margin-bottom: 0;
+}
+
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
+.mentor-revenue-page .btn {
+    border-radius: 8px;
+}
+
+.mentor-revenue-page .btn-group .btn {
+    border-radius: 0;
+}
+
+.mentor-revenue-page .btn-group .btn:first-child {
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+.mentor-revenue-page .btn-group .btn:last-child {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+
+/* =========================================================
+   Forms
+   ========================================================= */
+
+.mentor-revenue-page .form-control,
+.mentor-revenue-page .input-group-text {
+    border-radius: 8px;
+}
+
+.mentor-revenue-page .input-group .form-control {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.mentor-revenue-page .input-group .input-group-text {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+
+/* =========================================================
+   Responsive
+   ========================================================= */
+
+@media (max-width: 991.98px) {
+
+    .mentor-revenue-page {
+        padding-bottom: 2rem;
+    }
+
+    .mentor-revenue-page .table th,
+    .mentor-revenue-page .table td {
+        font-size: 0.85rem;
+    }
+}
+
+
+@media (max-width: 767.98px) {
+
+    .mentor-revenue-page {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .revenue-stat-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .mentor-revenue-page .modal-dialog {
+        margin: 0.75rem;
+    }
+
+    .mentor-revenue-page .modal-body {
+        padding: 1.25rem;
+    }
+
+    .mentor-revenue-page .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .mentor-revenue-page .modal-footer {
+        padding: 1rem 1.25rem;
+    }
+}
+
+
+@media (max-width: 575.98px) {
+
+    .mentor-revenue-page .btn-group {
+        width: 100%;
+    }
+
+    .mentor-revenue-page .btn-group .btn {
+        flex: 1;
+    }
+
+    .mentor-revenue-page .modal-footer {
+        flex-direction: column;
+    }
+
+    .mentor-revenue-page .modal-footer .btn {
+        width: 100%;
+    }
+}

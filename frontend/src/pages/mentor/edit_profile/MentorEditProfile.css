@@ -1,0 +1,116 @@
+.mentor-edit-page {
+    min-height: 100vh;
+    background: #f8f9ff;
+    padding-bottom: 100px;
+}
+
+.mentor-edit-avatar {
+    width: 112px;
+    height: 112px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: #e9ecef;
+    border: 4px solid #fff;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.photo-camera-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+}
+
+.photo-camera-button .material-symbols-outlined {
+    font-size: 17px;
+}
+
+.verified-icon {
+    font-size: 15px;
+}
+
+.preview-avatar {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 50%;
+    background: #e9ecef;
+}
+
+.preview-verified {
+    font-size: 16px;
+}
+
+.professional-summary {
+    min-height: 100px;
+    white-space: pre-wrap;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    display: inline-block;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+.letter-spacing-wide {
+    letter-spacing: 4px;
+}
+
+.mentor-edit-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    z-index: 1000;
+
+    padding: 14px 0;
+
+    background: rgba(255, 255, 255, 0.94);
+
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 -4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.card {
+    border-color: transparent;
+}
+
+.form-control,
+.input-group-text {
+    border-color: #dee2e6;
+}
+
+.form-control:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.12);
+}
+
+textarea.form-control {
+    resize: vertical;
+}
+
+@media (max-width: 575px) {
+
+    .mentor-edit-avatar {
+        width: 92px;
+        height: 92px;
+    }
+
+    .mentor-edit-action-bar {
+        padding: 10px 0;
+    }
+
+}

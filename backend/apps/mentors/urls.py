@@ -1,0 +1,80 @@
+from .views import MentorDocumentListCreateView,MentorRegisterView,VerifyMentorRegistrationOTPView,ResendMentorRegistrationOTPView,MentorLoginView,MentorGoogleLoginView,MentorForgotPasswordView,MentorVerifyResetOTPView,MentorResetPasswordView,MentorDashboardView,MentorProfileUpdateView,UserMentorProfileView,UserMentorReviewView,MentorReceivedReviewsView,MentorStudentsView
+from django.urls import path
+
+urlpatterns=[
+    path(
+        'login/',
+        MentorLoginView.as_view(),
+        name='mentor-login',
+    ),
+    path(
+        'register/',
+        MentorRegisterView.as_view(),
+        name='mentor-register',
+    ),
+    path(
+        'documents/',
+        MentorDocumentListCreateView.as_view(),
+        name='mentor-documents',
+    ),
+    path(
+    "verify-email/",
+    VerifyMentorRegistrationOTPView.as_view(),
+    name="verify-mentor-registration-otp",
+),
+    path(
+    "resend-otp/",
+    ResendMentorRegistrationOTPView.as_view(),
+    name="mentor-resend-otp",
+),
+    path(
+        'google-login/',
+        MentorGoogleLoginView.as_view(),
+        name='mentor-google-login',
+    ),
+    path(
+            'forgot-password/',
+            MentorForgotPasswordView.as_view(),
+            name='mentor-forgot-password',
+        ),
+    path(
+            'verify-reset-otp/',
+            MentorVerifyResetOTPView.as_view(),
+            name='verify-mentor-reset-otp',
+        ),
+    path(
+            'reset-password/',
+            MentorResetPasswordView.as_view(),
+            name='mentor-reset-password',
+        ),
+    path(
+        'dashboard/',
+        MentorDashboardView.as_view(),
+        name='mentor-dashboard',
+    ),
+    path(
+        'profile/',
+        MentorProfileUpdateView.as_view(),
+        name='mentor-profile-update',
+    ),
+    path(
+        '<int:mentor_id>/profile/',
+        UserMentorProfileView.as_view(),
+        name='user-mentor-profile',
+    ), 
+    path(
+        '<int:mentor_id>/reviews/',
+        UserMentorReviewView.as_view(),
+        name='user-mentor-reviews',
+    ),
+    path(
+        'reviews/',
+        MentorReceivedReviewsView.as_view(),
+        name='mentor-received-reviews',
+    ),
+    path(
+        'students/',
+        MentorStudentsView.as_view(),
+        name='mentor-students',
+    ),
+]

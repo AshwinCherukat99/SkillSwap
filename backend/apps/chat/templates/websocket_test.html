@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SkillSwap Chat Test</title>
+</head>
+
+<body>
+
+<h2>SkillSwap Group Chat Test</h2>
+
+<input
+    id="token"
+    placeholder="JWT access token"
+    style="width: 500px;"
+>
+
+<br><br>
+
+<input
+    id="conversation"
+    placeholder="Conversation ID"
+    value="1"
+>
+
+<button onclick="connectSocket()">
+    Connect
+</button>
+
+<br><br>
+
+<div id="status"></div>
+
+<br>
+
+<input
+    id="message"
+    placeholder="Type a message"
+>
+
+<button onclick="sendMessage()">
+    Send
+</button>
+
+<h3>Messages</h3>
+
+<div id="messages"></div>
+
+
+<script>
+
+let socket = null;
+
+
+function connectSocket() {
+
+    const token = document.getElementById("token").value;
+    const conversationId =
+        document.getElementById("conversation").value;
+
+    const wsUrl =
+        `ws://127.0.0.1:8000/ws/chat/${conversationId}/?token=${token}`;
+
+    console.log("Connecting to:", wsUrl);
+
+    socket = new WebSocket(wsUrl);
+
+
+    socket.onopen = function() {
+
+        document.getElementById("status").innerText =
+            "Connected";
+
+        console.log("WebSocket connected");
+    };
+
+
+    socket.onmessage = function(event) {
+
+        console.log("Received:", event.data);
+
+        const data = JSON.parse(event.data);
+
+        const messageDiv =
+            document.createElement("div");
+
+        messageDiv.innerText =
+            JSON.stringify(data);
+
+        document
+            .getElementById("messages")
+            .appendChild(messageDiv);
+    };
+
+
+    socket.onerror = function(error) {
+
+        console.error("WebSocket error:", error);
+
+        document.getElementById("status").innerText =
+            "WebSocket error";
+    };
+
+
+    socket.onclose = function(event) {
+
+        console.log(
+            "WebSocket closed:",
+            event.code,
+            event.reason
+        );
+
+        document.getElementById("status").innerText =
+            `Disconnected (${event.code})`;
+    };
+}
+
+
+function sendMessage() {
+
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+
+        alert("WebSocket is not connected");
+
+        return;
+    }
+
+
+    const message =
+        document.getElementById("message").value;
+
+
+    socket.send(
+        JSON.stringify({
+            message: message
+        })
+    );
+
+
+    document.getElementById("message").value = "";
+}
+
+</script>
+
+</body>
+</html>

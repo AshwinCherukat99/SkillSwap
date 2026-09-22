@@ -1,0 +1,194 @@
+/* =========================
+   PAGE
+========================= */
+
+.edit-profile-page {
+    min-height: 100vh;
+    background-color: #f5f7fb;
+}
+
+
+/* =========================
+   LOADING
+========================= */
+
+.edit-profile-loading {
+    min-height: 100vh;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.edit-profile-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 20px;
+}
+
+
+.edit-profile-header h2 {
+    font-weight: 700;
+
+    margin-bottom: 5px;
+}
+
+
+.edit-profile-header p {
+    color: #6c757d;
+
+    margin-bottom: 0;
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.edit-profile-card {
+    border: none;
+
+    border-radius: 12px;
+}
+
+
+/* =========================
+   SECTION TITLES
+========================= */
+
+.section-title {
+    font-weight: 700;
+}
+
+
+.section-title i {
+    color: var(--bs-primary);
+}
+
+
+/* =========================
+   PROFILE IMAGE
+========================= */
+
+.profile-image-wrapper {
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+}
+
+
+.edit-profile-image {
+    width: 160px;
+
+    height: 160px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 4px solid #fff;
+
+    box-shadow: 0 4px 15px rgba(
+        0,
+        0,
+        0,
+        0.15
+    );
+}
+
+
+.edit-profile-placeholder {
+    width: 160px;
+
+    height: 160px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    background-color: var(--bs-primary);
+
+    color: white;
+
+    font-size: 60px;
+
+    box-shadow: 0 4px 15px rgba(
+        0,
+        0,
+        0,
+        0.15
+    );
+}
+
+
+/* =========================
+   FORM
+========================= */
+
+.edit-profile-card .form-label {
+    font-weight: 600;
+}
+
+
+.edit-profile-card .form-control {
+    padding: 10px 14px;
+
+    border-radius: 8px;
+}
+
+
+.edit-profile-card textarea {
+    resize: vertical;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (
+    max-width: 768px
+) {
+
+    .edit-profile-header {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+
+    .edit-profile-header button {
+        width: 100%;
+    }
+
+
+    .edit-profile-image,
+    .edit-profile-placeholder {
+        width: 130px;
+
+        height: 130px;
+    }
+
+
+    .edit-profile-placeholder {
+        font-size: 50px;
+    }
+
+}

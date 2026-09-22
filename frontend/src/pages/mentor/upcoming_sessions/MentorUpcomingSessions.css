@@ -1,0 +1,155 @@
+.upcoming-sessions-page {
+    min-height: 100vh;
+    background: #f8f9ff;
+}
+
+.date-indicator {
+    padding: 10px 14px;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    background: white;
+}
+
+.session-avatar {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e8e6ff;
+    color: #3525cd;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.small-avatar {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    font-size: 0.7rem;
+}
+
+.session-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding: 10px 12px;
+    background: #f1f4fa;
+    border-radius: 8px;
+    color: #6c757d;
+    font-size: 0.78rem;
+}
+
+.session-meta svg {
+    color: #3525cd;
+}
+
+.request-message {
+    padding: 12px 14px;
+    background: #f4f5fa;
+    border-left: 3px solid #3525cd;
+    border-radius: 0 8px 8px 0;
+    color: #6c757d;
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+.countdown-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 13px;
+    border-radius: 9px;
+    background: #f1f4fa;
+    border: 1px solid #dfe3ed;
+}
+
+.countdown-values {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #3525cd;
+    font-weight: 800;
+    font-family: monospace;
+    font-size: 0.95rem;
+}
+
+.countdown-values span {
+    padding: 3px 6px;
+    background: white;
+    border-radius: 5px;
+}
+
+.countdown-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 13px;
+    border-radius: 9px;
+    background: #e5f8ef;
+    border: 1px solid #b8e7ce;
+    color: #006c49;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #006c49;
+    animation: pulse 1.2s infinite;
+}
+
+.session-live-border {
+    border-left: 4px solid #006c49 !important;
+}
+
+.empty-state-icon {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: #eef0f5;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bg-purple-subtle {
+    background: #eeeaff;
+}
+
+.text-purple {
+    color: #5b43c5;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.45;
+        transform: scale(0.8);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@media (max-width: 767px) {
+
+    .countdown-box,
+    .countdown-live {
+        width: 100%;
+        justify-content: center;
+    }
+
+}

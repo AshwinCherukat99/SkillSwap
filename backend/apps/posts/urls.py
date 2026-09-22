@@ -1,0 +1,49 @@
+from django.urls import path
+
+from .views import (
+    MyPostsView,
+    CreatePostView,
+    DeletePostView,
+    FeedPostsView,
+    PostLikeView,
+    PostCommentsView,
+    EditPostView
+)
+
+urlpatterns=[
+    path(
+        'my_posts/',
+        MyPostsView.as_view(),
+        name='my-posts',
+    ),
+    path(
+        '<int:post_id>/delete/',
+        DeletePostView.as_view(),
+        name='delete-post',
+    ),
+    path(
+            'create/',
+            CreatePostView.as_view(),
+            name='create-post',
+        ),
+    path(
+        'feed/',
+        FeedPostsView.as_view(),
+        name='feed-posts',
+    ),
+    path(
+        '<int:post_id>/like/',
+        PostLikeView.as_view(),
+        name='post-like',
+    ),
+    path(
+        '<int:post_id>/comments/',
+        PostCommentsView.as_view(),
+        name='post-comments',
+    ),
+    path(
+        '<int:post_id>/edit/',
+        EditPostView.as_view(),
+        name='edit-post',
+    ),
+]

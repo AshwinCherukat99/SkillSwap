@@ -1,0 +1,354 @@
+.mentor-verification-page {
+    background: #f7f9fb;
+    color: #0f172a;
+}
+
+.mentor-verification-topbar {
+    z-index: 1000;
+}
+
+.verification-container {
+    max-width: 1280px;
+}
+
+.verification-card {
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+}
+
+.verification-accent {
+    height: 4px;
+    background: linear-gradient(
+        90deg,
+        #f59e0b,
+        #fbbf24
+    );
+}
+
+.mentor-avatar {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    border-radius: 50%;
+    background: #e9e7ff;
+    color: #3525cd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.verification-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f2;
+    font-size: 14px;
+}
+
+.verification-info-row:last-child {
+    border-bottom: none;
+}
+
+.verification-info-row > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+}
+
+.verification-info-row strong {
+    text-align: right;
+    word-break: break-word;
+}
+
+.verification-check-item {
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.verification-check-item.verified {
+    border-color: #c7d2fe;
+    background: #f5f3ff;
+}
+
+.verification-check-item .form-check {
+    display: flex;
+    gap: 10px;
+}
+
+.verification-check-item .form-check-input {
+    margin-top: 4px;
+}
+
+.verification-check-item .form-check-input:checked {
+    background-color: #3525cd;
+    border-color: #3525cd;
+}
+
+.document-card {
+    height: 100%;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.document-card:hover {
+    border-color: #818cf8;
+    box-shadow: 0 5px 15px rgba(15, 23, 42, 0.08);
+}
+
+.document-card-selected {
+    border: 2px solid #3525cd;
+    background: #f5f3ff;
+}
+
+.document-preview {
+    height: 110px;
+    border-radius: 9px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.document-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.document-viewer {
+    min-height: 550px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    background: #e2e5e8;
+    display: flex;
+    flex-direction: column;
+}
+
+.document-viewer-toolbar {
+    min-height: 58px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid #dbe1e7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.document-viewer-canvas {
+    flex: 1;
+    min-height: 490px;
+    padding: 40px;
+    overflow: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: radial-gradient(
+        #94a3b8 0.7px,
+        transparent 0.7px
+    );
+    background-size: 20px 20px;
+}
+
+.document-image-wrapper {
+    background: #fff;
+    padding: 8px;
+    box-shadow: 0 8px 25px rgba(15, 23, 42, 0.15);
+    transition: transform 0.25s ease;
+    transform-origin: center center;
+}
+
+.document-image {
+    display: block;
+    max-width: 100%;
+    max-height: 600px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    display: flex;
+    gap: 15px;
+    padding-bottom: 25px;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 30px;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.timeline-icon {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    position: relative;
+    z-index: 1;
+}
+
+.timeline-primary {
+    background: #6366f1;
+}
+
+.timeline-success {
+    background: #16a34a;
+}
+
+.timeline-danger {
+    background: #dc2626;
+}
+
+.timeline-warning {
+    background: #f59e0b;
+}
+
+.timeline-content {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #f8fafc;
+}
+
+@media (max-width: 768px) {
+
+    .verification-info-row {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .verification-info-row strong {
+        text-align: left;
+    }
+
+    
+}
+.document-viewer {
+    width: 100%;
+    height: 650px;
+
+    background: #e9ecef;
+
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================================
+   TOOLBAR
+========================================= */
+
+.document-viewer-toolbar {
+    height: 52px;
+    min-height: 52px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #dee2e6;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 14px;
+}
+
+
+/* =========================================
+   CANVAS
+========================================= */
+
+.document-viewer-canvas {
+    position: relative;
+
+    flex: 1;
+
+    width: 100%;
+    min-height: 0;
+
+    overflow: auto;
+
+    background: #e9ecef;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+
+/* =========================================
+   PDF WRAPPER
+========================================= */
+
+.document-frame-wrapper {
+    width: 100%;
+    height: 100%;
+
+    min-height: 598px;
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+
+    transform-origin: center top;
+
+    transition: transform 0.2s ease;
+}
+
+
+/* =========================================
+   PDF IFRAME
+========================================= */
+
+.document-frame {
+    display: block;
+
+    width: 100%;
+    height: 100%;
+
+    min-height: 598px;
+
+    border: none;
+
+    background: #ffffff;
+}

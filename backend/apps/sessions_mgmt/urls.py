@@ -1,0 +1,66 @@
+from django.urls import path
+
+from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView
+
+urlpatterns=[
+    path(
+        'mentor/schedule/',
+        MentorScheduleCourseSessionView.as_view(),
+        name='mentor-schedule-course-session',
+    ),
+    path(
+            'history/',
+            SessionHistoryView.as_view(),
+            name='session-history',
+        ),
+    path(
+        'upcoming/',
+        UpcomingSessionsView.as_view(),
+        name='upcoming-sessions',
+    ),
+    path(
+        'requests/',
+        SessionRequestQueueView.as_view(),
+        name='session-request-queue',
+    ),
+    path(
+        'requests/<int:session_id>/action',
+        SessionRequestActionView.as_view(),
+        name='session-request-action',
+    ),
+    path(
+        'mentor/upcoming/',
+        MentorUpcomingSessionsView.as_view(),
+        name='mentor-upcoming-sessions',
+    ),
+    path(
+        'mentor/course-session/<int:session_id>/cancel/',
+        MentorCancelSessionView.as_view(),
+        name='mentor-cancel-course-session',
+    ),
+    path(
+        'session-requests/send/',
+        SendSessionRequestView.as_view(),
+        name='send-session-request',
+    ),
+    path(
+        'session-requests/received/',
+        ReceivedSessionRequestsView.as_view(),
+        name='received-session-requests',
+    ),
+    path(
+        'session-requests/<int:session_id>/accept/',
+        AcceptSessionRequestView.as_view(),
+        name='accept-session-request',
+    ),
+    path(
+        'session-requests/<int:session_id>/reject/',
+        RejectSessionRequestView.as_view(),
+        name='reject-session-request',
+    ),
+    path(
+        'mentor/session-history/',
+        MentorCourseSessionHistoryView.as_view(),
+        name='mentor-session-history',
+    ),
+]

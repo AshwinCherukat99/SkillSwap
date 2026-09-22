@@ -1,0 +1,433 @@
+.find-mentors-page {
+    padding: 30px;
+    background-color: #f8f9ff;
+    min-height: 100vh;
+}
+
+
+/* HERO */
+
+.mentor-hero {
+    background: white;
+    border-radius: 24px;
+    padding: 50px;
+    box-shadow: 0 10px 35px rgba(79, 70, 229, 0.08);
+}
+
+.elite-badge {
+    background: #e6fff4;
+    color: #087f5b;
+    padding: 8px 14px;
+    border-radius: 30px;
+}
+
+.mentor-hero h1 {
+    font-size: 48px;
+    font-weight: 800;
+}
+
+.mentor-hero h1 span {
+    color: #4f46e5;
+}
+
+.hero-description {
+    color: #6c757d;
+    font-size: 18px;
+    max-width: 600px;
+}
+
+.hero-btn {
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.hero-icon {
+    width: 240px;
+    height: 240px;
+    margin: auto;
+    border-radius: 50%;
+    background: #eef0ff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-icon i {
+    font-size: 100px;
+    color: #4f46e5;
+}
+
+
+/* SEARCH */
+
+.mentor-search {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.mentor-search input {
+    border: none;
+    outline: none;
+    width: 100%;
+}
+
+
+/* FILTERS */
+
+.filter-card {
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(79, 70, 229, 0.08);
+}
+
+.experience-btn {
+    border: 1px solid #dee2e6;
+    font-size: 13px;
+}
+
+.experience-btn.active {
+    background: #4f46e5;
+    color: white;
+}
+
+
+/* RECOMMENDATION */
+
+.recommendation-card {
+    background: #4f46e5;
+    color: white;
+
+    padding: 24px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 10px 30px
+        rgba(79, 70, 229, 0.25);
+}
+
+.recommendation-card h6 {
+    margin: 0;
+}
+
+.recommendation-card p {
+    margin-top: 15px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.8);
+}
+
+.recommendation-btn {
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: none;
+}
+
+
+/* MENTOR CARD */
+
+.mentor-card {
+    border-radius: 20px;
+
+    box-shadow:
+        0 8px 30px
+        rgba(79, 70, 229, 0.08);
+
+    transition: 0.3s;
+}
+
+.mentor-card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 15px 40px
+        rgba(79, 70, 229, 0.15);
+}
+
+.mentor-image-container {
+    position: relative;
+}
+
+.mentor-image {
+    width: 65px;
+    height: 65px;
+
+    object-fit: cover;
+
+    border-radius: 16px;
+}
+
+.verified-icon {
+    position: absolute;
+
+    bottom: -5px;
+    right: -5px;
+
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 13px;
+}
+
+.mentor-role {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+
+    font-size: 13px;
+}
+
+.rating i {
+    color: #f59f00;
+}
+
+.rating span {
+    color: #6c757d;
+}
+
+.favorite-btn {
+    border: none;
+}
+
+.mentor-stat {
+    background: #f5f6ff;
+
+    padding: 10px;
+
+    border-radius: 10px;
+}
+
+.mentor-stat small {
+    display: block;
+    font-size: 9px;
+    color: #6c757d;
+}
+
+.mentor-stat strong {
+    display: block;
+    color: #4f46e5;
+}
+
+.mentor-skills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-badge {
+    background: #eef0ff;
+    color: #4f46e5;
+
+    padding: 5px 9px;
+
+    border-radius: 6px;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* RECENTLY ACTIVE */
+
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.active-dot {
+    width: 9px;
+    height: 9px;
+
+    background: #22c55e;
+
+    border-radius: 50%;
+}
+
+.recently-active-container {
+    display: flex;
+
+    gap: 15px;
+
+    overflow-x: auto;
+
+    padding-bottom: 10px;
+}
+
+.recent-mentor {
+    min-width: 200px;
+
+    background: white;
+
+    padding: 12px;
+
+    border-radius: 15px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    box-shadow:
+        0 4px 15px
+        rgba(0,0,0,0.05);
+}
+
+.recent-mentor img {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+}
+
+.recent-mentor strong {
+    display: block;
+}
+
+.recent-mentor small {
+    color: #6c757d;
+}
+
+
+/* TOP RATED */
+
+.top-rated-container {
+    display: flex;
+
+    gap: 20px;
+
+    overflow-x: auto;
+
+    padding-bottom: 15px;
+}
+
+.top-rated-card {
+    min-width: 280px;
+
+    background: white;
+
+    padding: 22px;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0,0,0,0.05);
+}
+
+.top-rated-card img {
+    width: 55px;
+    height: 55px;
+
+    border-radius: 12px;
+
+    object-fit: cover;
+}
+
+.verified-text {
+    color: #198754;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* MOBILE */
+
+@media (max-width: 768px) {
+
+    .find-mentors-page {
+        padding: 15px;
+    }
+
+    .mentor-hero {
+        padding: 30px 20px;
+    }
+
+    .mentor-hero h1 {
+        font-size: 34px;
+    }
+
+}
+
+.top-mentor-image {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #f1f3f5;
+}
+
+.rating-filter {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.rating-star {
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-size: 20px;
+    cursor: pointer;
+    color: #ced4da;
+    transition: transform 0.15s ease;
+}
+
+.rating-star.active {
+    color: #f5b301;
+}
+
+.rating-star:hover {
+    transform: scale(1.1);
+    color: #f5b301;
+}
+
+.course-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #fff;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    margin-top: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+.course-suggestion-item {
+    display: block;
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    background: #fff;
+    text-align: left;
+    color: #212529;
+}
+
+.course-suggestion-item:hover {
+    background: #f8f9fa;
+}

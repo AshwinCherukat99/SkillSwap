@@ -1,0 +1,104 @@
+.certificates-page {
+    min-height: 100vh;
+    background-color: #f8f9fa;
+}
+
+/* -----------------------------------------
+   Certificate Card
+----------------------------------------- */
+
+.certificate-card {
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+    overflow: hidden;
+}
+
+.certificate-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* -----------------------------------------
+   Certificate Preview
+----------------------------------------- */
+
+.certificate-preview {
+    min-height: 210px;
+    background: linear-gradient(
+        135deg,
+        #f8f9fa,
+        #ffffff
+    );
+    border-bottom: 1px solid #e9ecef;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 2rem;
+}
+
+.certificate-preview-content {
+    max-width: 85%;
+}
+
+.certificate-preview-content h5 {
+    line-height: 1.4;
+}
+
+/* -----------------------------------------
+   Card Information
+----------------------------------------- */
+
+.certificate-card-info {
+    border-top: 1px solid #e9ecef;
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+}
+
+/* -----------------------------------------
+   Buttons
+----------------------------------------- */
+
+.certificate-card .btn-primary {
+    transition: all 0.2s ease;
+}
+
+.certificate-card .btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+/* -----------------------------------------
+   Category Filter
+----------------------------------------- */
+
+.certificates-page .overflow-auto {
+    scrollbar-width: thin;
+}
+
+.certificates-page .overflow-auto::-webkit-scrollbar {
+    height: 5px;
+}
+
+.certificates-page .overflow-auto::-webkit-scrollbar-thumb {
+    background: #ced4da;
+    border-radius: 10px;
+}
+
+/* -----------------------------------------
+   Responsive
+----------------------------------------- */
+
+@media (max-width: 576px) {
+
+    .certificate-preview {
+        min-height: 180px;
+        padding: 1.5rem;
+    }
+
+    .certificate-preview-content h5 {
+        font-size: 1rem;
+    }
+
+}

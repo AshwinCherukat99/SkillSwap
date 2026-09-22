@@ -1,0 +1,436 @@
+.mentor-profile-page {
+    min-height: 100vh;
+    background: #f7f8fc;
+}
+
+
+/* =========================
+   PROFILE HEADER
+========================= */
+
+.mentor-profile-header {
+    background: white;
+    border-radius: 24px;
+    padding: 40px;
+
+    box-shadow:
+        0 10px 35px
+        rgba(0, 0, 0, 0.05);
+
+    position: relative;
+    overflow: hidden;
+}
+
+
+.mentor-profile-header::before {
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    background:
+        rgba(79, 70, 229, 0.08);
+
+    border-radius: 50%;
+
+    top: -200px;
+    right: -100px;
+}
+
+
+/* =========================
+   PROFILE IMAGE
+========================= */
+
+.profile-image-wrapper {
+    position: relative;
+
+    display: inline-block;
+}
+
+
+.profile-image {
+    width: 130px;
+    height: 130px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+
+    border: 5px solid white;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.12);
+}
+
+
+.top-mentor-badge {
+    position: absolute;
+
+    bottom: -10px;
+    right: -15px;
+
+    background: #22c55e;
+    color: white;
+
+    padding: 6px 10px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+.verified-profile-icon {
+    color: #22c55e;
+
+    font-size: 20px;
+}
+
+
+/* =========================
+   PROFILE DETAILS
+========================= */
+
+.username {
+    color: #6c757d;
+
+    margin-bottom: 8px;
+}
+
+
+.mentor-title {
+    color: #4f46e5;
+
+    font-weight: 600;
+
+    margin-bottom: 12px;
+}
+
+
+.profile-bio {
+    color: #6c757d;
+
+    max-width: 700px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.profile-stat {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.profile-stat i {
+    font-size: 20px;
+
+    color: #4f46e5;
+}
+
+
+.profile-stat:first-child i {
+    color: #f59f00;
+}
+
+
+.profile-stat strong {
+    display: block;
+
+    font-size: 15px;
+}
+
+
+.profile-stat small {
+    color: #6c757d;
+
+    font-size: 11px;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+.profile-action-btn {
+    padding: 12px 25px;
+
+    border-radius: 10px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================
+   CARDS
+========================= */
+
+.profile-card {
+    border-radius: 18px;
+
+    box-shadow:
+        0 8px 30px
+        rgba(0, 0, 0, 0.05);
+}
+
+
+.section-heading {
+    font-weight: 700;
+
+    margin-bottom: 20px;
+}
+
+
+.about-text {
+    color: #6c757d;
+
+    line-height: 1.8;
+}
+
+
+/* =========================
+   SKILLS
+========================= */
+
+.skills-container {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 10px;
+}
+
+
+.profile-skill {
+    background: #eef0ff;
+
+    color: #4f46e5;
+
+    padding: 8px 14px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================
+   SESSION CARD
+========================= */
+
+.session-card {
+    position: sticky;
+
+    top: 25px;
+}
+
+
+.session-info {
+    margin-top: 20px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+.session-info div {
+    color: #6c757d;
+
+    font-size: 14px;
+}
+
+
+.session-info i {
+    width: 25px;
+
+    color: #4f46e5;
+}
+
+
+/* =========================
+   INFO CARD
+========================= */
+
+.info-item {
+    display: flex;
+
+    gap: 14px;
+
+    margin-bottom: 20px;
+}
+
+
+.info-item:last-child {
+    margin-bottom: 0;
+}
+
+
+.info-item i {
+    font-size: 20px;
+
+    color: #4f46e5;
+}
+
+
+.info-item small {
+    display: block;
+
+    color: #6c757d;
+
+    font-size: 11px;
+}
+
+
+.info-item strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+
+/* =========================
+   COURSES
+========================= */
+
+.course-card {
+    border-radius: 16px;
+
+    box-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.05);
+
+    transition: 0.3s;
+}
+
+
+.course-card:hover {
+    transform: translateY(-5px);
+
+    box-shadow:
+        0 15px 35px
+        rgba(79, 70, 229, 0.12);
+}
+
+
+.course-level {
+    background: #eef0ff;
+
+    color: #4f46e5;
+
+    padding: 5px 10px;
+
+    border-radius: 6px;
+
+    font-size: 11px;
+
+    font-weight: 600;
+}
+
+
+.course-meta {
+    display: flex;
+
+    gap: 18px;
+
+    margin-top: 15px;
+
+    color: #6c757d;
+
+    font-size: 13px;
+}
+
+
+.course-meta i {
+    margin-right: 5px;
+
+    color: #4f46e5;
+}
+
+
+.course-meta .bi-star-fill {
+    color: #f59f00;
+}
+
+
+/* =========================
+   REVIEWS
+========================= */
+
+.review-card {
+    border-radius: 14px;
+
+    box-shadow:
+        0 5px 20px
+        rgba(0, 0, 0, 0.04);
+}
+
+
+.review-stars i {
+    color: #f59f00;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 991px) {
+
+    .mentor-profile-header {
+        padding: 30px 20px;
+    }
+
+
+    .session-card {
+        position: static;
+    }
+
+}
+
+
+@media (max-width: 576px) {
+
+    .profile-image {
+        width: 110px;
+        height: 110px;
+    }
+
+
+    .mentor-profile-header {
+        text-align: center;
+    }
+
+
+    .profile-stat {
+        justify-content: center;
+    }
+
+
+    .profile-action-btn {
+        width: 100%;
+    }
+
+} 

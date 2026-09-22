@@ -1,0 +1,293 @@
+.badges-page {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+
+.badges-header {
+    margin-bottom: 35px;
+}
+
+
+.badges-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+
+.badges-header p {
+    color: #6c757d;
+    margin: 0;
+}
+
+
+.badge-stats {
+    margin-bottom: 45px;
+}
+
+
+.badge-stat-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    height: 100%;
+}
+
+
+.badge-stat-icon {
+    font-size: 30px;
+}
+
+
+.badge-stat-card p {
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+
+.badge-stat-card h3 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 700;
+}
+
+
+.badge-section {
+    margin-bottom: 55px;
+}
+
+
+.section-header {
+    margin-bottom: 20px;
+}
+
+
+.section-header h2,
+.journey-section h2 {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+
+.section-header p,
+.journey-section > p {
+    color: #6c757d;
+}
+
+
+.badge-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+
+.badge-filters button {
+    border: 1px solid #dee2e6;
+    background: white;
+    border-radius: 8px;
+    padding: 8px 18px;
+    cursor: pointer;
+}
+
+
+.badge-filters button.active {
+    background: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+
+.badge-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 22px;
+    height: 100%;
+    transition: 0.2s;
+}
+
+
+.badge-card:hover {
+    transform: translateY(-3px);
+}
+
+
+.badge-locked {
+    opacity: 0.65;
+}
+
+
+.badge-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+
+.badge-icon {
+    font-size: 42px;
+}
+
+
+.badge-rarity {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 20px;
+}
+
+
+.badge-rarity.common {
+    background: #e9ecef;
+}
+
+
+.badge-rarity.rare {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+
+.badge-rarity.epic {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+
+.badge-rarity.legendary {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+
+.badge-card h4 {
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+
+.badge-description {
+    color: #6c757d;
+    min-height: 48px;
+}
+
+
+.badge-card-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+
+.earned-status {
+    color: #198754;
+}
+
+
+.locked-status {
+    color: #6c757d;
+}
+
+
+.badge-date {
+    display: block;
+    margin-top: 12px;
+    color: #6c757d;
+}
+
+
+.journey-section {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 16px;
+    padding: 30px;
+    margin-bottom: 40px;
+}
+
+
+.journey-timeline {
+    margin-top: 30px;
+}
+
+
+.journey-item {
+    display: flex;
+    position: relative;
+    gap: 20px;
+    padding-bottom: 30px;
+}
+
+
+.journey-marker {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    z-index: 1;
+}
+
+
+.journey-marker.completed {
+    background: #198754;
+    color: white;
+}
+
+
+.journey-marker.pending {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+
+.journey-content h5 {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+
+.journey-content span {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+
+.journey-line {
+    position: absolute;
+    left: 20px;
+    top: 42px;
+    height: calc(100% - 42px);
+    width: 2px;
+    background: #dee2e6;
+}
+
+
+@media (max-width: 576px) {
+
+    .badges-header h1 {
+        font-size: 26px;
+    }
+
+
+    .badge-filters {
+        flex-wrap: wrap;
+    }
+
+
+    .journey-section {
+        padding: 20px;
+    }
+
+}
