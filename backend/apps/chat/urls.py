@@ -9,12 +9,12 @@ urlpatterns=[
         name='mentor-chat-groups',
     ),
     path(
-        'conversations/<int:conversation_id>/messages/',
+        'mentor/conversations/<int:conversation_id>/messages/',
         ConversationMessagesView.as_view(),
         name='conversation-messages',
     ),
     path(
-        'conversations/<int:conversation_id>/members/',
+        'mentor/conversations/<int:conversation_id>/members/',
         ConversationMembersView.as_view(),
         name='conversation-members',
     ),

@@ -52,39 +52,25 @@ const MentorStudents=()=>{
         fetchCourses()
     },[])
     const filteredStudents=useMemo(()=>{
-        return students.map((student)=>{
-            let enrollment=null
-            if (selectedCourse==='all'){
-                enrollment=student.enrollments?.[0]||null
-            }else{
-                enrollment=student?.enrollments.find((item)=>String(item.course_id)===String(selectedCourse))||null
-            }
-            if (!enrollment){
-                return null
-            }
-            const isCompleted=enrollment.completed_at!==null
-            const status=isCompleted?'completed':'active'
+        return students.filter((student)=>{
             const studentName=student.full_name||''
             const matchesSearch=studentName.toLowerCase().includes(search.trim().toLowerCase())
-            const matchesCourse=selectedCourse==='all'||enrollment!==null
+            const matchesCourse=selectedCourse==='all'||String(courses.id)===String(selectedCourse)
+            const status=student.completed_at!==null?'completed':'active'
             const matchesStatus=selectedStatus==='all'||status===selectedStatus
-            if (!matchesSearch||!matchesCourse||!matchesStatus){
-                return null
-            }
-            return {
-                ...student,
-                selectedEnrollment:enrollment,
-                progress:enrollment.progress??0,
-                course_id:enrollment.course_id,
-                course_title:enrollment.course_title,
-                enrollment_id:enrollment.id,
-                status,
-                completed_at:enrollment.completed_at,
-                enrolled_at:enrollment.enrolled_at,
-            }
-        })
-        .filter(Boolean)
-    },[students,search,selectedCourse,selectedStatus])
+            return (matchesSearch&&matchesCourse&&matchesStatus)
+        }).map((student)=>({
+            ...student,
+            status:student.completed_at!==null?'completed':'active',
+            selectedEnrollment:student,
+            enrollment_id:student.id,
+        }))
+    },[
+        students,
+        search,
+        selectedCourse,
+        selectedStatus,
+    ])
     return (
     <div className="mentor-students-page">
       <div className="container-fluid py-4">

@@ -7,6 +7,7 @@ import FriendStats from '../../../components/user/friends/FriendStats'
 import FriendsToolbar from '../../../components/user/friends/FriendsToolbar'
 import EmptyFriends from '../../../components/user/friends/EmptyFriends'
 import FriendCard from '../../../components/user/friends/FriendCard'
+import FriendRequests from '../../../components/user/friends/FriendRequests'
 
 import './Friends.css'
 
@@ -82,6 +83,9 @@ const Friends=()=>{
             {/* Statistics */}
             <FriendStats stats={stats} />
 
+            <div className="mb-5">
+    <FriendRequests />
+</div>
 
             <div className="row g-4">
 
@@ -96,7 +100,6 @@ const Friends=()=>{
                         sort={sort}
                         setSort={setSort}
                     />
-
 
                     {loading ? (
 

@@ -17,6 +17,7 @@ class Course(models.Model):
     class Status(models.TextChoices):
         DRAFT='DRAFT','Draft'
         PUBLISHED='PUBLISHED','Published'
+        PENDING_REVIEW='PENDING_REVIEW','Pending Review'
         ARCHIVED='ARCHIVED','Archived'
     mentor=models.ForeignKey(
         "mentors.Mentor",

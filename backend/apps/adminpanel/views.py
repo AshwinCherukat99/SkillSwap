@@ -1,18 +1,24 @@
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from django.utils import timezone
 
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from apps.accounts.permissions import IsAdmin
 from apps.accounts.services import generate_tokens
 from apps.mentors.models import Mentor,MentorDocument,MentorVerification
+from apps.courses.models import Course
 
 from .serializers.auth import AdminLoginSerializer
 from .serializers.mentor_verification import (
     RejectMentorSerializer,
     RequestMentorInfoSerializer,
 )
+from .serializers.course import AdminCourseDetailSerializer,AdminCourseListSerializer,AdminCourseModuleSerializer,AdminCourseLessonSerializer,AdminCourseRejectSerializer
 
 from .services import (
     approve_mentor,
@@ -235,6 +241,151 @@ class RejectMentorView(APIView):
             {
                 'message':'mentor rejected',
                 'status':verification.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminCourseManagementView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+    def get(self,request):
+        courses=Course.objects.all().select_related(
+            'mentor',
+            'category'
+        ).prefetch_related(
+            'modules',
+            'enrollments'
+        ).order_by('-updated_at')
+        search=request.query_params.get('search')
+        if search:
+            courses=courses.filter(
+                Q(title__icontains=search)|
+                Q(mentor__username__icontains=search)|
+                Q(mentor__full_name__icontains=search)
+            )
+        course_status=request.query_params.get('status')
+        if course_status:
+            courses=courses.filter(status=course_status)
+        category=request.query_params.get('category')
+        if category:
+            courses=courses.filter(
+                category_id=category
+            )
+        total_courses=courses.count()
+        pending_courses=courses.filter(
+            status=Course.Status.PENDING_REVIEW
+        ).count()
+        published_courses=courses.filter(
+            status=Course.Status.PUBLISHED
+        ).count()
+        draft_courses=courses.filter(
+            status=Course.Status.DRAFT
+        ).count()
+        rejected_courses=courses.filter(
+            status=Course.Status.ARCHIVED
+        )
+        serializer=AdminCourseListSerializer(
+            courses,
+            many=True,
+        )
+        return Response(
+            {
+                'stats':{
+                    'total_courses':total_courses,
+                    'pending_review':pending_courses,
+                    'published':published_courses,
+                    'drafts':draft_courses,
+                    'rejected':rejected_courses,
+                },
+                'courses':serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminCourseDetailView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+    def get(self,request,course_id):
+        course=get_object_or_404(
+            Course.objects.select_related(
+                'mentor',
+                'category',
+            ).prefetch_related('modules__lessons'),
+            id=course_id,
+        )
+        serializer=AdminCourseDetailSerializer(
+            course
+        )
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+class AdminCourseApproveView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+    def post(self,request,course_id):
+        course=get_object_or_404(
+            Course,
+            id=course_id,
+        )
+        if course.status!=Course.Status.PENDING_REVIEW:
+            return Response({
+                'error':'only courses pending review can be approved'
+            },status=status.HTTP_400_BAD_REQUEST,)
+        course.status=Course.Status.PUBLISHED
+        course.is_active=True
+        course.published_at=timezone.now()
+        course.save(
+            update_fields=[
+                'status',
+                'is_active',
+                'published_at',
+                'updated_at',
+            ]
+        )
+        return Response(
+            {
+                'message':'course approved and published successfully',
+                'course_id':course.id,
+                'status':course.status,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminCourseRejectView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[JWTAuthentication]
+    def post(self,request,course_id):
+        course=get_object_or_404(
+            Course,
+            id=course_id,
+        )
+        serializer=AdminCourseRejectSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if course.status!=Course.Status.PENDING_REVIEW:
+            return Response(
+                {
+                    'error':'only courses pending review can be rejected'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        reason=serializer.validated_data['reason']
+        course.status=Course.Status.REJECTED
+        course.rejection_reason=reason
+        course.save(
+            update_fields=[
+                'status',
+                'rejection_reason',
+                'updated_at',
+            ]
+        )
+        return Response(
+            {
+                'message':'course rejected successfully',
+                'course_id':course.id,
+                'status':course.status,
+                'reason':reason,
             },
             status=status.HTTP_200_OK,
         )

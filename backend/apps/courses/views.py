@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from .models import Course,CourseEnrollment,Assessment,CourseCategory,CourseModule,CourseLesson
 from .serializers.course import CourseListSerializer
-from .serializers.mentor_course import MentorCourseSerializer,MentorCourseCreateSerializer,MentorCourseDetailSerializer
+from .serializers.mentor_course import MentorCourseSerializer,MentorCourseCreateSerializer,MentorCourseDetailSerializer,MentorCourseUpdateSerializer
 from apps.mentors.authentication import MentorJWTAuthentication
 from apps.chat.models import Conversation,ConversationMember
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -83,15 +83,16 @@ class StartAssessmentView(APIView):
             attempt_number=last_attempt.attempt_number+1
         else:
             attempt_number=1
-        assessment=Assessment.objects.create(
-            enrollment=enrollment,
-            course=course,
-            attempt_number=attempt_number,
-            total_questions=0,
-            status=Assessment.Status.IN_PROGRESS,
-        )
         try:
-            generate_assessment_questions(assessment)
+            with transaction.atomic():
+                assessment=Assessment.objects.create(
+                            enrollment=enrollment,
+                            course=course,
+                            attempt_number=attempt_number,
+                            total_questions=0,
+                            status=Assessment.Status.IN_PROGRESS,
+                        )
+                generate_assessment_questions(assessment)
         except Exception as exc:
             return Response(
                 {
@@ -187,11 +188,11 @@ class MentorCourseManagementView(APIView):
                         content=lesson_data.get('content','').strip(),
                         order=lesson_index,
                     )
-                        conversation=Conversation.objects.create(
+                conversation=Conversation.objects.create(
                             conversation_type=Conversation.ConversationType.GROUP,
                             course=course,
                         )
-                        ConversationMember.objects.create(
+                ConversationMember.objects.create(
                             conversation=conversation,
                             mentor=request.user,
                         )
@@ -422,3 +423,80 @@ class CourseEnrollView(APIView):
             },
             status=status.HTTP_201_CREATED,
         )
+
+class MentorCourseUpdateView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def patch(self,request,course_id):
+        mentor=request.user
+        course=get_object_or_404(
+            Course,
+            id=course_id,
+            mentor=mentor,
+        )
+        if course.status not in [Course.Status.DRAFT,Course.Status.PUBLISHED]:
+            return Response({
+                'error':'this course cannot be edited while it is under review or archived'
+            },status=status.HTTP_400_BAD_REQUEST,)
+        data=request.data.copy()
+        modules_data=data.get('modules')
+        if modules_data is not None:
+            if isinstance(modules_data,str):
+                try:
+                    modules_data=json.loads(modules_data)
+                except json.JSONDecodeError:
+                    return Response({
+                        'error':'invalid modules data'
+                    },status=status.HTTP_400_BAD_REQUEST)
+            data['modules']=modules_data
+        serializer=MentorCourseUpdateSerializer(
+            course,
+            data=data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        try:
+            with transaction.atomic():
+                old_status=course.status
+                course=serializer.save()
+                if modules_data is not None:
+                    CourseModule.objects.filter(course=course).delete()
+                    for module_index,module_data in enumerate(modules_data,start=1):
+                        module=CourseModule.objects.create(
+                            course=course,
+                            title=module_data.get('title','').strip(),
+                            description=module_data.get('description','').strip(),
+                            order=module_index,
+                        )
+                        lessons_data=module_data.get('lessons',[])
+                        for lesson_index,lesson_data in enumerate(lessons_data,start=1):
+                            CourseLesson.objects.create(
+                                module=module,
+                                title=lesson_data.get('title','').strip(),
+                                content=lesson_data.get('content','').strip(),
+                                order=lesson_index,
+                            )
+                if old_status==Course.Status.PUBLISHED:
+                    course.status=Course.Status.PENDING_REVIEW
+                    course.published_at=None
+                    course.save(
+                        update_fields=[
+                            'status',
+                            'published_at',
+                            'updated_at',
+                        ]
+                    )
+            return Response(
+                MentorCourseDetailSerializer(
+                    course,
+                    context={'request':request}
+                ).data,
+                status=status.HTTP_200_OK,
+            )
+        except Exception as exc:
+            return Response(
+                {
+                    'error':str(exc)
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )

@@ -10,7 +10,7 @@ function Register() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] =
         useState(false);
-
+    const [fieldErrors,setFieldErrors]=useState({})
     const [fullName, setFullName] = useState("");
 const [username, setUsername] = useState("");
 const [email, setEmail] = useState("");

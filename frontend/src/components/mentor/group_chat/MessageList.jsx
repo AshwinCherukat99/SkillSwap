@@ -1,7 +1,7 @@
 import React,{useEffect,useRef} from 'react'
 import MessageBubble from './MessageBubble'
 
-const MessageList=({messages,currentUserId,loading})=>{
+const MessageList=({messages,currentUserId,currentUserType,loading})=>{
     const messagesEndRef=useRef(null)
     useEffect(()=>{
         messagesEndRef.current?.scrollIntoView({
@@ -30,6 +30,7 @@ const MessageList=({messages,currentUserId,loading})=>{
             key={message.id}
             message={message}
             currentUserId={currentUserId}
+            currentUserType={currentUserType}
           />
         ))
       )}

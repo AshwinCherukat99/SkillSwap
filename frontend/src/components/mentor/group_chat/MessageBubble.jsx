@@ -1,8 +1,8 @@
 import React from 'react'
 
-const MessageBubble=({message,currentUserId})=>{
+const MessageBubble=({message,currentUserId,currentUserType})=>{
     const senderId=message.sender?.id 
-    const isMine=Number(senderId)===Number(currentUserId) && message.sender?.type==='USER'
+    const isMine=Number(senderId)===Number(currentUserId) && message.sender?.type===currentUserType
     const isMentor=message.sender?.type==='MENTOR'
     return (
         <div

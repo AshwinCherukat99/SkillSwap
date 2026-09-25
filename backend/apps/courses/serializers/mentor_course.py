@@ -125,3 +125,47 @@ class MentorCourseDetailSerializer(serializers.ModelSerializer):
         return request.build_absolute_uri(
             obj.thumbnail.url
         )
+
+class MentorCourseUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Course
+        fields=[
+            'title',
+            'slug',
+            'description',
+            'thumbnail',
+            'category',
+            'level',
+            'price',
+            'estimated_duration',
+        ]
+    def validate_price(self,value):
+        if value<0:
+            raise serializers.ValidationError('price cannot be negative')
+        return value
+    def validate_estimated_duration(self,value):
+        if value<=0:
+            raise serializers.ValidationError('estimated duration must be greater than 0')
+        return value
+    def validate_modules(self,value):
+        if not isinstance(value,list):
+            raise serializers.ValidationError('modules must be a list')
+        for module in value:
+            if not isinstance(module,dict):
+                raise serializers.ValidationError('module must be an object')
+            title=module.get('title','').strip()
+            if not title:
+                raise serializers.ValidationError('every module must have a title')
+            lessons=module.get('lessons',[])
+            if not isinstance(lessons,list):
+                raise serializers.ValidationError('lessons must be a list')
+            for lesson in lessons:
+                if not isinstance(lesson,dict):
+                    raise serializers.ValidationError('each lesson must be an object')
+                lesson_title=lesson.get('title','').strip()
+                lesson_content=lesson.get('content','').strip()
+                if not lesson_title:
+                    raise serializers.ValidationError('every lesson must have a title')
+                if not lesson_content:
+                    raise serializers.ValidationError('every lesson must have content')
+    

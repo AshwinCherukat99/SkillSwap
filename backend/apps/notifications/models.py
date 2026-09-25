@@ -133,3 +133,100 @@ class Notification(models.Model):
             f'{self.recipient.username}-'
             f'{self.title}'
         )
+
+class AdminNotification(models.Model):
+    class Audience(models.TextChoices):
+        ALL=(
+            'ALL',
+            'All Users'
+        )
+        USER=(
+            'USERS',
+            'Users Only'
+        )
+        MENTOR=(
+            'MENTOR',
+            'Mentors Only'
+        )
+        INDIVIDUAL=(
+            'INDIVIDUAL',
+            'Individual User'
+        )
+    class Priority(models.TextChoices):
+        NORMAL=(
+            'NORMAL',
+            'Normal'
+        )
+        HIGH=(
+            'HIGH',
+            'High'
+        )
+        URGENT=(
+            'URGENT',
+            'Urgent'
+        )
+    class Status(models.TextChoices):
+        SENT=(
+            'SENT',
+            'Sent'
+        )
+        SCHEDULED=(
+            'SCEHDULED',
+            'Scheduled'
+        )
+        CANCELLED=(
+            'CANCELLED',
+            'Cancelled'
+        )
+    title=models.CharField(
+        max_length=255
+    )
+    message=models.TextField()
+    audience=models.CharField(
+        max_length=20,
+        choices=Audience.choices,
+    )
+    recipient=models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='admin_direct_notifications'
+    )
+    priotity=models.CharField(
+        max_length=20,
+        choices=Priority.choices,
+        default=Priority.NORMAL
+    )
+    in_app=models.BooleanField(
+        default=True
+    )
+    push=models.BooleanField(
+        default=False
+    )
+    email=models.BooleanField(
+        default=False
+    )
+    scheduled_at=models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+    status=models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.SENT,
+    )
+    sent_at=models.DateTimeField(
+        blank=True,
+        null=True,
+    )
+    created_at=models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at=models.DateTimeField(
+        auto_now=True
+    )
+    class Meta:
+        ordering=['-created_at']
+    def __str__(self):
+        return self.title

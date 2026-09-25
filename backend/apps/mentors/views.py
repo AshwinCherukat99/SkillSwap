@@ -860,12 +860,14 @@ class MentorStudentsView(APIView):
             course__mentor=mentor,
             course__is_active=True,
         ).select_related('user','course').order_by('-enrolled_at'))
+        total_students=(enrollments.values('user_id').distinct().count())
+        completed_students=(enrollments.filter(completed_at__isnull=False).values('user_id').distinct().count())
         search=request.query_params.get('search','').strip()
         if search:
             enrollments=enrollments.filter(
                 Q(user__username__icontains=search)|
                 Q(user__full_name__icontains=search)|
-                Q(user__first_name__icontains=search)|
+                Q(user__last_name__icontains=search)|
                 Q(user__first_name__icontains=search)
             )
         course_id=request.query_params.get('course')
@@ -876,11 +878,11 @@ class MentorStudentsView(APIView):
         student_status=request.query_params.get('status')
         if student_status=='active':
             enrollments=enrollments.filter(
-                completed_at__is_null=True
+                completed_at__isnull=True
             )
         elif student_status=='completed':
             enrollments=enrollments.filter(
-                completed_at__is_null=False
+                completed_at__isnull=False
             )  
         serializer=MentorStudentSerializer(
             enrollments,
@@ -889,13 +891,17 @@ class MentorStudentsView(APIView):
                 'request':request
             }
         )
-        total_students=(enrollments.values('user_id').distict().count())
-        completed_students=(enrollments.filter(completed_at__is_null=False).values('user_id').distinct().count())
         return Response(
             {
                 'students':serializer.data,
-                'total_students':total_students,
-                'completed_students':completed_students,
+                'stats':{
+                    'total_students':total_students,
+                    'completed_students':completed_students,
+                    'active_now': 0,
+        'sessions_this_week': 0,
+        'average_rating': None,
+        'success_rate': None,
+                }
             },
             status=status.HTTP_200_OK,
         )

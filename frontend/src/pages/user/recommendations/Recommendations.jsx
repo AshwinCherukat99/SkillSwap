@@ -134,6 +134,59 @@ function Recommendations(){
     const handleViewProfile=(user)=>{
         navigate(`/profile/${user.id}/`)
     }
+const handleAddFriend = async (user) => {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/api/auth/friends/add/`,
+            {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify({
+                    receiver_id: user.id,
+                }),
+            }
+        )
+
+        const data = await response.json()
+
+        if (!response.ok) {
+            throw new Error(
+                data.detail ||
+                data.error ||
+                data.message ||
+                'Unable to send friend request'
+            )
+        }
+
+        // Update the specific recommendation so the button changes
+        setRecommendations((previous) =>
+            previous.map((recommendation) => {
+                const recommendedUser = getUser(recommendation)
+
+                if (recommendedUser.id === user.id) {
+                    return {
+                        ...recommendation,
+                        friendship_status: 'PENDING',
+                    }
+                }
+
+                return recommendation
+            })
+        )
+
+    } catch (error) {
+        console.error(
+            'failed to send friend request:',
+            error
+        )
+
+        setError(
+            error.message ||
+            'Unable to send friend request'
+        )
+    }
+}
+
     return (
             <div className="recommendations-page">
 
@@ -419,6 +472,7 @@ function Recommendations(){
                                     recommendation
                                 );
 
+                            const friendshipStatus=recommendation.friendship_status
 
                             const matchPercentage =
                                 getMatchPercentage(
@@ -716,89 +770,102 @@ function Recommendations(){
 
                                         {/* ACTION BUTTONS */}
 
-                                        <div
-                                            className="recommendation-actions"
-                                        >
+{/* ACTION BUTTONS */}
 
-                                            <button
+<div className="recommendation-actions">
 
-                                                className="btn btn-primary request-session-btn"
+    {/* Request Session + Add Friend */}
 
-                                                onClick={
-                                                    () =>
+    <div className="row g-2 mb-2">
 
-                                                        handleRequestSession(
-                                                            user
-                                                        )
-                                                }
+        <div className="col-6">
 
-                                            >
+            <button
+                type="button"
+                className="btn btn-primary w-100 request-session-btn"
+                onClick={() =>
+                    handleRequestSession(user)
+                }
+            >
+                <i className="bi bi-calendar-plus me-1"></i>
+                Request Session
+            </button>
 
-                                                Request Session
+        </div>
 
-                                            </button>
+        <div className="col-6">
+
+            <button
+    type="button"
+    className={`btn w-100 ${
+        friendshipStatus === 'PENDING'
+            ? 'btn-secondary'
+            : 'btn-outline-primary'
+    }`}
+    disabled={
+        friendshipStatus === 'PENDING' ||
+        friendshipStatus === 'ACCEPTED'
+    }
+    onClick={() => handleAddFriend(user)}
+>
+    <i
+        className={`bi ${
+            friendshipStatus === 'PENDING'
+                ? 'bi-clock'
+                : 'bi-person-plus'
+        } me-1`}
+    ></i>
+
+    {friendshipStatus === 'PENDING'
+        ? 'Request Sent'
+        : friendshipStatus === 'ACCEPTED'
+        ? 'Friends'
+        : 'Add Friend'}
+</button>
+
+        </div>
+
+    </div>
 
 
-                                            <div
-                                                className="row g-2"
-                                            >
+    {/* Message + View Profile */}
 
-                                                <div
-                                                    className="col-6"
-                                                >
+    <div className="row g-2">
 
-                                                    <button
+        <div className="col-6">
 
-                                                        className="btn btn-outline-secondary w-100"
+            <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={() =>
+                    handleMessage(user)
+                }
+            >
+                <i className="bi bi-chat-dots me-2"></i>
+                Message
+            </button>
 
-                                                        onClick={
-                                                            () =>
+        </div>
 
-                                                                handleMessage(
-                                                                    user
-                                                                )
-                                                        }
+        <div className="col-6">
 
-                                                    >
+            <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={() =>
+                    handleViewProfile(user)
+                }
+            >
+                View Profile
+            </button>
 
-                                                        <i
-                                                            className="bi bi-chat-dots me-2"
-                                                        />
+        </div>
 
-                                                        Message
+    </div>
 
-                                                    </button>
-
-                                                </div>
+</div>
 
 
-                                                <div
-                                                    className="col-6"
-                                                >
-
-                                                    <button
-
-                                                        className="btn btn-outline-secondary w-100"
-
-                                                        onClick={
-                                                            () =>
-
-                                                                handleViewProfile(
-                                                                    user
-                                                                )
-                                                        }
-
-                                                    >
-
-                                                        View Profile
-
-                                                    </button>
-
-                                                </div>
-
-                                            </div>
-
-                                        </div>
 
                                     </div>
 

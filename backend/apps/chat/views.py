@@ -122,9 +122,9 @@ class UserConversationMessagesView(APIView):
             conversation=conversation,
             is_deleted=False,
         ).select_related(
-            'sender__user',
-            'sender__mentor',
-        ).order_by('created')
+            'sender_user',
+            'sender_mentor',
+        ).order_by('created_at')
         serializer=ChatMessageSerializer(
             messages,
             many=True,

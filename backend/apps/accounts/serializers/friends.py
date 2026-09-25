@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from ..models import User
+from ..models import User,Friendship
 from apps.skills.models import UserSkill
+from django.db.models import Q
+from django.utils import timezone
 
 class FriendSerializer(serializers.ModelSerializer):
     name=serializers.SerializerMethodField()
@@ -47,7 +49,7 @@ class FriendSerializer(serializers.ModelSerializer):
         if not request:
             return None
         friendship=obj.sent_friend_requests.filter(
-            reciever=request.user,
+            receiver=request.user,
             status='ACCEPTED',
         ).first()
         if not friendship:
@@ -58,3 +60,72 @@ class FriendSerializer(serializers.ModelSerializer):
         if friendship:
             return friendship.accepted_at
         return None
+
+class AddFriendSerializer(serializers.ModelSerializer):
+    receiver_id=serializers.IntegerField(
+        write_only=True
+    )
+    class Meta:
+        model=Friendship
+        fields=['receiver_id']
+    def validate_receiver_id(self,value):
+        request=self.context['request']
+        sender=request.user
+        if sender.id==value:
+            raise serializers.ValidationError('you cannot send a friend request to yourself')
+        try:
+            receiver=User.objects.get(id=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('user not found')
+        existing_friendship=Friendship.objects.filter(
+            Q(sender=sender,receiver=receiver)|
+            Q(sender=receiver,receiver=sender)
+        ).first()
+        if existing_friendship:
+            if existing_friendship.status==Friendship.Status.ACCEPTED:
+                raise serializers.ValidationError('you are already friends with this user')
+            if existing_friendship.status==Friendship.Status.PENDING:
+                if existing_friendship.sender==sender:
+                    raise serializers.ValidationError('friend request already sent')
+            else:
+                raise serializers.ValidationError('this user has already sent you a friend request')
+            if existing_friendship.status==Friendship.Status.REJECTED:
+                return value
+        return value
+    def create(self,validated_data):
+        sender=self.context['request'].user
+        receiver=User.objects.get(
+            id=validated_data['receiver_id']
+        )
+        friendship=Friendship.objects.filter(
+            sender=sender,
+            receiver=receiver
+        ).first()
+        if friendship:
+            friendship.status=Friendship.Status.PENDING
+            friendship.accepted_at=None
+            friendship.created_at=timezone.now()
+            friendship.save(
+                update_fields=[
+                    'status',
+                    'accepted_at',
+                    'created_at',
+                ]
+            )
+            return friendship
+        return Friendship.objects.create(
+            sender=sender,
+            receiver=receiver,
+            status=Friendship.Status.PENDING,
+        )
+
+class FriendRequestSerializer(serializers.ModelSerializer):
+    sender=FriendSerializer(read_only=True)
+    class Meta:
+        model=Friendship
+        fields=[
+            'id',
+            'sender',
+            'status',
+            'created_at'
+        ]

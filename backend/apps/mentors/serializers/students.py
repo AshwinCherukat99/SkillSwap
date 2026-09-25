@@ -24,6 +24,7 @@ class MentorStudentSerializer(serializers.ModelSerializer):
     class Meta:
         model=CourseEnrollment
         fields=[
+            'id',
             'student_id',
             'full_name',
             'username',

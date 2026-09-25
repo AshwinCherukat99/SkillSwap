@@ -7,6 +7,7 @@ const ChatWindow=({
     group,
     messages,
     currentUserId,
+    currentUserType,
     loadingMessages,
     onSend,
     connected
@@ -40,6 +41,7 @@ const ChatWindow=({
         <MessageList
           messages={messages}
           currentUserId={currentUserId}
+          currentUserType={currentUserType}
           loading={loadingMessages}
         />
 

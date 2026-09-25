@@ -54,6 +54,9 @@ import DocumentVerification from './pages/admin/document_verification/DocumentVe
 import MentorSessionHistory from './pages/mentor/session_history/MentorSessionHistory'
 import Chat from './pages/user/chat/Chat'
 import VerificationList from './pages/admin/verification_list/VerificationList'
+import NotificationManagement from './pages/admin/notif_mgmt/NotificationManagement'
+import EditCourse from './pages/mentor/edit_course/EditCourse'
+import AdminCourseManagement from './pages/admin/course_mgmt/AdminCourseManagement'
 
 function App(){
   return (
@@ -266,6 +269,11 @@ function App(){
             <MentorSessionHistory/>
           </MentorProtectedRoute>
         }/>
+        <Route path='/mentor/courses/:courseId/edit' element={
+          <MentorProtectedRoute>
+            <EditCourse/>
+          </MentorProtectedRoute>
+        }/>
         <Route path='/admin/login/' element={
           <AdminLogin/>
         }/>
@@ -282,6 +290,16 @@ function App(){
         <Route path='/admin/verification-list' element={
           <AdminProtectedRoute>
             <VerificationList/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/notification-management' element={
+          <AdminProtectedRoute>
+            <NotificationManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/course-management' element={
+          <AdminProtectedRoute>
+            <AdminCourseManagement/>
           </AdminProtectedRoute>
         }/>
       </Routes>

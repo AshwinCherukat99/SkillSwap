@@ -18,7 +18,7 @@ from .views.profile import UserProfileView,ProfileImageView,PublicProfileView
 from .views.recommendation import RecommendedUsersView
 from .views.leaderboard import LeaderBoardView,MyLeaderBoardRankView
 from .views.mentors import MentorListView
-from .views.friends import FriendsListView
+from .views.friends import FriendsListView,AddFriendView,AcceptFriendRequestView,RejectFriendRequestView,FriendRequestListView
 from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns=[
     path(
@@ -130,5 +130,25 @@ urlpatterns=[
         'friends/',
         FriendsListView.as_view(),
         name='friend-list',
-    )
+    ),
+    path(
+        'friends/add/',
+        AddFriendView.as_view(),
+        name='add-friend',
+    ),
+    path(
+        'friends/requests/<int:request_id>/accept/',
+        AcceptFriendRequestView.as_view(),
+        name='accept-friend-request',
+    ),
+    path(
+        'friends/requests/<int:request_id>/reject/',
+        RejectFriendRequestView.as_view(),
+        name='reject-friend-request',
+    ),
+    path(
+        'friends/requests/',
+        FriendRequestListView.as_view(),
+        name='friend-request-list',
+    ),
 ]

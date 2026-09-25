@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useRef, use} from "react";
+import React,{useEffect,useState,useRef} from "react";
 
 import api from "../../../services/api";
 
@@ -42,8 +42,12 @@ const Chat=()=>{
     }
     useEffect(()=>{
         if (!selectedGroup){
+            setMessages([])
+            setMembers([])
             return
         }
+        setMessages([])
+        setMembers([])
         loadGroupData(
             selectedGroup.id
         )
@@ -77,7 +81,7 @@ const Chat=()=>{
             return
         }
         const wsProtocol=window.location.protocol==='https:'?'wss':'ws'
-        const wsHost=window.location.hostname==='localhost'?'localhost:8000':'127.0.0.1:8000'
+        const wsHost='127.0.0.1:8000'
         const wsUrl=`${wsProtocol}://${wsHost}` +
             `/ws/chat/${conversationId}/` +
             `?token=${encodeURIComponent(

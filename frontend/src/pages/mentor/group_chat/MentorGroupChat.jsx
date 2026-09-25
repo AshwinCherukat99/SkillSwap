@@ -52,10 +52,10 @@ const MentorGroupChat=()=>{
             setLoadingMessages(true)
             const [messagesResponse,membersResponse]=await Promise.all([
                 mentorApi.get(
-                    `/chat/conversations/${conversationId}/messages/`
+                    `/chat/mentor/conversations/${conversationId}/messages/`
                 ),
                 mentorApi.get(
-                    `/chat/conversations/${conversationId}/members/`
+                    `/chat/mentor/conversations/${conversationId}/members/`
                 )
             ])
             setMessages(messagesResponse.data)
@@ -180,6 +180,7 @@ const MentorGroupChat=()=>{
               group={selectedGroup}
               messages={messages}
               currentUserId={currentUserId}
+              currentUserType='MENTOR'
               loadingMessages={loadingMessages}
               onSend={sendMessage}
               connected={connected}

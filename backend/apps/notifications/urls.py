@@ -5,7 +5,11 @@ from .views import (
     MarkNotificationReadView,
     MarkAllNotificationsReadView,
     UnreadNotificationCountView,
-    ClearReadNotificationsView
+    ClearReadNotificationsView,
+    AdminNotificationListCreateView,
+    AdminNotificationDetailView,
+    CancelAdminNotificationView,
+    AdminNotificationUserSearchView,
 )
 
 urlpatterns=[
@@ -33,5 +37,25 @@ urlpatterns=[
         '<int:notification_id>/read',
         MarkNotificationReadView.as_view(),
         name='mark-notification-read',
+    ),
+    path(
+        'admin/',
+        AdminNotificationListCreateView.as_view(),
+        name='admin-notification-list-create',
+    ),
+    path(
+        'admin/<int:notification_id>/',
+        AdminNotificationDetailView.as_view(),
+        name='admin-notification-detail',
+    ),
+    path(
+        'admin/<int:notification_id>/cancel/',
+        CancelAdminNotificationView.as_view(),
+        name='admin-notification-cancel',
+    ),
+    path(
+        'admin/users/search/',
+        AdminNotificationUserSearchView.as_view(),
+        name='admin-notification-user-search',
     ),
 ]
