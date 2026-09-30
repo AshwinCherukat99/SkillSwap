@@ -36,6 +36,7 @@ import Badges from './pages/user/badges/Badges'
 import LeaderBoard from './pages/user/leaderboard/LeaderBoard'
 import MentorEditProfile from './pages/mentor/edit_profile/MentorEditProfile'
 import MainLayout from './layouts/MainLayout'
+import MentorLayout from './layouts/MentorLayout'
 import MentorGroupChat from './pages/mentor/group_chat/MentorGroupChat'
 import MentorCourseManagement from './pages/mentor/course_mgmt/MentorCourseManagement'
 import MentorStudents from './pages/mentor/student_mgmt/MentorStudents'  
@@ -57,6 +58,10 @@ import VerificationList from './pages/admin/verification_list/VerificationList'
 import NotificationManagement from './pages/admin/notif_mgmt/NotificationManagement'
 import EditCourse from './pages/mentor/edit_course/EditCourse'
 import AdminCourseManagement from './pages/admin/course_mgmt/AdminCourseManagement'
+import AdminUserManagement from './pages/admin/user_mgmt/AdminUserManagement'
+import AdminReviewManagement from './pages/admin/review_mgmt/AdminReviewManagement'
+import LessonPage from './pages/user/lesson_page/LessonPage'
+import AIAssessment from './pages/user/ai_assessment/AIAssessment'
 
 function App(){
   return (
@@ -196,6 +201,16 @@ function App(){
             <Chat/>
           </ProtectedRoute>
         }/>
+        <Route path='/courses/:courseId/lessons/:lessonId' element={
+          <ProtectedRoute>
+            <LessonPage/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/courses/:courseId/assessment' element={
+          <ProtectedRoute>
+            <AIAssessment/>
+          </ProtectedRoute>
+        }/>
         </Route>
         <Route path='/mentor/login/' element={
           <MentorPublicRoute>
@@ -214,6 +229,7 @@ function App(){
         <Route path='/mentor/reset-password/' element={
           <MentorResetPassword/>
         }/>
+        <Route element={<MentorLayout/>}>
         <Route path='/mentor/dashboard/' element={
           <MentorProtectedRoute>
             <MentorDashboard/>
@@ -274,6 +290,7 @@ function App(){
             <EditCourse/>
           </MentorProtectedRoute>
         }/>
+        </Route>
         <Route path='/admin/login/' element={
           <AdminLogin/>
         }/>
@@ -300,6 +317,16 @@ function App(){
         <Route path='/admin/course-management' element={
           <AdminProtectedRoute>
             <AdminCourseManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/user-management' element={
+          <AdminProtectedRoute>
+            <AdminUserManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/review-management' element={
+          <AdminProtectedRoute>
+            <AdminReviewManagement/>
           </AdminProtectedRoute>
         }/>
       </Routes>

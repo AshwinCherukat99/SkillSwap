@@ -29,7 +29,7 @@ function ScheduleNotificationList({notifications,onEdit,onDelete,onCancel}){
         if (Number.isNaN(date.getTime())){
             return '-'
         }
-        return date.toLocaleDateString(
+        return date.toLocaleString(
             undefined,
             {
                 dateStyle:'medium',

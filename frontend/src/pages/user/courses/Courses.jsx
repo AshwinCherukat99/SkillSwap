@@ -102,7 +102,7 @@ function Courses(){
 
                         <BestSellingCourses
                             courses={bestSellingCourses}
-                            onViewCourse={handleViewCourse}
+                            onViewCourses={handleViewCourse}
                         />
                     </>
                 )}

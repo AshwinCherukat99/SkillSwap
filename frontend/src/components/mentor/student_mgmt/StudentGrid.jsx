@@ -64,7 +64,7 @@ const StudentGrid=({students,loading,onScheduleSession,onMessage})=>{
 
             {students.map((student) => (
                 <StudentCard
-                    key={student.id}
+                    key={student.student_id}
                     student={student}
                     onScheduleSession={onScheduleSession}
                     onMessage={onMessage}

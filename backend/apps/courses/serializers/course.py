@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import Course
+from ..models import Course,CourseLesson
 
 class CourseListSerializer(serializers.ModelSerializer):
     category_name=serializers.CharField(
@@ -54,3 +54,19 @@ class CourseListSerializer(serializers.ModelSerializer):
         if enrollment:
             return enrollment.progress
         return None
+
+class UserLessonSerializer(serializers.ModelSerializer):
+    module_title=serializers.CharField(
+        source='module.title',
+        read_only=True
+    )
+    class Meta:
+        model=CourseLesson
+        fields=[
+            'id',
+            'module',
+            'module_title',
+            'title',
+            'content',
+            'order',
+        ]

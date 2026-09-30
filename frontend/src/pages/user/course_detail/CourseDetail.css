@@ -1,3 +1,18 @@
+.course-lesson-clickable {
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.course-lesson-clickable:hover {
+    background-color: #f1f5f9;
+}
+
+.course-lesson-clickable:hover .course-lesson-icon {
+    color: var(--bs-primary);
+}
+
 .course-detail-page {
     min-height: 100vh;
     background: #f8f9fa;

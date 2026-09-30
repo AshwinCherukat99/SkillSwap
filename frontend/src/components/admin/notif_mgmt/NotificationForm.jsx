@@ -169,10 +169,10 @@ function NotificationForm({editingNotification,quickAction,onSaved,onDiscard,sho
                 showAlert('please select a valid schedule time','danger')
                 return
             }
-        }
-        if (selecteDate<=new Date()){
+            if (selectedDate<=new Date()){
             showAlert('scheduled time must be in the future','danger')
             return
+        }
         }
         const payload={
             title:title.trim(),

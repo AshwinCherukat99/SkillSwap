@@ -12,7 +12,8 @@ class RecommendedUsersView(APIView):
         recommendations=get_recommended_users(request.user)
         serializer=RecommendedUserSerializer(
             recommendations,
-            many=True
+            many=True,
+            context={'request':request},
         )
         return Response(
             serializer.data,

@@ -193,7 +193,7 @@ class AdminNotification(models.Model):
         blank=True,
         related_name='admin_direct_notifications'
     )
-    priotity=models.CharField(
+    priority=models.CharField(
         max_length=20,
         choices=Priority.choices,
         default=Priority.NORMAL

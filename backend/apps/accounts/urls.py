@@ -18,6 +18,7 @@ from .views.profile import UserProfileView,ProfileImageView,PublicProfileView
 from .views.recommendation import RecommendedUsersView
 from .views.leaderboard import LeaderBoardView,MyLeaderBoardRankView
 from .views.mentors import MentorListView
+from .views.skills import SuggestSkillView
 from .views.friends import FriendsListView,AddFriendView,AcceptFriendRequestView,RejectFriendRequestView,FriendRequestListView
 from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns=[
@@ -150,5 +151,10 @@ urlpatterns=[
         'friends/requests/',
         FriendRequestListView.as_view(),
         name='friend-request-list',
+    ),
+    path(
+        'skills/suggest/',
+        SuggestSkillView.as_view(),
+        name='suggest-skill'
     ),
 ]

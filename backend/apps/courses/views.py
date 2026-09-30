@@ -1,8 +1,8 @@
 from django.shortcuts import render,get_object_or_404
 from django.utils import timezone
 from rest_framework.views import APIView
-from .models import Course,CourseEnrollment,Assessment,CourseCategory,CourseModule,CourseLesson
-from .serializers.course import CourseListSerializer
+from .models import Course,CourseEnrollment,Assessment,CourseCategory,CourseModule,CourseLesson,AssessmentQuestion,AssessmentAnswer,AssessmentResult,LessonProgress
+from .serializers.course import CourseListSerializer,UserLessonSerializer
 from .serializers.mentor_course import MentorCourseSerializer,MentorCourseCreateSerializer,MentorCourseDetailSerializer,MentorCourseUpdateSerializer
 from apps.mentors.authentication import MentorJWTAuthentication
 from apps.chat.models import Conversation,ConversationMember
@@ -10,11 +10,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count
-from .services.assessment_service import generate_assessment_questions 
+from .services.assessment_service import generate_assessment_questions,evaluate_objective_answer,evaluate_subjective_answer 
 import json
 from django.db import transaction
 
-from .serializers.assessment import AssessmentSerializer
+from .serializers.assessment import AssessmentSerializer,AssessmentAnswerSerializer,AssessmentResultSerializer
 from .serializers.mentor_student import MentorStudentSerializer
 
 class CourseListView(APIView):
@@ -105,6 +105,192 @@ class StartAssessmentView(APIView):
             serializer.data,
             status=status.HTTP_201_CREATED,
         )  
+
+class SaveAssessmentAnswerView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request,assessment_id,question_id):
+        assessment=get_object_or_404(
+            Assessment,
+            id=assessment_id,
+            enrollment__user=request.user
+        )
+        if assessment.status!=Assessment.Status.IN_PROGRESS:
+            return Response(
+                {
+                    'error':'this assessment is no longer in progress'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        question=get_object_or_404(
+            AssessmentQuestion,
+            id=question_id,
+            assessment=assessment,
+        )
+        answer=request.data.get('answer')
+        if answer is None:
+            return Response(
+                {
+                    'error':'answer is required'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(answer,str):
+            answer=str(answer)
+        answer=answer.strip()
+        if not answer:
+            return Response(
+                {
+                    'error':'answer cannot be empty'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        assessment_answer,created=AssessmentAnswer.objects.update_or_create(
+            assessment=assessment,
+            question=question,
+            defaults={
+                'answer':answer,
+            }
+        )
+        serializer=AssessmentAnswerSerializer(
+            assessment_answer
+        )
+        return Response(
+            {
+                'message':'answer saved successfully',
+                'created':created,
+                'answer':serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class SubmitAssessmentView(APIView):
+    permission_classes=[IsAuthenticated]
+    @transaction.atomic
+    def post(self,request,assessment_id):
+        assessment=get_object_or_404(
+            Assessment.objects.select_related(
+                'course',
+                'enrollment',
+            ),
+            id=assessment_id,
+            enrollment__user=request.user
+        )
+        if assessment.status!=Assessment.Status.IN_PROGRESS:
+            return Response(
+                {
+                    'error':'this assessment has already been submitted'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        questions=AssessmentQuestion.objects.filter(
+            assessment=assessment
+        ).order_by('order')
+        if not questions.exists():
+            return Response(
+                {
+                    'error':'this assessment has no questions'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        answers=AssessmentAnswer.objects.filter(
+            assessment=assessment
+        )
+        answer_map={
+            answer.question_id:answer
+            for answer in answers
+        }
+        total_score=0
+        evaluated_answers=[]
+        for question in questions:
+            assessment_answer=answer_map.get(question.id)
+            if not assessment_answer:
+                assessment_answer=AssessmentAnswer.objects.create(
+                    assessment=assessment,
+                    question=question,
+                    answer='',
+                    is_correct=False,
+                    score=0,
+                    feedback='question was not answered'
+                )
+                evaluated_answers.append(assessment_answer)
+                continue
+            student_answer=assessment_answer.answer.strip()
+            if question.question_type in ['MCQ','TRUE_FALSE',]:
+                evaluation=evaluate_objective_answer(question,student_answer)
+            elif question.question_type in ['SHORT_ANSWER','CODE']:
+                evaluation=evaluate_subjective_answer(question,student_answer)
+            else:
+                evaluation={
+                    'is_correct':False,
+                    'score':0,
+                    'feedback':'unsupported question type',
+                }
+            assessment_answer.is_correct=evaluation['is_correct']
+            assessment_answer.score=evaluation['score']
+            assessment_answer.feedback=evaluation['feedback']
+            assessment_answer.save(
+                update_fields=[
+                    'is_correct',
+                    'score',
+                    'feedback',
+                    'evaluated_at',
+                ]
+            )
+            total_score+=evaluation['score']
+            evaluated_answers.append(assessment_answer)
+        total_questions=questions.count()
+        percentage=(total_score/total_questions)*100
+        passed=percentage>=70
+        if percentage>=90:
+            proficiency_level='EXPERT'
+        elif percentage>=75:
+            proficiency_level='ADVANCED'
+        elif percentage>=60:
+            proficiency_level='INTERMEDIATE'
+        else:
+            proficiency_level='BEGINNER'
+        ai_summary=generate_assessment_summary(
+            assessment=assessment,
+            answers=evaluated_answers,
+            percentage=percentage
+        )
+        result=AssessmentResult.objects.create(
+            assessment=assessment,
+            score=total_score,
+            passed=passed,
+            proficiency_level=proficiency_level,
+            strengths=ai_summary.get('strengths',''),
+            weaknesses=ai_summary.get('weaknesses',''),
+            recommendations=ai_summary.get('recommendations',''),
+            ai_summary=ai_summary.get('summary',''),
+        )
+        assessment.score=total_score
+        assessment.status=Assessment.Status.COMPLETED
+        assessment.completed_at=timezone.now()
+        assessment.save(
+            update_fields=[
+                'score',
+                'status',
+                'completed_at',
+            ]
+        )
+        return Response(
+            {
+                'message':'assessment submitted successfully',
+                'assessment':{
+                    'id':assessment.id,
+                    'score':total_score,
+                    'total_questions':total_questions,
+                    'percentage':percentage,
+                    'passed':passed,
+                    'status':assessment.status,
+                },
+                'result':AssessmentResultSerializer(
+                    result
+                ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
 
 class MentorCourseManagementView(APIView):
     authentication_classes=[MentorJWTAuthentication]
@@ -296,45 +482,44 @@ class UserCourseDetailView(APIView):
         modules=list(
             course.modules.all().order_by('order')
         )
+        first_lesson=None
+        if modules:
+            first_module=modules[0]
+            first_lesson=(
+                first_module.lessons.all().order_by('order').first()
+            )
         module_data=[]
-        if is_enrolled:
-            for module in modules:
-                lessons=[]
-                for lesson in module.lessons.all().order_by('order'):
-                    lessons.append({
-                        'id':lesson.id,
-                        'title':lesson.title,
-                        'content':lesson.content,
-                        'order':lesson.order
-                    })
-                module_data.append({
-                    'id':module.id,
-                    'title':module.title,
-                    'description':module.description,
-                    'order':module.order,
-                    'lessons':lessons
-                })
-        else:
-            if modules:
-                first_module=modules[0]
-                lessons=list(
-                    first_module.lessons.all().order_by('order')
+        for module in modules:
+            lessons=[]
+            for lesson in module.lessons.all().order_by('order'):
+                is_first_lesson=(
+                    first_lesson is not None
+                    and lesson.id==first_lesson.id
                 )
-                if lessons:
-                    first_lesson=lessons[0]
-                    module_data.append({
-                        'id':first_module.id,
-                        'title':first_module.title,
-                        'description':first_module.description,
-                        'order':first_module.order,
-                        'lessons':[
-                            {
-                                'id':first_lesson.id,
-                                'title':first_lesson.title,
-                                'order':first_lesson.order,
-                            }
-                        ]
-                    })
+                is_unlocked=False
+                if is_first_lesson:
+                    is_unlocked=True
+                elif is_enrolled:
+                    lesson_progress=LessonProgress.objects.filter(
+                        enrollment=enrollment,
+                        lesson=lesson,
+                    ).first()
+                    if lesson_progress:
+                        is_unlocked=lesson_progress.is_unlocked
+                lessons.append({
+                    'id':lesson.id,
+                    'title':lesson.title,
+                    'order':lesson.order,
+                    'is_unlocked':is_unlocked,
+                    'is_preview':is_first_lesson,
+                })
+            module_data.append({
+                'id':module.id,
+                'title':module.title,
+                'description':module.description,
+                'order':module.order,
+                'lessons':lessons,
+            })
         mentor_image=None
         if course.mentor.profile_image:
             mentor_image=request.build_absolute_uri(
@@ -381,6 +566,79 @@ class UserCourseDetailView(APIView):
                 },
                 status=status.HTTP_200_OK,
             )
+
+class UserLessonDetailView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request,course_id,lesson_id):
+        print('user lesson view called')
+        print('course_id:', course_id)
+        print('lesson_id:', lesson_id)
+        course=get_object_or_404(
+            Course.objects.select_related('mentor'),
+            id=course_id,
+            status=Course.Status.PUBLISHED,
+            is_active=True,
+            mentor__is_active=True,
+            mentor__is_verified=True,
+        )
+        print('COURSE:', course)
+        print('course status:', course.status)
+        print('course active:', course.is_active)
+        print('mentor active:', course.mentor.is_active)
+        print('mentor verified:', course.mentor.is_verified)
+        print(
+    'ALL LESSONS FOR COURSE:',
+    list(
+        CourseLesson.objects.filter(
+            module__course=course
+        ).values(
+            'id',
+            'title',
+            'module_id',
+        )
+    )
+)
+        lesson=get_object_or_404(
+            CourseLesson.objects.select_related('module'),
+            id=lesson_id,
+            module__course=course
+        )
+        enrollment=CourseEnrollment.objects.filter(
+            user=request.user,
+            course=course
+        ).first()
+        first_lesson=CourseLesson.objects.filter(
+            module__course=course
+        ).order_by('module__order','order').first()
+        is_first_lesson=(
+            first_lesson and lesson.id==first_lesson.id
+        )
+        if is_first_lesson:
+            pass
+        elif not enrollment:
+            return Response(
+                {
+                    'error':'this lesson is locked. enroll in the course to acceess it'
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        else:
+            lesson_progress=LessonProgress.objects.filter(
+                enrollment=enrollment,
+                lesson=lesson
+            ).first()
+            if not lesson_progress or not lesson_progress.is_unlocked:
+                return Response(
+                    {
+                        'error':'this lesson has not been unlocked yet'
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
+        serializer=UserLessonSerializer(lesson)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
 class CourseEnrollView(APIView):
     permission_classes=[IsAuthenticated]

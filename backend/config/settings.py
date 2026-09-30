@@ -20,6 +20,7 @@ from decimal import Decimal
 load_dotenv()
 
 OPENAI_API_KEY=os.getenv('OPENAI_API_KEY')
+GEMINI_API_KEY=os.getenv('GEMINI_API_KEY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -63,6 +64,7 @@ INSTALLED_APPS = [
     'apps.courses.apps.CoursesConfig',
     'apps.payments',
     'apps.certificates',
+    'apps.reports',
 ]
 
 ASGI_APPLICATION='config.asgi.application'

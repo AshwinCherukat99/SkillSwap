@@ -51,11 +51,36 @@ const MentorStudents=()=>{
         fetchStudents()
         fetchCourses()
     },[])
+    const groupedStudents=useMemo(()=>{
+        const grouped={}
+        students.forEach((enrollment)=>{
+            const studentId=enrollment.student_id
+            if (!grouped[studentId]){
+                grouped[studentId]={
+                    student_id:studentId,
+                    full_name:enrollment.full_name,
+                    username:enrollment.username,
+                    profile_image:enrollment.profile_image,
+                    courses:[],
+                }
+            }
+            grouped[studentId].courses.push({
+                enrollment_id:enrollment.id,
+                course_id:enrollment.course_id,
+                course_title:enrollment.course_title,
+                progress:enrollment.progress??0,
+                enrolled_at:enrollment.enrolled_at,
+                completed_at:enrollment.completed_at,
+                status:enrollment.completed_at!==null?'completed':'active',
+            })
+        })
+        return Object.values(grouped)
+    },[students])
     const filteredStudents=useMemo(()=>{
-        return students.filter((student)=>{
+        return groupedStudents.filter((student)=>{
             const studentName=student.full_name||''
             const matchesSearch=studentName.toLowerCase().includes(search.trim().toLowerCase())
-            const matchesCourse=selectedCourse==='all'||String(courses.id)===String(selectedCourse)
+            const matchesCourse=selectedCourse==='all'||student.courses.some((course)=>String(course.course_id)===String(selectedCourse))
             const status=student.completed_at!==null?'completed':'active'
             const matchesStatus=selectedStatus==='all'||status===selectedStatus
             return (matchesSearch&&matchesCourse&&matchesStatus)
@@ -66,7 +91,7 @@ const MentorStudents=()=>{
             enrollment_id:student.id,
         }))
     },[
-        students,
+        groupedStudents,
         search,
         selectedCourse,
         selectedStatus,

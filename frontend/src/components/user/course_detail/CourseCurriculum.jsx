@@ -122,6 +122,7 @@ function CourseCurriculum({course,isEnrolled}){
                                         )
                                     }
                                     isPreview={!isEnrolled && index===0}
+                                    courseId={course.id}
                                 />
                             )
                         )}

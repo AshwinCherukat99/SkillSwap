@@ -1,0 +1,58 @@
+.admin-user-management {
+    background: #f7f9fb;
+    min-height: 100vh;
+}
+
+
+.admin-user-management .card {
+    border-radius: 16px;
+}
+
+
+.admin-user-management .table > :not(caption) > * > * {
+    padding: 1rem;
+}
+
+
+.admin-user-management .table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+
+.admin-user-management .table tbody tr:hover {
+    background-color: rgba(79, 70, 229, 0.025);
+}
+
+
+.admin-user-management .btn-primary {
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+
+.admin-user-management .btn-primary:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+}
+
+
+.admin-user-management .dropdown-menu {
+    border-radius: 12px;
+    padding: 0.5rem;
+}
+
+
+.admin-user-management .dropdown-item {
+    border-radius: 8px;
+    padding: 0.55rem 0.75rem;
+}
+
+
+.admin-user-management .dropdown-item:hover {
+    background-color: #f1f3f5;
+}
+
+
+.admin-user-management .badge {
+    font-weight: 600;
+}

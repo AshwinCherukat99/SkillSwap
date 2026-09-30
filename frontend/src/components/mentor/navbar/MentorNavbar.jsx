@@ -1,11 +1,13 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import {NavLink} from 'react-router-dom'
+import {NavLink,useNavigate} from 'react-router-dom'
 import {MessageSquare,LogOut} from 'lucide-react'
 
 import './MentorNavbar.css'
+import { mentorLogout } from '../../../store/slices/authSlice'
 
 const MentorNavbar=()=>{
+    const navigate=useNavigate()
     const dispatch=useDispatch()
     const navItems=[
         {name:'Home',path:'/mentor/dashboard'},
@@ -14,7 +16,13 @@ const MentorNavbar=()=>{
         {name:'Revenue',path:'/mentor/revenue'},
         {name:'Study Group Chat',path:'/mentor/group-chat'},
         {name:'Reviews',path:'/mentor/reviews'},
+        {name:'Upcoming Sessions',path:'/mentor/upcoming_sessions'},
+        {name:'Session History',path:'/mentor/session_history'},
     ]
+    const handleLogout=()=>{
+        dispatch(mentorLogout())
+        navigate('/mentor/login/')
+    }
     return ( 
         <nav className='navbar skillswap-navbar'>
             <div className='container-fluid'>
@@ -37,10 +45,10 @@ const MentorNavbar=()=>{
                 ))}
                 </div>
                 <div className='skillswap-actions'>
-                <button className='icon-btn' title='Chat'>
-                    <MessageSquare size={20}/>
-                </button>
-                <button type='button' className='icon-btn' title='LogOut'>
+                <NavLink to='mentor/group-chat/' className='icon-btn' title='Chat'>
+                            <MessageSquare size={20} />
+                          </NavLink>
+                <button type='button' className='icon-btn' title='LogOut' onClick={handleLogout}>
                     <LogOut size={20}/>
                 </button>
                 </div>

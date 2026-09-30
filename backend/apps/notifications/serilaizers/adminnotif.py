@@ -31,7 +31,7 @@ class AdminNotificationSerializer(serializers.ModelSerializer):
             'recipient_username',
             'priority',
             'priority_display',
-            'in-app',
+            'in_app',
             'push',
             'email',
             'scheduled_at',

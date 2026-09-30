@@ -13,16 +13,16 @@ def send_admin_notification(admin_notification):
     if audience==AdminNotification.Audience.INDIVIDUAL:
         if admin_notification.recipient:
             recipient_ids.add(admin_notification.recipient.id)
-    elif audience==AdminNotification.Audience.USERS:
+    elif audience==AdminNotification.Audience.USER:
         user_ids=User.objects.filter(role=User.Role.USER).values_list(id,flat=True)
         recipient_ids.update(user_ids)
-    elif audience==AdminNotification.Audience.MENTORS:
-        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__is_null=False,user__is_active=True).values_list('user_id',flat=True))
+    elif audience==AdminNotification.Audience.MENTOR:
+        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
         recipient_ids.update(mentor_user_ids)
     elif audience==AdminNotification.Audience.ALL:
         user_ids=(User.objects.filter(is_active=True).values_list('id',flat=True))
         recipient_ids.update(user_ids)
-        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__is_null=False,user__is_active=True).values_list('user_id',flat=True))
+        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
         recipient_ids.update(mentor_user_ids)
     notification_objects=[]
     for user_id in recipient_ids:

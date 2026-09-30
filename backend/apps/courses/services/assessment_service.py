@@ -2,10 +2,28 @@ import json
 from django.db import transaction
 from ..models import Assessment,AssessmentQuestion 
 from openai import OpenAI
+from google import genai
 from django.conf import settings
 from collections import Counter
+import time
 
-client=OpenAI(api_key=settings.OPENAI_API_KEY)
+client=genai.Client(api_key=settings.GEMINI_API_KEY)
+
+def generate_with_retry(prompt):
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model="gemini-3.8-flash",
+                contents=prompt,
+            )
+
+            return response.text
+
+        except Exception as exc:
+            if attempt == 2:
+                raise exc
+
+            time.sleep(3)
 
 @transaction.atomic
 def generate_assessment_questions(assessment):
@@ -72,11 +90,7 @@ Requirements:
 11. Make questions appropriate for the course content.
 12. Return exactly 10 questions.
 """
-    response=client.responses.create(
-        model='gpt-5.6-luna',
-        input=prompt,
-    )
-    response_text=response.output_text           
+    response_text=generate_with_retry(prompt)           
     try:
         data=json.loads(response_text)
     except json.JSONDecodeError as exc:
@@ -160,3 +174,131 @@ Requirements:
     assessment.total_questions=len(questions)
     assessment.save(update_fields=['total_questions']) 
     return questions
+
+def evaluate_subjective_answer(question,answer):
+    prompt=f"""
+You are an educational assessment evaluator.
+
+Evaluate the student's answer based ONLY on the question
+and the expected answer provided below.
+
+Question:
+{question.question_text}
+
+Expected Answer:
+{question.correct_answer}
+
+Question Type:
+{question.question_type}
+
+Student Answer:
+{answer}
+
+Evaluate the student's answer.
+
+Return ONLY valid JSON in this exact format:
+
+{{
+    "is_correct": true,
+    "score": 1,
+    "feedback": "Brief explanation of the evaluation."
+}}
+
+Rules:
+
+1. score must be either 0 or 1.
+2. is_correct must be true when score is 1.
+3. is_correct must be false when score is 0.
+4. For SHORT_ANSWER, accept answers that are semantically correct
+   even if the wording is different.
+5. For CODE, evaluate whether the code correctly solves the
+   requested problem.
+6. Do not require the student's answer to exactly match the
+   expected answer.
+7. Do not award partial marks because each question is worth 1 point.
+"""
+    response_text=generate_with_retry(prompt)
+    try:
+        result=json.loads(response_text)
+    except json.JSONDecodeError:
+        raise ValueError(
+            'ai returned invalid evaluation json'
+        )
+    is_correct=result.get('is_correct')
+    score=result.get('score')
+    feedback=result.get('feedback','')
+    if not isinstance(is_correct,bool):
+        raise ValueError(
+            'ai returned invalid is_correct value'
+        )
+    if score not in [0,1]:
+        raise ValueError(
+            'ai returned invalid score'
+        )
+    return {
+        'is_correct':is_correct,
+        'score':score,
+        'feedback':feedback,
+    }
+
+def evaluate_objective_answer(question,answer):
+    student_answer=answer.strip().lower()
+    correct_answer=question.correct_answer.strip().lower()
+    is_correct=student_answer==correct_answer
+    return {
+        'is_correct':is_correct,
+        'score':1 if is_correct else 0,
+        'feedback':{
+            'correct_answer' if is_correct
+            else f'correct_answer:{question.correct_answer}'
+        }
+    }
+
+def generate_assessment_summary(assessment,answers,percentage):
+    answer_data=[]
+    for answer in answers:
+        answer_data.append({
+            'question':answer.question.question_text,
+            'question_type':answer.question.question_type,
+            'student_answer':answer.answer,
+            'is_correct':answer.is_correct,
+            'score':answer.score,
+            'feedback':answer.feedback,
+        })
+    prompt=f"""
+You are an educational assessment analyst.
+
+Analyze the student's assessment performance.
+
+Course:
+{assessment.course.title}
+
+Score:
+{percentage}%
+
+Questions and answers:
+{json.dumps(answer_data, indent=2)}
+
+Return ONLY valid JSON:
+
+{{
+    "summary": "Short overall assessment summary.",
+    "strengths": "Areas the student performed well in.",
+    "weaknesses": "Areas where the student needs improvement.",
+    "recommendations": "Specific recommendations for improvement."
+}}
+
+Keep the feedback educational and concise.
+"""
+    response_text=generate_with_retry(prompt)
+    try:
+        return json.loads(
+            response_text
+        )
+    except json.JSONDecodeError:
+        return {
+            'summary':'assessment completed',
+            'strengths':'',
+            'weaknesses':'',
+            'recommendations':'',
+        }

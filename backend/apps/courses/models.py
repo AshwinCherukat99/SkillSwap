@@ -150,13 +150,15 @@ class LessonProgress(models.Model):
         on_delete=models.CASCADE,
         related_name='progress_records'
     )
-    completed=models.BooleanField(default=False)
+    is_unlocked=models.BooleanField(default=False)
+    is_completed=models.BooleanField(default=False)
+    unlocked_at=models.BooleanField(null=True,blank=True)
     completed_at=models.DateTimeField(null=True,blank=True)
     class Meta:
         constraints=[
             models.UniqueConstraint(
                 fields=['enrollment','lesson'],
-                name='unique_enrollment_lesson'
+                name='unique_enrollment_lesson_progress'
             )
         ]
     def __str__(self):

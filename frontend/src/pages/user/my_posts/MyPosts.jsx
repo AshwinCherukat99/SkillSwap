@@ -1,5 +1,6 @@
 import {useEffect,useState,useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import api from '../../../services/api'
 
@@ -10,6 +11,9 @@ import './MyPosts.css'
 
 function MyPosts(){
     const navigate=useNavigate()
+    const user=useSelector(
+        (state)=>state.auth.user
+    )
     const [posts,setPosts]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
@@ -93,7 +97,7 @@ function MyPosts(){
             return
         }
         try{
-            await api.delete(`/posts/${postId}/`)
+            await api.delete(`/posts/${postId}/delete/`)
             setPosts((currentPosts)=>
             currentPosts.filter(
                 (post)=>post.id!==postId
@@ -420,6 +424,7 @@ function MyPosts(){
                                         onDelete={
                                             handleDelete
                                         }
+                                        currentUser={user}
                                     />
 
                                 )

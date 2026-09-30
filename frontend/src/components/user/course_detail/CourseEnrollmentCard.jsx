@@ -12,9 +12,11 @@ function CourseEnrollmentCard({
     const handleEnroll=async ()=>{
         try{
             setLoading(true)
-            await api.post(
+            const response=await api.post(
                 `/courses/${course.id}/enroll/`
             )
+            console.log('enrolled:',response.data)
+            alert(JSON.stringify(response['message']))
             navigate(`/courses/${course.id}`)
             window.location.reload()
         }catch(error){

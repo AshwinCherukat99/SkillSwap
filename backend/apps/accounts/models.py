@@ -10,12 +10,17 @@ class User(AbstractUser):
     class Role(models.TextChoices): 
         USER="USER","User"
         ADMIN="ADMIN","Admin"
+    class Status(models.TextChoices):
+        ACTIVE='ACTIVE','Active'
+        BLOCKED='BLOCKED','Blocked'
+        SUSPENDED='SUSPENDED','Suspended'
     username=models.CharField(max_length=150,unique=True)
     email=models.EmailField(unique=True) 
     full_name=models.CharField(max_length=150,blank=True,)
     bio=models.TextField(blank=True)
     location=models.CharField(max_length=255,blank=True)
     role=models.CharField(max_length=10,choices=Role.choices,default=Role.USER) 
+    status=models.CharField(max_length=10,choices=Status.choices,default=Status.ACTIVE,db_index=True)
     profile_image=models.ImageField(upload_to='profile_images/',blank=True,null=True)
     phone_number=models.CharField(max_length=15,blank=True,null=True) 
     google_id=models.CharField(
@@ -71,7 +76,12 @@ class UserRating(models.Model):
     )
     rating=models.PositiveSmallIntegerField()
     review=models.TextField(blank=True)
+    is_hidden=models.BooleanField(
+        default=False
+    )
     created_at=models.DateTimeField(auto_now_add=True)
+    def __str__(self):
+        return f'{self.rated_by}->{self.rated_user}({self.rating})'
 
 class Friendship(models.Model):
     class Status(models.TextChoices):

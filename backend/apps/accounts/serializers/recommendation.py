@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from django.db.models import Avg
+from django.db.models import Avg,Q
 from apps.skills.models import Skill
+from apps.accounts.models import Friendship
 
 class RecommendedUserSerializer(serializers.Serializer):
     id=serializers.IntegerField(
@@ -20,6 +21,7 @@ class RecommendedUserSerializer(serializers.Serializer):
     skills_to_learn=serializers.SerializerMethodField()
     skills_to_teach=serializers.SerializerMethodField()
     match_score=serializers.IntegerField()
+    friendship_status=serializers.SerializerMethodField()
     def get_skills_to_learn(self,obj):
         skills=Skill.objects.filter(
             id__in=obj['skills_to_learn_ids']
@@ -53,3 +55,13 @@ class RecommendedUserSerializer(serializers.Serializer):
               average_rating,
               1
          )
+    def get_friendship_status(self,obj):
+         current_user=self.context['request'].user
+         recommended_user=obj['user']
+         friendship=Friendship.objects.filter(
+              Q(sender=current_user,receiver=recommended_user)|
+              Q(sender=recommended_user,receiver=current_user)
+         ).first()
+         if not friendship:
+            return 'NONE'
+         return friendship.status

@@ -1,11 +1,15 @@
+import {useNavigate} from 'react-router-dom'
+
 function CourseModule({
     module,
     moduleNumber,
     isEnrolled,
     expanded,
     onToggle,
-    isPreview
+    isPreview,
+    courseId
 }){
+    const navigate=useNavigate()
     const lessons=module.lessons||[]
     const visibleLessons=lessons
     const formatDuration = (minutes) => {
@@ -22,6 +26,11 @@ function CourseModule({
             ? `${hours}h ${mins}m`
             : `${hours}h`;
     };
+    const handleLessonClick=(lesson)=>{
+        navigate(
+            `/courses/${courseId}/lessons/${lesson.id}`
+        )
+    }
     return (
         <div className="course-module border rounded-3 overflow-hidden">
 
@@ -106,9 +115,22 @@ function CourseModule({
                                 (lesson, index) => {
                                     const isLessonPreview=!isEnrolled&&isPreview&&index===0
                                     const isLessonUnlocked=isEnrolled||isLessonPreview
-                                    return(<div
+                                    return(<button
                                         key={lesson.id}
-                                        className="course-lesson"
+                                        type="button"
+                                        className={`course-lesson-button ${
+                                            isLessonUnlocked
+                                                ? "lesson-available"
+                                                : "lesson-locked"
+                                        }`}
+                                        disabled={!isLessonUnlocked}
+                                        onClick={() => {
+                                            if (isLessonUnlocked) {
+                                                handleLessonClick(
+                                                    lesson
+                                                )
+                                            }
+                                        }}
                                     >
 
                                         <div className="d-flex align-items-center gap-3">
@@ -172,10 +194,12 @@ function CourseModule({
                                                     <i className="bi bi-lock-fill"></i>
                                                 </span>
                                             )}
+                                            
 
                                         </div>
 
-                                    </div>)
+                                    </button>
+                                )
 }
                             )}
 

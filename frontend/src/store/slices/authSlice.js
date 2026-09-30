@@ -88,6 +88,7 @@ const authSlice=createSlice({
 export const {
     login,
     logout,
+    mentorLogout,
     updateUser,
     updateAccessToken
 }=authSlice.actions
