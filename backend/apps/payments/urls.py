@@ -5,6 +5,7 @@ from .views import (
     VerifyCoursePaymentView,
     MentorRevenueView,
     MentorRequestPayoutView,
+    AdminPaymentDashboardView,
 )
 
 urlpatterns=[
@@ -27,5 +28,10 @@ urlpatterns=[
         'mentor/payout/',
         MentorRequestPayoutView.as_view(),
         name='mentor-request-payout',
+    ),
+    path(
+        'admin/dashboard/',
+        AdminPaymentDashboardView.as_view(),
+        name='admin-payment-dashboard',
     ),
 ]

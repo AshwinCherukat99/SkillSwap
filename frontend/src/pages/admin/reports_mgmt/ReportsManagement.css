@@ -1,0 +1,67 @@
+/* ReportsModeration.css */
+
+.reports-page {
+    min-height: 100vh;
+    background: #f8f9ff;
+}
+
+.report-stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(53, 37, 205, 0.08);
+
+    font-size: 1.25rem;
+}
+
+.report-tabs {
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+}
+
+.report-tabs .nav-link {
+    border-radius: 999px;
+    padding: 8px 18px;
+    color: #555;
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.report-tabs .nav-link.active {
+    background: #3525cd;
+    color: white;
+}
+
+.reports-page .table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #777;
+    white-space: nowrap;
+}
+
+.reports-page .table td {
+    vertical-align: middle;
+}
+
+.reports-page .card {
+    border-radius: 16px;
+}
+
+.reports-page .form-control,
+.reports-page .form-select,
+.reports-page .input-group-text {
+    border-color: #dee2e6;
+}
+
+.reports-page .form-control:focus,
+.reports-page .form-select:focus {
+    border-color: #3525cd;
+    box-shadow: 0 0 0 0.2rem rgba(53, 37, 205, 0.1);
+}

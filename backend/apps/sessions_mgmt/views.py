@@ -15,7 +15,9 @@ from .serializers.course_session import MentorCourseSessionCreateSerializer
 from .serializers.session_history import SkillExchangeSessionHistorySerializer,CourseSessionHistorySerializer,MentorCourseSessionHistorySerializer
 from .serializers.upcoming_session import UpcomingSkillExchangeSerializer,UpcomingCourseSessionSerializer,MentorUpcomingSessionSerializer
 from .serializers.session_request import FriendSessionRequestSerializer,RecievedSessionRequestSerializer
+from .serializers.admin import AdminCourseSessionSerializer,AdminSkillExchangeSessionSerializer
 
+from apps.accounts.permissions import IsAdmin
 from apps.mentors.authentication import MentorJWTAuthentication
 
 class MentorScheduleCourseSessionView(APIView):
@@ -631,6 +633,184 @@ class MentorCourseSessionHistoryView(APIView):
             {
                 'sessions':serializer.data,
                 'total_sessions':sessions.count()
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminSessionManagementView(APIView):
+    authentication_classes=[IsAdmin]
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        session_type=request.query_params.get('session_type','ALL')
+        status_filter=request.query_params.get('status')
+        search=request.query_params.get('status','').strip()
+        sessions=[]
+        if session_type in ['ALL','SKILL_EXCHANGE']:
+            skill_sessions=SkillExchangeSession.objects.select_related(
+                'requester',
+                'recipient',
+                'skill_wanted',
+                'skill_offered',
+            )
+            if status_filter:
+                skill_sessions=skill_sessions.filter(
+                status=status_filter
+            )
+            if search:
+                skill_sessions=skill_sessions.filter(
+                Q(requester__full_name__icontains=search)|
+                Q(requester__username__icontains=search)|
+                Q(recipient__full_name__icontains=search)|
+                Q(recipient__username__icontains=search)|
+                Q(skill_wanted__name__icontains=search)|
+                Q(skill_offered__name__icontains=search)
+            )
+            serializer=AdminSkillExchangeSessionSerializer(
+            skill_sessions,
+            many=True,
+            context={'request':request},
+        )
+            sessions.extend(serializer.data)
+        if session_type in ['ALL','COURSE']:
+            course_sessions=(
+                CourseSession.objects.select_related(
+                    'mentor',
+                    'enrollment',
+                    'enrollment__user',
+                    'enrollment__course',
+                )
+            )
+            if status_filter:
+                course_sessions=course_sessions.filter(
+                    status=status_filter
+                )
+            if search:
+                course_sessions=course_sessions.filter(
+                    Q(mentor__username__icontains=search)|
+                    Q(mentor__full_name__icontains=search)|
+                    Q(enrollment__user__username__icontains=search)|
+                    Q(enrollment__user__full_name__icontains=search)|
+                    Q(enrollment__course__title__icontains=search)
+                )
+            serializer=AdminCourseSessionSerializer(
+                course_sessions,
+                many=True,
+                context={'request':request},
+            )
+            sessions.extend(serializer.data)
+        sessions.sort(
+            key=lambda x:x.get('scheduled_start') or '',
+            reverse=True,
+        )
+        skill_queryset=SkillExchangeSession.objects.all()
+        course_queryset=CourseSession.objects.all()
+        total_sessions=(
+            skill_queryset.count()+
+            course_queryset.count()
+        )
+        completed=(
+            skill_queryset.filter(
+                status=SkillExchangeSession.Status.COMPLETED
+            ).count()+
+            course_queryset.filter(
+                status=CourseSession.Status.COMPLETED
+            ).count()
+        )
+        cancelled=(
+            skill_queryset.filter(
+                status=SkillExchangeSession.Status.CANCELLED
+            ).count()+
+            course_queryset.filter(
+                status=CourseSession.Status.COMPLETED
+            ).count()
+        )
+        rejected=skill_queryset.filter(
+            status=SkillExchangeSession.Status.REJECTED
+        ).count()
+        expired=(
+            skill_queryset.filter(
+                status=SkillExchangeSession.Status.EXPIRED
+            ).count()+
+            course_queryset.filter(
+                status=CourseSession.Status.EXPIRED
+            ).count()
+        )
+        scheduled=(
+                    skill_queryset.filter(
+                        status=SkillExchangeSession.Status.SCHEDULED
+                    ).count()+
+                    course_queryset.filter(
+                        status=CourseSession.Status.SCHEDULED
+                    ).count()
+                )
+        now=timezone.now()
+        ongoing_skill=skill_queryset.filter(
+            status=SkillExchangeSession.Status.SCHEDULED,
+            scheduled_start__lte=now
+        ).count()
+        ongoing_course=course_queryset.filter(
+            status=CourseSession.Status.SCHEDULED,
+            scheduled_start__lte=now
+        ).count()
+        ongoing=ongoing_skill+ongoing_course
+        upcoming=scheduled-ongoing
+        skill_duration=list(
+            skill_queryset.values_list(
+                'duration_minutes',
+                flat=True,
+            )
+        )
+        course_duration=list(
+            course_queryset.values_list(
+                'duration_minutes',
+                flat=True
+            )
+        )
+        durations=skill_duration+course_duration
+        average_duration=(
+            round(sum(durations)/len(durations),1)
+            if durations else 0
+        )
+        completion_total=(
+            completed+cancelled+rejected+expired
+        )
+        def percentage(value):
+            if completion_total==0:
+                return 0
+            return round((value/completion_total)*100,1)
+        completion_trends={
+            'completed':{
+                'count':completed,
+                'percentage':percentage(completed),
+            },
+            'cancelled':{
+                            'count':cancelled,
+                            'percentage':percentage(cancelled),
+                        },
+            'rejected':{
+                            'count':rejected,
+                            'percentage':percentage(rejected),
+                        },
+            'expired':{
+                                        'count':expired,
+                                        'percentage':percentage(expired),
+                                    },
+        }
+        return Response(
+            {
+                'stats':{
+                    'total_sessions':total_sessions,
+                    'upcoming':upcoming,
+                    'ongoing':ongoing,
+                    'completed':completed,
+                    'cancelled':cancelled,
+                    'rejected':rejected,
+                    'expired':expired,
+                    'average_duration':average_duration,
+                    'average_rating':None,
+                },
+                'completion_trends':completion_trends,
+                'sessions':sessions,
             },
             status=status.HTTP_200_OK,
         )

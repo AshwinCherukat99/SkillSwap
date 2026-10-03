@@ -4,7 +4,13 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from apps.accounts.permissions import IsAdmin
+from django.db.models import Count,Q
+from django.shortcuts import get_object_or_404
+
 from .models import UserBadge,Badge
+from .serializers.initialization import BadgeSerializer
+from .serializers.admin import AdminBadgeCreateSerializer,AdminBadgeUpdateSerializer
 
 class BadgeDashboardView(APIView):
     permission_classes=[IsAuthenticated]
@@ -72,4 +78,88 @@ class BadgeDashboardView(APIView):
                 'badges':badge_data,
             },
             status=status.HTTP_200_OK,
+        )
+
+class AdminBadgeListCreateView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get(self,request):
+        badges=Badge.objects.all().prefetch_related('rules').annotate(awarded_count_db=Count('user_badges')).order_by('-created_at')
+        search=request.query_params.get('search')
+        rarity=request.query_params.get('rarity')
+        status_filter=request.query_params.get('status')
+        if search:
+            badges=badges.filter(
+                Q(name__icontains=search)|
+                Q(description__icontains=search)
+            )
+        if rarity:
+            badges=badges.filter(
+                rarity=rarity.upper()
+            )
+        if status_filter=='active':
+            badges=badges.filter(
+                is_active=True
+            )
+        if status_filter=='inactive':
+            badges=badges.filter(
+                is_active=False
+            )
+        serializer=BadgeSerializer(
+            badges,
+            many=True,
+        )
+        return Response(
+            {
+                'count':badges.count(),
+                'badges':serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+    def post(self,request):
+        serializer=AdminBadgeCreateSerializer(
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+        badge=serializer.save()
+        return Response(
+            BadgeSerializer(badge).data,
+            status=status.HTTP_201_CREATED,
+        )
+
+class AdminBadgeDetailView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get_object(self,badge_id):
+        return get_object_or_404(
+            Badge.objects.prefetch_related('rules'),
+            id=badge_id,
+        )
+    def get(self,request,badge_id):
+        badge=self.get_object(badge_id)
+        serializer=BadgeSerializer(badge)
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+    def patch(self,request,badge_id):
+        badge=self.get_object(badge_id)
+        serializer=AdminBadgeUpdateSerializer(
+            badge,
+            data=request.data,
+            partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        badge=serializer.save()
+        return Response(
+            BadgeSerializer(badge).data,
+            status=status.HTTP_200_OK,
+        )
+    def delete(self,request,badge_id):
+        badge=self.get_object(
+            badge_id
+        )
+        badge.delete()
+        return Response(
+            status=status.HTTP_204_NO_CONTENT,
         )

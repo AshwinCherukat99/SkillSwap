@@ -6,6 +6,10 @@ from .managers import MentorManager
 # Create your models here.
 
 class Mentor(AbstractBaseUser):
+    class Status(models.TextChoices):
+        ACTIVE='ACTIVE','Active'
+        SUSPENDED='SUPENDED','Suspended'
+        BLOCKED='BLOCKED','Blocked'
     user=models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,

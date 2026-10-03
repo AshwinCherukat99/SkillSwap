@@ -26,6 +26,7 @@ from .serializers.course import AdminCourseDetailSerializer,AdminCourseListSeria
 from .serializers.skills import AdminSkillSerializer,SuggestedSkillSerializer
 from .serializers.users import AdminUserSerializer       
 from .serializers.reviews import AdminReviewSerializer,ReviewReportSerializer
+from .serializers.mentors import (AdminMentorListSerializer,AdminMentorDetailSerializer,AdminMentorUpdateSerializer)
 
 from .services import (
     approve_mentor,
@@ -997,3 +998,150 @@ class AdminReviewReportUpdateView(APIView):
             return Response(
                 serializer.data
             )
+
+class AdminMentorManagementView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get(self,request):
+        mentors=Mentor.objects.select_related('profile').all()
+        search=request.query_params.get('search','').strip()
+        mentor_status=request.query_params.get('status','ALL')
+        if search:
+            mentors=mentors.filter(
+                Q(full_name__icontains=search)|
+                Q(username__icontains=search)|
+                Q(email__icontains=search)
+            )
+        if mentor_status!='ALL':
+            if mentor_status=='PENDING':
+                mentors=mentors.filter(is_verified=False)
+            elif mentor_status in [
+                Mentor.Status.ACTIVE,
+                Mentor.Status.BLOCKED,
+                Mentor.Status.SUSPENDED
+            ]:
+                mentors=mentors.filter(
+                    status=mentor_status
+                )
+        mentors=mentors.order_by('-created_at')
+        serializer=AdminMentorListSerializer(
+            mentors,
+            many=True,
+            context={
+                'request':request,
+            }
+        )
+        return Response(
+            {
+                'mentors':serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminMentorStatsView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get(self,request):
+        total=Mentor.objects.count()
+        active=Mentor.objects.filter(
+            status=Mentor.Status.ACTIVE
+        ).count()
+        pending=Mentor.objects.filter(
+            is_verified=False
+        ).count()
+        suspended=Mentor.objects.filter(
+            status=Mentor.Status.SUSPENDED
+        ).count()
+        blocked=Mentor.objects.filter(
+            status=Mentor.Status.BLOCKED
+        ).count()
+        return Response(
+            {
+                'total':total,
+                'active':active,
+                'pending_verification':pending,
+                'suspended':suspended,
+                'blocked':blocked,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminMentorDetailView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get(self,request,mentor_id):
+        mentor=get_object_or_404(
+            Mentor,
+            id=mentor_id,
+        )       
+        serializer=AdminMentorDetailSerializer(
+            mentor,
+            context={
+                'request':request
+            }
+        )
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+class AdminMentorActionView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def post(self,request,mentor_id):
+        mentor=get_object_or_404(
+            Mentor,
+            id=mentor_id
+        )
+        action=request.data.get('action')
+        if action=='suspend':
+            mentor.status=Mentor.Status.SUSPENDED
+            mentor.is_active=False
+        elif action=='block':
+            mentor.status=Mentor.Status.BLOCKED
+            mentor.is_active=False
+        elif action=='activate':
+            mentor.status=Mentor.Status.ACTIVE
+            mentor.is_active=True
+        else:
+            return Response(
+                {
+                    'error':'invalid response. use suspend, block or activate'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        mentor.save(
+            update_fields=[
+                'status',
+                'is_active',
+                'updated_at',
+            ]
+        )
+        return Response(
+            {
+                'message':f'mentor {action}ed successfully',
+                'status':mentor.status,
+                'is_active':mentor.is_active,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class AdminMentorUpdateView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def patch(self,request,mentor_id):
+        mentor=get_object_or_404(
+            Mentor,
+            id=mentor_id,
+        )
+        serializer=AdminMentorUpdateSerializer(
+            mentor,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )

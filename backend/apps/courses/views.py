@@ -10,7 +10,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Count
-from .services.assessment_service import generate_assessment_questions,evaluate_objective_answer,evaluate_subjective_answer 
+from .services.assessment_service import generate_assessment_questions,evaluate_objective_answer,evaluate_subjective_answer,generate_assessment_summary
 import json
 from django.db import transaction
 

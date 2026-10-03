@@ -1,0 +1,359 @@
+.mentor-management-page {
+    min-height: 100vh;
+    background: #f8f9ff;
+    color: #121c2a;
+}
+
+.mentor-main-card {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid #e1e4ef;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(79, 70, 229, 0.08);
+}
+
+
+/* =========================
+   STATS
+========================= */
+
+.mentor-stat-card {
+    min-height: 150px;
+    padding: 20px;
+    background: white;
+    border-radius: 20px;
+    border: 1px solid #e4e7f0;
+    box-shadow: 0 4px 20px rgba(79, 70, 229, 0.06);
+}
+
+.mentor-stat-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+}
+
+.mentor-stat-card p {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 4px;
+    font-weight: 500;
+}
+
+.mentor-stat-card h3 {
+    font-size: 30px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.mentor-stat-primary .mentor-stat-icon {
+    background: rgba(53, 37, 205, 0.1);
+    color: #3525cd;
+}
+
+.mentor-stat-success {
+    border-left: 4px solid #198754;
+}
+
+.mentor-stat-success .mentor-stat-icon {
+    background: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.mentor-stat-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+.mentor-stat-warning .mentor-stat-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.mentor-stat-danger {
+    border-left: 4px solid #ba1a1a;
+}
+
+.mentor-stat-danger .mentor-stat-icon {
+    background: rgba(186, 26, 26, 0.1);
+    color: #ba1a1a;
+}
+
+.mentor-stat-secondary {
+    border-left: 4px solid #777587;
+}
+
+.mentor-stat-secondary .mentor-stat-icon {
+    background: rgba(119, 117, 135, 0.1);
+    color: #777587;
+}
+
+
+/* =========================
+   FILTERS
+========================= */
+
+.mentor-filters {
+    padding: 16px 24px;
+    border-bottom: 1px solid #e4e7f0;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.mentor-tabs {
+    display: flex;
+    gap: 4px;
+    background: #eff2f9;
+    padding: 4px;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.mentor-tabs button {
+    border: 0;
+    background: transparent;
+    padding: 9px 14px;
+    border-radius: 6px;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.mentor-tabs button:hover {
+    color: #121c2a;
+    background: white;
+}
+
+.mentor-tabs button.active {
+    background: white;
+    color: #3525cd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+}
+
+.pending-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    background: #f59e0b;
+    color: white;
+    border-radius: 999px;
+    font-size: 11px;
+}
+
+.mentor-search {
+    width: 280px;
+    position: relative;
+}
+
+.mentor-search i {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777587;
+}
+
+.mentor-search input {
+    width: 100%;
+    border: 1px solid #c7c4d8;
+    border-radius: 8px;
+    padding: 9px 12px 9px 38px;
+    outline: none;
+}
+
+.mentor-search input:focus {
+    border-color: #3525cd;
+    box-shadow: 0 0 0 2px rgba(53, 37, 205, 0.1);
+}
+
+
+/* =========================
+   TABLE
+========================= */
+
+.mentor-table {
+    min-width: 1050px;
+}
+
+.mentor-table thead th {
+    background: rgba(248, 249, 255, 0.8);
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 16px 24px;
+    border-bottom: 1px solid #e4e7f0;
+}
+
+.mentor-table tbody td {
+    padding: 16px 24px;
+    border-bottom: 1px solid #edf0f5;
+}
+
+.mentor-table tbody tr:hover {
+    background: rgba(53, 37, 205, 0.025);
+}
+
+.mentor-row-blocked {
+    background: rgba(186, 26, 26, 0.04);
+}
+
+.mentor-avatar {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.mentor-avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e7e9ff;
+    color: #3525cd;
+    font-weight: 700;
+}
+
+.mentor-expertise {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.mentor-expertise span {
+    background: rgba(53, 37, 205, 0.08);
+    color: #3525cd;
+    padding: 5px 8px;
+    border-radius: 5px;
+    font-size: 11px;
+}
+
+.mentor-performance {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.mentor-performance small {
+    font-size: 11px;
+}
+
+.mentor-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.mentor-status-active {
+    color: #198754;
+    background: rgba(25, 135, 84, 0.08);
+    border: 1px solid rgba(25, 135, 84, 0.15);
+}
+
+.mentor-status-active .status-dot {
+    background: #198754;
+}
+
+.mentor-status-suspended {
+    color: #ba1a1a;
+    background: rgba(186, 26, 26, 0.08);
+    border: 1px solid rgba(186, 26, 26, 0.15);
+}
+
+.mentor-status-suspended .status-dot {
+    background: #ba1a1a;
+}
+
+.mentor-status-blocked {
+    color: #555;
+    background: rgba(80, 80, 80, 0.08);
+    border: 1px solid rgba(80, 80, 80, 0.15);
+}
+
+.mentor-status-blocked .status-dot {
+    background: #555;
+}
+
+.mentor-icon-btn,
+.mentor-more-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    background: transparent;
+    color: #6b7280;
+    border-radius: 6px;
+}
+
+.mentor-icon-btn:hover,
+.mentor-more-btn:hover {
+    color: #3525cd;
+    background: #eef0ff;
+}
+
+.mentor-main-card .dropdown-menu {
+    border: 1px solid #e4e7f0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.mentor-main-card .dropdown-item {
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.mentor-main-card .dropdown-item:hover {
+    background: #f1f2ff;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+    .mentor-search {
+        width: 100%;
+    }
+
+    .mentor-filters {
+        padding: 15px;
+    }
+
+    .mentor-tabs {
+        width: 100%;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+
+    .mentor-tabs button {
+        white-space: nowrap;
+    }
+
+}

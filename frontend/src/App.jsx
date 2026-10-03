@@ -60,6 +60,10 @@ import EditCourse from './pages/mentor/edit_course/EditCourse'
 import AdminCourseManagement from './pages/admin/course_mgmt/AdminCourseManagement'
 import AdminUserManagement from './pages/admin/user_mgmt/AdminUserManagement'
 import AdminReviewManagement from './pages/admin/review_mgmt/AdminReviewManagement'
+import ReportsManagement from './pages/admin/reports_mgmt/ReportsManagement'
+import MentorManagement from './pages/admin/mentor_mgmt/MentorManagement'
+import BadgeManagement from './pages/admin/badge_mgmt/BadgeManagement'
+import AdminSessionManagement from './pages/admin/session_mgmt/AdminSessionManagement'
 import LessonPage from './pages/user/lesson_page/LessonPage'
 import AIAssessment from './pages/user/ai_assessment/AIAssessment'
 
@@ -327,6 +331,26 @@ function App(){
         <Route path='/admin/review-management' element={
           <AdminProtectedRoute>
             <AdminReviewManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/report-management' element={
+          <AdminProtectedRoute>
+            <ReportsManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/mentor-management' element={
+          <AdminProtectedRoute>
+            <MentorManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/badge-management' element={
+          <AdminProtectedRoute>
+            <BadgeManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/session-management' element={
+          <AdminProtectedRoute>
+            <AdminSessionManagement/>
           </AdminProtectedRoute>
         }/>
       </Routes>

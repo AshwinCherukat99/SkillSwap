@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AdminLoginView,MentorVerificationDetailView,ApproveMentorView,RequestMentorInfoView,RejectMentorView,MentorVerificationListView,AdminCourseManagementView,AdminCourseDetailView,AdminCourseApproveView,AdminCourseRejectView,AdminSkillListCreateView,AdminSkillDeleteView,AdminSuggestedSkillListView,AdminApproveSuggestedSkillView,AdminRejectSuggestedSkillView,AdminReviewManagementView,AdminHideReviewView,AdminRevealReviewView,AdminRemoveReviewView,AdminReviewReportsView,AdminReviewReportUpdateView
+from .views import AdminLoginView,MentorVerificationDetailView,ApproveMentorView,RequestMentorInfoView,RejectMentorView,MentorVerificationListView,AdminCourseManagementView,AdminCourseDetailView,AdminCourseApproveView,AdminCourseRejectView,AdminSkillListCreateView,AdminSkillDeleteView,AdminSuggestedSkillListView,AdminApproveSuggestedSkillView,AdminRejectSuggestedSkillView,AdminReviewManagementView,AdminHideReviewView,AdminRevealReviewView,AdminRemoveReviewView,AdminReviewReportsView,AdminReviewReportUpdateView,AdminUserManagementView,AdminUserDetailView,AdminUserUpdateView,AdminBlockUserView,AdminSuspendUserView,AdminActivateUserView,AdminMentorActionView,AdminMentorDetailView,AdminMentorManagementView,AdminMentorStatsView,AdminMentorUpdateView
 
 urlpatterns=[
     path('login/',AdminLoginView.as_view(),name='admin-login'),
@@ -23,4 +23,15 @@ urlpatterns=[
     path('reviews/<int:review_id>/',AdminRemoveReviewView.as_view(),name='admin-remove-review'),
     path('reviews/<int:review_id>/reports/',AdminReviewReportsView.as_view(),name='admin-review-reports'),
     path('reviews/<int:review_id>/reports/<int:report_id>/',AdminReviewReportUpdateView.as_view(),name='admin-review-report-update'),
+    path('users/',AdminUserManagementView.as_view(),name='admin-user-management'),
+    path('users/<int:user_id>/',AdminUserDetailView.as_view(),name='admin-user-details'),
+    path('users/<int:user_id>/update/',AdminUserUpdateView.as_view(),name='admin-user-update'),
+    path('users/<int:user_id>/block/',AdminBlockUserView.as_view(),name='admin-block-user'),
+    path('users/<int:user_id>/suspend/',AdminSuspendUserView.as_view(),name='admin-suspend-user'),
+    path('users/<int:user_id>/active/',AdminActivateUserView.as_view(),name='admin-activate-user'),    
+    path('mentor-management/',AdminMentorManagementView.as_view(),name='admin-mentor-management'),
+    path('mentor-management/stats/',AdminMentorStatsView.as_view(),name='admin-mentor-stats'),
+    path('mentor-management/<int:mentor_id>/',AdminMentorDetailView.as_view(),name='admin-mentor-detail'),
+    path('mentor-management/<int:mentor_id>/action/',AdminMentorActionView.as_view(),name='admin-mentor-action'),
+    path('mentor-management/<int:mentor_id>/edit/',AdminMentorUpdateView.as_view(),name='admin-mentor-update'),
 ]

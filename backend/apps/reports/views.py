@@ -32,6 +32,7 @@ class AdminReportListView(APIView):
         reports=Report.objects.select_related('reporter','reported_user','reported_mentor')
         search=request.query_params.get('search','').strip()
         report_type=request.query_params.get('report_type')
+        target_type=request.query_params.get('target_type')
         priority=request.query_params.get('priority')
         report_status=request.query_params.get('report_status')
         if search:
@@ -43,6 +44,8 @@ class AdminReportListView(APIView):
             )
         if report_type:
             reports=reports.filter(report_type=report_type)
+        if target_type:
+            reports=reports.filter(target_type=target_type)
         if priority:
             reports=reports.filter(priority=priority)
         if report_status:

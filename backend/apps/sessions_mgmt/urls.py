@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView
+from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView,AdminSessionManagementView
 
 urlpatterns=[
     path(
@@ -62,5 +62,10 @@ urlpatterns=[
         'mentor/session-history/',
         MentorCourseSessionHistoryView.as_view(),
         name='mentor-session-history',
+    ),
+    path(
+        'admin/',
+        AdminSessionManagementView.as_view(),
+        name='admin-session-management',
     ),
 ]

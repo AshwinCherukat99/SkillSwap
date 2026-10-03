@@ -1,0 +1,565 @@
+.request-session-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+
+    background: rgba(208, 219, 237, 0.4);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+
+.request-session-modal {
+    width: 100%;
+    max-width: 560px;
+
+    max-height: calc(100vh - 32px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background: rgba(255, 255, 255, 0.85);
+
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+
+    border: 1px solid rgba(255, 255, 255, 0.6);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 25px 50px -12px rgba(18, 28, 42, 0.25);
+
+    animation: requestModalIn 0.25s ease-out;
+}
+
+
+@keyframes requestModalIn {
+
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+
+/* ================= HEADER ================= */
+
+.request-session-header {
+    padding: 24px;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    border-bottom: 1px solid rgba(119, 117, 135, 0.2);
+}
+
+
+.request-session-user {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    min-width: 0;
+}
+
+
+.request-session-avatar-wrapper {
+    position: relative;
+
+    flex-shrink: 0;
+}
+
+
+.request-session-avatar {
+    width: 64px;
+    height: 64px;
+
+    border-radius: 50%;
+
+    object-fit: cover;
+
+    border: 2px solid rgba(79, 70, 229, 0.2);
+
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+
+.request-session-verified {
+    position: absolute;
+
+    right: -2px;
+    bottom: -2px;
+
+    width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #006c49;
+
+    color: white;
+
+    border: 2px solid white;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.request-session-user-info {
+    min-width: 0;
+}
+
+
+.request-session-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    flex-wrap: wrap;
+}
+
+
+.request-session-name-row h2 {
+    margin: 0;
+
+    font-family: "Manrope", sans-serif;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    color: #121c2a;
+}
+
+
+.request-session-badge {
+    padding: 4px 8px;
+
+    border-radius: 999px;
+
+    background: #6cf8bb;
+
+    color: #005236;
+
+    font-size: 10px;
+    font-weight: 600;
+
+    text-transform: uppercase;
+}
+
+
+.request-session-user-info p {
+    margin: 3px 0 0;
+
+    color: #464555;
+
+    font-size: 14px;
+}
+
+
+.request-session-user-info small {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #3525cd;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+.request-session-close {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    color: #464555;
+
+    font-size: 28px;
+
+    line-height: 1;
+
+    transition: 0.2s;
+}
+
+
+.request-session-close:hover {
+    background: #d9e3f6;
+}
+
+
+/* ================= CONTENT ================= */
+
+.request-session-content {
+    padding: 24px;
+
+    overflow-y: auto;
+}
+
+
+.request-session-content::-webkit-scrollbar {
+    width: 4px;
+}
+
+
+.request-session-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.request-session-content::-webkit-scrollbar-thumb {
+    background: #d9e3f6;
+
+    border-radius: 10px;
+}
+
+
+.request-session-content h1 {
+    margin-bottom: 24px;
+
+    font-family: "Manrope", sans-serif;
+
+    font-size: 24px;
+    font-weight: 600;
+
+    color: #121c2a;
+}
+
+
+.request-session-content .form-label {
+    margin-left: 4px;
+
+    color: #464555;
+
+    font-family: "JetBrains Mono", monospace;
+
+    font-size: 12px;
+    font-weight: 500;
+
+    letter-spacing: 0.04em;
+}
+
+
+.session-input,
+.session-textarea {
+    border: 1px solid #c7c4d8;
+
+    background: rgba(248, 249, 255, 0.6);
+
+    border-radius: 8px;
+
+    color: #121c2a;
+
+    font-size: 15px;
+
+    padding: 12px 14px;
+
+    transition: all 0.2s;
+}
+
+
+.session-input:focus,
+.session-textarea:focus {
+    border-color: #4f46e5;
+
+    box-shadow:
+        0 0 0 3px rgba(79, 70, 229, 0.12);
+
+    background: white;
+}
+
+
+.input-icon-wrapper {
+    position: relative;
+}
+
+
+.input-icon-wrapper .input-icon {
+    position: absolute;
+
+    left: 12px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    z-index: 2;
+
+    font-size: 16px;
+
+    pointer-events: none;
+}
+
+
+.input-icon-wrapper .session-input {
+    padding-left: 42px;
+}
+
+
+.skill-preview {
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 10px 14px;
+
+    border: 1px solid #c7c4d8;
+
+    border-radius: 8px;
+
+    background: rgba(248, 249, 255, 0.6);
+
+    color: #121c2a;
+
+    font-size: 14px;
+}
+
+
+/* ================= INFORMATION ================= */
+
+.session-information {
+    display: flex;
+
+    gap: 12px;
+
+    padding: 16px;
+
+    border-radius: 12px;
+
+    background: rgba(108, 248, 187, 0.15);
+
+    border: 1px solid rgba(108, 248, 187, 0.4);
+}
+
+
+.session-information-icon {
+    width: 24px;
+    height: 24px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #006c49;
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.session-information h4 {
+    margin: 0 0 2px;
+
+    color: #005236;
+
+    font-family: "Manrope", sans-serif;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+
+.session-information p {
+    margin: 0;
+
+    color: #005236;
+
+    font-size: 13px;
+
+    line-height: 1.6;
+}
+
+
+/* ================= FOOTER ================= */
+
+.request-session-footer {
+    display: flex;
+
+    gap: 16px;
+
+    padding: 24px;
+
+    background: rgba(239, 244, 255, 0.7);
+
+    border-top: 1px solid rgba(119, 117, 135, 0.1);
+}
+
+
+.request-cancel-btn {
+    flex: 1;
+
+    padding: 13px 24px;
+
+    border: 1px solid #3525cd;
+
+    border-radius: 8px;
+
+    color: #3525cd;
+
+    background: transparent;
+
+    font-family: "Manrope", sans-serif;
+
+    font-size: 16px;
+    font-weight: 600;
+}
+
+
+.request-cancel-btn:hover {
+    background: rgba(53, 37, 205, 0.05);
+
+    color: #3525cd;
+}
+
+
+.request-submit-btn {
+    flex: 2;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    padding: 13px 24px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4f46e5 0%,
+            #3525cd 100%
+        );
+
+    color: white;
+
+    font-family: "Manrope", sans-serif;
+
+    font-size: 16px;
+    font-weight: 600;
+
+    transition: all 0.25s;
+}
+
+
+.request-submit-btn:hover:not(:disabled) {
+    color: white;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 10px 15px -3px rgba(79, 70, 229, 0.3);
+}
+
+
+.request-submit-btn:disabled,
+.request-cancel-btn:disabled {
+    opacity: 0.65;
+
+    cursor: not-allowed;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 576px) {
+
+    .request-session-backdrop {
+        padding: 8px;
+    }
+
+
+    .request-session-modal {
+        max-height: calc(100vh - 16px);
+
+        border-radius: 18px;
+    }
+
+
+    .request-session-header {
+        padding: 18px;
+    }
+
+
+    .request-session-content {
+        padding: 18px;
+    }
+
+
+    .request-session-footer {
+        padding: 18px;
+    }
+
+
+    .request-session-avatar {
+        width: 52px;
+        height: 52px;
+    }
+
+
+    .request-session-name-row h2 {
+        font-size: 17px;
+    }
+
+
+    .request-session-content h1 {
+        font-size: 21px;
+    }
+
+
+    .request-session-footer {
+        flex-direction: column;
+    }
+
+
+    .request-cancel-btn,
+    .request-submit-btn {
+        flex: none;
+
+        width: 100%;
+    }
+
+}

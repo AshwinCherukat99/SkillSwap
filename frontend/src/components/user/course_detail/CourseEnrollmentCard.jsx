@@ -3,6 +3,10 @@ import {useNavigate} from 'react-router-dom'
 
 import api from '../../../services/api'
 
+import paymentApi from '../../../services/paymentApi'
+
+import { loadRazorpay } from '../../../utils/loadRazorpay'
+
 function CourseEnrollmentCard({
     course,
     isEnrolled,
@@ -12,22 +16,69 @@ function CourseEnrollmentCard({
     const handleEnroll=async ()=>{
         try{
             setLoading(true)
-            const response=await api.post(
-                `/courses/${course.id}/enroll/`
+            const razorPayLoaded=await loadRazorpay()
+            if (!razorPayLoaded){
+                alert('unable to load razorpay. please check your internet connection')
+                setLoading(false)
+                return
+            }
+            console.log('razorapay after loading:',window.razorPay)
+            const response=await paymentApi.createCourseOrder(course.id)
+            const data=response.data
+            console.log('payment order created:',data)
+            const options={
+                key:data.razorpay_key_id,
+                amount:Math.round(Number(data.amount)*100),
+                currency:data.currency||'INR',
+                name:'SkillSwap',
+                description:course.title,
+                order_id:data.razorpay_order_id,
+                prefill:{
+                    name:'',
+                    email:'',
+                    contact:'',
+                },
+                notes:{
+                    course_id:String(course.id),
+                    payment_id:String(data.payment_id),
+                },
+                theme:{
+                    color:'#0d6efed'
+                },
+                handler:async function(paymentResponse){
+                    try{
+                        console.log('razorpay payment response:',paymentResponse)   
+                        const verifyResponse=await paymentApi.verifyCoursePayment({
+                            razorpay_order_id:paymentResponse.razorpay_order_id,
+                            razorpay_payment_id:paymentResponse.razorpay_payment_id,
+                            razorpay_signature:paymentResponse.razorpay_signature,
+                        })
+                        console.log('payment verified:',verifyResponse.data)
+                        alert('payment successfull! you have enrolled in the course. have a fun time learning:)')
+                        navigate(`/courses/${course.id}`)
+                    }catch(err){
+                        console.error('payment verification failed:',err)
+                        alert(err.response?.data?.detail||'payment verification failed')
+                    }finally{
+                        setLoading(false)
+                    }
+                },
+                modal:{
+                    ondismiss:function(){
+                        console.log('razorpay checkout closed')
+                        setLoading(false)
+                    }
+                },
+            }
+            console.log("Razorpay:", window.Razorpay)
+            console.log("Razorpay type:", typeof window.Razorpay)
+            const razorpay=new window.Razorpay(
+                options
             )
-            console.log('enrolled:',response.data)
-            alert(JSON.stringify(response['message']))
-            navigate(`/courses/${course.id}`)
-            window.location.reload()
+            razorpay.open()
         }catch(error){
-            console.error(
-                'enrollment failed',
-                error
-            )
-            alert(
-                error.response?.data?.error||
-                'unable to enroll in this course'
-            )
+            console.error('unable to create payment order:',error)
+            alert(error.response?.data?.detail||'unable to start payment')
         }finally{
             setLoading(false)
         }

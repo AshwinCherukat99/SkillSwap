@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.db.models import Sum,Count
 from django.db.models.functions import TruncDate
 from apps.mentors.authentication import MentorJWTAuthentication
+from apps.accounts.permissions import IsAdmin
 from rest_framework import status
 
 class CreateCoursePaymentOrderView(APIView):
@@ -248,3 +249,134 @@ class MentorRequestPayoutView(APIView):
                 'pending_balance':str(wallet.pending_balance),
             },
         },status=status.HTTP_201_CREATED,)
+
+class AdminPaymentDashboardView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[IsAdmin]
+    def get(self,request):
+        now=timezone.now()
+        today=now.date()
+        current_year=now.year
+        current_month=now.month
+        paid_payments=CoursePayment.objects.filter(
+            status=CoursePayment.Status.PAID
+        )
+        today_payments=paid_payments.filter(
+            paid_at__date=today
+        )
+        total_revenue=(
+            paid_payments.aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+        )
+        total_transactions=CoursePayment.objects.count()
+        today_revenue=(
+            today_payments.aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+        )
+        pending_payout_statuses=[
+            MentorPayout.Status.REQUESTED,
+            MentorPayout.Status.PROCESSING,
+            MentorPayout.Status.APPROVED,
+        ]
+        pending_payouts=(MentorPayout.objects.filter(
+            status__in=pending_payout_statuses
+        ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00'))
+        pending_payout_count=(MentorPayout.objects.filter(
+            status__in=pending_payout_statuses
+        ).count())
+        refunded_payments=CoursePayment.objects.filter(
+            status=CoursePayment.Status.REFUNDED,
+        ).count()
+        platform_profit=(
+            paid_payments.aggregate(
+                total=Sum('platform_fee'))['total'] or Decimal('0.00')
+        )
+        current_month_revenue=(
+            paid_payments.filter(
+                paid_at__year=current_year,
+                paid_at__month=current_month
+            ).aggregate(
+                total=Sum('amount')
+            )['total'] or Decimal('0.00')
+        )
+        if current_month==1:
+            previous_month_year=current_year-1
+            previous_month=12
+        else:
+            previous_month_year=current_year
+            previous_month=current_month-1
+        previous_month_revenue=(
+            paid_payments.filter(
+                paid_at__year=previous_month_year,
+                paid_at__month=previous_month,
+            ).aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+        )
+        if previous_month_revenue>0:
+            monthly_growth=(
+            (current_month_revenue-previous_month_revenue)/previous_month_revenue
+            )*Decimal('100')
+        else:
+            monthly_growth=Decimal('0.00')
+        total_payment_attempts=CoursePayment.objects.count()
+        successful_payments=paid_payments.count()
+        if total_payment_attempts>0:
+            transaction_success_rate=(
+                Decimal(successful_payments)/Decimal(total_payment_attempts)*Decimal('100')
+            )
+        else:
+            transaction_success_rate=Decimal('0.00')
+        if successful_payments>0:
+            refund_rate=(
+                Decimal(refunded_payments)/Decimal(successful_payments)*Decimal('100')
+            )
+        else:
+            refund_rate=Decimal('0.00')
+        today_sales_count=today_payments.count()
+        recent_payments=(
+            CoursePayment.objects.select_related('student','course','mentor').order_by('-created_at')[:10]
+        )
+        transactions=[]
+        for payment in recent_payments:
+            student_name=(
+                payment.student.get_full_name() or payment.student.username
+            )
+            transactions.append({
+                'id':payment.id,
+                'transaction_id':(
+                    payment.razorpay_payment_id or payment.razorpay_order_id
+                ),
+                'order_id':payment.razorpay_order_id,
+                'student_name':student_name,
+                'student_username':payment.student.username,
+                'mentor_name':payment.mentor.full_name or payment.mentor.username,
+                'course_title':payment.course.title,
+                'amount':payment.amount,
+                'platform_fee':payment.platform_fee,
+                'mentor_amount':payment.mentor_amount,
+                'status':payment.status,
+                'created_at':payment.created_at,
+                'paid_at':payment.paid_at,
+            })
+        return Response({
+            'overview':{
+                'total_revenue':total_revenue,
+                'total_transactions':total_transactions,
+                'today_revenue':today_revenue,
+                'pending_payouts':pending_payouts,
+                'pending_payout_count':pending_payout_count,
+                'refund_count':refunded_payments,
+                'platform_profit':platform_profit,
+                'monthly_growth':monthly_growth,
+            },
+            'today':{
+                'sales':today_revenue,
+                'transactions':today_sales_count,
+            },
+            'financial_health':{
+                'transaction_success_rate':transaction_success_rate,
+                'refund_rate':refund_rate,
+            },
+            'transactions':transactions,
+        },status=status.HTTP_200_OK)
