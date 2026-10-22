@@ -21,7 +21,7 @@ class User(AbstractUser):
     location=models.CharField(max_length=255,blank=True)
     role=models.CharField(max_length=10,choices=Role.choices,default=Role.USER) 
     status=models.CharField(max_length=10,choices=Status.choices,default=Status.ACTIVE,db_index=True)
-    profile_image=models.ImageField(upload_to='profile_images/',blank=True,null=True)
+    profile_image=models.ImageField(upload_to='profile_images/',default="profile_images/default.jpg",blank=True,null=True)
     phone_number=models.CharField(max_length=15,blank=True,null=True) 
     google_id=models.CharField(
         max_length=255,

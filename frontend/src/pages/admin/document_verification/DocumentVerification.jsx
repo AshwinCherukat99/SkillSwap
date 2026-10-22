@@ -45,6 +45,24 @@ const DocumentVerification=()=>{
             setLoading(false)
         }
     }
+    const handleVerificationChange=async (field,value)=>{
+        try{
+            const response=await adminApi.patch(
+                `/admin/mentors/${mentorId}/verification/`,
+                {
+                    field,
+                    value
+                }
+            )
+            setVerification(response.data.verification)
+        }catch(error){
+            console.error('failed to update verification:',error)
+            setError(error.response?.data?.error ||
+            error.response?.data?.detail ||
+            "Failed to update verification")
+            throw error
+        }
+    }
     useEffect(()=>{
         fetchVerification()
     },[mentorId])
@@ -54,7 +72,8 @@ const DocumentVerification=()=>{
             await adminApi.post(
                 `/admin/mentors/${mentorId}/verification/approve/`
             )
-            await fetchVerification()
+            alert('mentor has been approved successfully')
+            navigate('/admin/verification-list/')
         }catch(error){
             console.error('failed to approve mentor:',error)
             setError(error.response?.data?.error||'failed to approve mentor')
@@ -229,6 +248,7 @@ const DocumentVerification=()=>{
 
                                 <VerificationChecklist
                                     verification={verification}
+                                    onVerificationChange={handleVerificationChange}
                                 />
 
                                 <VerificationActions

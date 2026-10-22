@@ -1,7 +1,51 @@
-import React,{useState} from "react";
+import React,{ useState } from "react";
 
 import AchievementRule from "./AchievementRule";
 import BadgePreview from "./BadgePreview";
+
+const materialIcons = [
+    "workspace_premium",
+    "emoji_events",
+    "military_tech",
+    "star",
+    "stars",
+    "verified",
+    "school",
+    "menu_book",
+    "local_fire_department",
+    "bolt",
+    "diamond",
+    "favorite",
+    "thumb_up",
+    "groups",
+    "person",
+    "psychology",
+    "lightbulb",
+    "rocket_launch",
+    "trending_up",
+    "auto_awesome",
+    "workspace_premium",
+    "trophy",
+    "grade",
+    "shield",
+    "security",
+    "check_circle",
+    "celebration",
+    "volunteer_activism",
+    "handshake",
+    "forum",
+    "chat",
+    "code",
+    "language",
+    "design_services",
+    "school",
+    "engineering",
+    "palette",
+    "fitness_center",
+    "sports",
+    "timer",
+    "calendar_month",
+];
 
 const BadgeForm=({
     initialData,
@@ -22,6 +66,8 @@ const BadgeForm=({
             target_value:rule.target_value,
         }))||[]
     })
+    const [iconSearch,setIconSearch]=useState('')
+    const [showIconPicker,setShowIconPicker]=useState(false)
     const handleChange=(e)=>{
         const {name,value}=e.target
         setForm(prev=>({
@@ -69,6 +115,8 @@ const BadgeForm=({
             xp_reward:Number(form.xp_reward)
         })
     }
+    const filteredIcons=materialIcons.filter((icon)=>
+    icon.toLowerCase().includes(iconSearch.toLowerCase()))
     return (
         <form onSubmit={handleSubmit}>
 
@@ -143,19 +191,95 @@ const BadgeForm=({
                     <div className="row g-3">
 
                         <div className="col-md-4">
+    <label className="form-label">
+        Icon
+    </label>
 
-                            <label className="form-label">
-                                Icon
-                            </label>
+    <div className="position-relative">
 
-                            <input
-                                name="icon"
-                                className="form-control"
-                                value={form.icon}
-                                onChange={handleChange}
-                            />
+        {/* Selected icon */}
+        <button
+            type="button"
+            className="form-control d-flex align-items-center gap-2 text-start"
+            onClick={() =>
+                setShowIconPicker(prev => !prev)
+            }
+        >
+            <span className="material-symbols-outlined">
+                {form.icon}
+            </span>
 
-                        </div>
+            <span>
+                {form.icon}
+            </span>
+        </button>
+
+        {/* Icon picker */}
+        {showIconPicker && (
+            <div
+                className="position-absolute bg-white border rounded-3 shadow p-3"
+                style={{
+                    zIndex: 1000,
+                    width: "350px",
+                    maxHeight: "350px",
+                    overflowY: "auto",
+                    top: "100%",
+                    left: 0,
+                }}
+            >
+
+                {/* Search */}
+                <input
+                    type="text"
+                    className="form-control mb-3"
+                    placeholder="Search icons..."
+                    value={iconSearch}
+                    onChange={(e) =>
+                        setIconSearch(e.target.value)
+                    }
+                />
+
+                {/* Icons */}
+                <div
+                    className="d-grid"
+                    style={{
+                        gridTemplateColumns:
+                            "repeat(6, 1fr)",
+                        gap: "8px",
+                    }}
+                >
+                    {filteredIcons.map((icon) => (
+                        <button
+                            key={icon}
+                            type="button"
+                            className={`btn ${
+                                form.icon === icon
+                                    ? "btn-primary"
+                                    : "btn-light"
+                            }`}
+                            title={icon}
+                            onClick={() => {
+                                setForm(prev => ({
+                                    ...prev,
+                                    icon,
+                                }));
+
+                                setShowIconPicker(false);
+                                setIconSearch("");
+                            }}
+                        >
+                            <span className="material-symbols-outlined">
+                                {icon}
+                            </span>
+                        </button>
+                    ))}
+                </div>
+
+            </div>
+        )}
+
+    </div>
+</div>
 
                         <div className="col-md-4">
 

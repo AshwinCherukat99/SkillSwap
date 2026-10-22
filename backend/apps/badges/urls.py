@@ -1,12 +1,17 @@
 from django.urls import path
 
-from .views import BadgeDashboardView,AdminBadgeListCreateView,AdminBadgeDetailView
+from .views import BadgeDashboardView,AdminBadgeListCreateView,AdminBadgeDetailView,EvaluateMyBadgesView
 
 urlpatterns=[
     path(
         '',
         BadgeDashboardView.as_view(),
         name='badge-dashboard',
+    ),
+    path(
+        'evaluate/',
+        EvaluateMyBadgesView.as_view(),
+        name='evaluate-my-badges',
     ),
     path(
         'admin/',

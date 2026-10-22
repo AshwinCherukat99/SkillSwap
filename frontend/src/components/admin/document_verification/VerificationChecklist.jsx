@@ -1,8 +1,8 @@
-import React from 'react'
+import React,{useState} from 'react'
 
 import { ClipboardCheck } from 'lucide-react'
 
-const VerificationChecklist=({verification})=>{
+const VerificationChecklist=({verification,onVerificationChange})=>{
     const items=[
         {
             key: 'identity_verified',
@@ -29,6 +29,21 @@ const VerificationChecklist=({verification})=>{
                 'Submitted portfolio has been reviewed.',
         },
     ]
+    const [updatingKey,setUpdatingKey]=useState(null)
+    const handleToggle=async (key,currentValue)=>{
+        const newValue=!currentValue
+        try{
+            setUpdatingKey(key)
+            await onVerificationChange(
+                key,
+                newValue
+            )
+        }catch(error){
+            console.error('verification update failed:',error)
+        }finally{
+            setUpdatingKey(null)
+        }
+    }
     return (
         <section className="card border-0 shadow-sm verification-card">
 
@@ -53,6 +68,8 @@ const VerificationChecklist=({verification})=>{
                         const verified =
                             verification?.[item.key] === true
 
+                        const updating=updatingKey===item.key
+
                         return (
                             <div
                                 key={item.key}
@@ -68,13 +85,21 @@ const VerificationChecklist=({verification})=>{
                                 <div className="form-check">
 
                                     <input
+                                        id={`verification-${item.key}`}
                                         className="form-check-input"
                                         type="checkbox"
                                         checked={verified}
-                                        readOnly
+                                        disabled={updating}
+                                        onChange={()=>
+                                            handleToggle(item.key,verified)
+                                        }
                                     />
 
-                                    <label className="form-check-label">
+                                    <label htmlFor={`verification-${item.key}`} 
+                                    className="form-check-label"
+                                    style={{
+                                        cursor:updating?'default':'pointer'
+                                    }}>
 
                                         <div className="fw-semibold">
                                             {item.title}

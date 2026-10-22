@@ -8,7 +8,7 @@ from .managers import MentorManager
 class Mentor(AbstractBaseUser):
     class Status(models.TextChoices):
         ACTIVE='ACTIVE','Active'
-        SUSPENDED='SUPENDED','Suspended'
+        SUSPENDED='SUSPENDED','Suspended'
         BLOCKED='BLOCKED','Blocked'
     user=models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -31,6 +31,7 @@ class Mentor(AbstractBaseUser):
     )
     profile_image=models.ImageField(
         upload_to='mentor_profiles/',
+        default='mentor_profiles/mentor_default.webp',
         blank=True,
         null=True,
     )
@@ -38,6 +39,11 @@ class Mentor(AbstractBaseUser):
         max_length=15,
         blank=True,
         null=True,
+    )
+    status=models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.ACTIVE,
     )
     is_verified=models.BooleanField(
         default=False,

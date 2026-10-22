@@ -19,8 +19,9 @@ from .views.recommendation import RecommendedUsersView
 from .views.leaderboard import LeaderBoardView,MyLeaderBoardRankView
 from .views.mentors import MentorListView
 from .views.skills import SuggestSkillView
+from .views.users import PublicUserProfileView
 from .views.friends import FriendsListView,AddFriendView,AcceptFriendRequestView,RejectFriendRequestView,FriendRequestListView
-from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView 
 urlpatterns=[
     path(
         'register/',
@@ -157,4 +158,9 @@ urlpatterns=[
         SuggestSkillView.as_view(),
         name='suggest-skill'
     ),
+    path(
+        '<int:user_id>/profile/',
+        PublicUserProfileView.as_view(),
+        name='public-user-profile',
+    )
 ]

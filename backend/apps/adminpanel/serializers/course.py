@@ -59,6 +59,10 @@ class AdminCourseLessonSerializer(serializers.ModelSerializer):
         ]
 
 class AdminCourseModuleSerializer(serializers.ModelSerializer):
+    lessons=AdminCourseLessonSerializer(
+        many=True,
+        read_only=True,
+    )
     class Meta:
         model=CourseModule
         fields=[

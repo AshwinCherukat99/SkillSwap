@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CourseListView,StartAssessmentView,MentorCourseManagementView,MentorStudentsView,CourseCategoryListView,MentorCourseDetailView,UserCourseDetailView,CourseEnrollView,MentorCourseUpdateView,SaveAssessmentAnswerView,SubmitAssessmentView,UserLessonDetailView
+from .views import CourseListView,MentorEnrollmentProfileView,MentorUnlockLessonView,StartAssessmentView,MentorCourseManagementView,MentorStudentsView,CourseCategoryListView,MentorCourseDetailView,UserCourseDetailView,CourseEnrollView,MentorCourseUpdateView,SaveAssessmentAnswerView,SubmitAssessmentView,UserLessonDetailView,MentorCourseSubmitReviewView,AssessmentResultDetailView
 
 print("COURSES URLS LOADED")
 
@@ -59,5 +59,25 @@ urlpatterns=[
         '<int:course_id>/lessons/<int:lesson_id>/',
         UserLessonDetailView.as_view(),
         name='user-lesson-detail',
+    ),
+    path(
+        'mentor/<int:course_id>/submit-review/',
+        MentorCourseSubmitReviewView.as_view(),
+        name='mentor-course-submit-review',
+    ),
+    path(
+        'assessments/<int:assessment_id>/result/',
+        AssessmentResultDetailView.as_view(),
+        name='assessment-result-detail',
+    ),
+    path(
+        'mentor/<int:course_id>/enrollments/<int:enrollment_id>/lessons/<int:lesson_id>/unlock/',
+        MentorUnlockLessonView.as_view(),
+        name='mentor-unlock-lesson',
+    ),
+    path(
+        'mentor/enrollments/<int:enrollment_id>/profile/',
+        MentorEnrollmentProfileView.as_view(),
+        name='mentor-enrollment-profile'
     ),
 ]

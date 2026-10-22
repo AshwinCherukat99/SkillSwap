@@ -1,4 +1,4 @@
-function BadgeFilters({activeFilter,setActiveFilte}){
+function BadgeFilters({activeFilter,setActiveFilter}){
     return (
         <div className="badge-filters">
 

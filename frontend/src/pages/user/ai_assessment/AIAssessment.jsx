@@ -1,4 +1,4 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect,useCallback,useRef} from 'react'
 
 import {useParams,useNavigate} from 'react-router-dom'
 
@@ -7,6 +7,7 @@ import AssessmentReview from '../../../components/user/ai_assessment/AssessmentR
 import AssessmentProgress from '../../../components/user/ai_assessment/AssessmentProgress'
 import QuestionCard from '../../../components/user/ai_assessment/QuestionCard'
 import QuestionNavigator from '../../../components/user/ai_assessment/QuestionNavigator'
+import AssessmentTimer from '../../../components/user/ai_assessment/AssessmentTimer'
 
 import api from '../../../services/api'
 
@@ -20,6 +21,7 @@ const AIAssessment=()=>{
     const [error,setError]=useState('')
     const [reviewMode,setReviewMode]=useState(false)
     const [submitting,setSubmitting]=useState(false)
+    const submissionStarted=useRef(false)
     useEffect(()=>{
         startAssessment()
     },[courseId])
@@ -46,7 +48,7 @@ const AIAssessment=()=>{
         }
         setAnswers(previous=>({
             ...previous,
-            [question.id]:answer,
+            [String(question.id)]:answer,
         }))
     }
     const goToQuestion=(index)=>{
@@ -70,22 +72,59 @@ const AIAssessment=()=>{
     const handleBackToQuestions=()=>{
         setReviewMode(false)
     }
-    const handleSubmit=async ()=>{
+    const handleSubmit=useCallback(async ()=>{
+        if (submitting||submissionStarted.current||!assessment){
+            return
+        }
         try{
             setSubmitting(true)
             setError('')
-            console.log('submitting assessment:',assessment.id)
+            console.log('========== FRONTEND SUBMISSION ==========')
+        console.log('ASSESSMENT ID:', assessment.id)
+        console.log('QUESTIONS:', questions)
+        console.log('ANSWERS STATE:', answers)
+            const submittedAnswers=questions.map(question=>({
+                question_id:question.id,
+                answer:answers[String(question.id)]??''
+            }))
+            console.log(
+            'SUBMITTED ANSWERS:',
+            submittedAnswers
+        )
+
+        console.log(
+            'ANSWERS JSON:',
+            JSON.stringify({
+                answers: submittedAnswers,
+            }, null, 2)
+        )
+
+        console.log('==========================================')
             const response=await api.post(
-                `/courses/assessments/${assessment.id}/submit/`
+                `/courses/assessments/${assessment.id}/submit/`,
+                {
+                    answers:submittedAnswers
+                }
             )
+        console.log('post succeeded:',response.status)
+        console.log('full response:',response.data)
+        const assessmentData=response.data.assessment
+        const resultData=response.data.result
+        console.log('assessment:',assessmentData)
+        console.log('result:',resultData)
+        navigate(`/courses/${courseId}/assessment/${assessment.id}/result`,{
+            state:{assessment:assessmentData,result:resultData},
+        })
+        console.log('navigate called')
             console.log('assessment submitted successfully:',response.data)
         }catch(error){
             console.error('failed to submit assessment-',error)
             setError(error.response?.data?.error||'failed to submit assessment')
+            submissionStarted.current=false
         }finally{
             setSubmitting(false)
         }
-    }
+    },[submitting,assessment,questions,answers,api,navigate,courseId])
     if (loading){
         return (
             <div className="container py-5">
@@ -146,6 +185,15 @@ const AIAssessment=()=>{
                 assessment={assessment}
             />
 
+            <div className="container-fluid px-4 px-lg-5 pt-3">
+    <div className="d-flex justify-content-end">
+        <AssessmentTimer
+            deadline={assessment.deadline}
+            onTimeUp={handleSubmit}
+            disabled={submitting}
+        />
+    </div>
+</div>
 
             <AssessmentProgress
                 currentQuestion={currentQuestion}

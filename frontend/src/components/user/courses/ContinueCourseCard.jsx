@@ -1,4 +1,8 @@
 function ContinueCourseCard({course,onContinue}){
+    const progress=Math.min(
+        100,
+        Math.max(0,Number(course.progress||0))
+    )
     return (
         <div className="course-card continue-course-card">
 
@@ -32,31 +36,24 @@ function ContinueCourseCard({course,onContinue}){
                 </p>
 
                 <div className="progress-info">
+    <div className="d-flex justify-content-between">
+        <span>Progress: {progress}%</span>
+    </div>
 
-                    <div className="d-flex justify-content-between">
-
-                        <span>
-                            Progress: {course.progress}%
-                        </span>
-
-                    </div>
-
-                    <div className="progress course-progress">
-
-                        <div
-                            className="progress-bar"
-                            role="progressbar"
-                            style={{
-                                width: `${course.progress}%`
-                            }}
-                            aria-valuenow={course.progress}
-                            aria-valuemin="0"
-                            aria-valuemax="100"
-                        />
-
-                    </div>
-
-                </div>
+    <div
+        className="progress course-progress"
+        role="progressbar"
+        aria-label={`${course.title} progress`}
+        aria-valuenow={progress}
+        aria-valuemin={0}
+        aria-valuemax={100}
+    >
+        <div
+            className="progress-bar"
+            style={{ width: `${progress}%` }}
+        />
+    </div>
+</div>
 
                 <button
                     type="button"

@@ -34,3 +34,25 @@ class AdminUserSerializer(serializers.ModelSerializer):
         if request:
             return request.build_absolute_uri(obj.profile_image.url)
         return obj.profile_image.url
+
+class AdminUserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=[
+            'id',
+            'username',
+            'email',
+            'full_name',
+            'bio',
+            'location',
+            'role',
+            'status',
+            'is_active',
+            'profile_image',
+            'phone_number',
+            'xp',
+            'current_streak',
+            'last_session_date',
+            'date_joined',
+        ]
+        read_only_fields=fields

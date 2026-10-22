@@ -1,17 +1,23 @@
 import React,{useMemo,useState,useEffect} from 'react'
+import {useNavigate} from 'react-router-dom'
 import MentorStudentsHeader from '../../../components/mentor/student_mgmt/MentorStudentsHeader'
 import StudentStats from '../../../components/mentor/student_mgmt/StudentStats'
 import StudentGrid from '../../../components/mentor/student_mgmt/StudentGrid'
 import mentorApi from '../../../services/mentorApi'
+import ScheduleCourseSessionModal from '../../../components/mentor/student_mgmt/ScheduleCourseSessionModal'
 
 import './MentorStudents.css'
 
 const MentorStudents=()=>{
+    const navigate=useNavigate()
     const [students,setStudents]=useState([])
     const [courses,setCourses]=useState([])
     const [search,setSearch]=useState("")
+    const [showScheduleModal,setShowScheduleModal]=useState(false)
+    const [selectedStudent,setSelectedStudent]=useState(null)
     const [selectedCourse,setSelectedCourse]=useState('all')
     const [selectedStatus,setSelectedStatus]=useState('all')
+    const [openingChatFor,setOpeningChatFor]=useState(null)
     const [stats,setStats]=useState({
         total_students:0,
         active_now:0,
@@ -51,6 +57,14 @@ const MentorStudents=()=>{
         fetchStudents()
         fetchCourses()
     },[])
+    const handleScheduleSession=(student)=>{
+        setSelectedStudent(student)
+        setShowScheduleModal(true)
+    }
+    const handleCloseScheduleModal=()=>{
+        setShowScheduleModal(false)
+        setSelectedStudent(null)
+    }
     const groupedStudents=useMemo(()=>{
         const grouped={}
         students.forEach((enrollment)=>{
@@ -62,6 +76,7 @@ const MentorStudents=()=>{
                     username:enrollment.username,
                     profile_image:enrollment.profile_image,
                     courses:[],
+                    enrollments:[],
                 }
             }
             grouped[studentId].courses.push({
@@ -73,6 +88,14 @@ const MentorStudents=()=>{
                 completed_at:enrollment.completed_at,
                 status:enrollment.completed_at!==null?'completed':'active',
             })
+            grouped[studentId].enrollments.push({
+                id:enrollment.id,
+                course_id:enrollment.course_id,
+                course_title:enrollment.course_title,
+                progress:enrollment.progress??0,
+                enrolled_at:enrollment.enrolled_at,
+                completed_at:enrollment.completed_at,
+            })
         })
         return Object.values(grouped)
     },[students])
@@ -80,22 +103,47 @@ const MentorStudents=()=>{
         return groupedStudents.filter((student)=>{
             const studentName=student.full_name||''
             const matchesSearch=studentName.toLowerCase().includes(search.trim().toLowerCase())
-            const matchesCourse=selectedCourse==='all'||student.courses.some((course)=>String(course.course_id)===String(selectedCourse))
-            const status=student.completed_at!==null?'completed':'active'
+            const matchesCourse=selectedCourse==='all'||student.courses.some((course)=>String(course.course_id)===String(selectedCourse)) 
+            const isCompleted=student.courses.length>0 && student.courses.every(
+                (course)=>course.completed_at!=null
+            )
+            const status=isCompleted?'completed':'active'
             const matchesStatus=selectedStatus==='all'||status===selectedStatus
             return (matchesSearch&&matchesCourse&&matchesStatus)
-        }).map((student)=>({
-            ...student,
-            status:student.completed_at!==null?'completed':'active',
-            selectedEnrollment:student,
-            enrollment_id:student.id,
-        }))
+        }).map((student)=>{
+            const isCompleted=student.courses.length>0 && student.courses.every(
+                (course)=>course.completed_at!=null
+            ) 
+            return {
+                ...student,
+                status:isCompleted?'completed':'active'
+            }
+        })
     },[
         groupedStudents,
         search,
         selectedCourse,
         selectedStatus,
     ])
+    const handleMessageStudent=async (student)=>{
+        try{
+            setOpeningChatFor(student.student_id)
+            setError('')
+            const response=await mentorApi.post(
+                '/chat/mentor/direct-chat/start/',
+                {
+                    user_id:student.student_id
+                }
+            )
+            const conversationId=response.data.id
+            navigate(`/mentor/direct-chat/?conversation=${conversationId}`)
+        }catch(err){
+            console.error('failed to open student chat:',err)
+            setError(err.response?.data?.detail||'unable to open conversation')
+        }finally{
+            setOpeningChatFor(null)
+        }
+    }
     return (
     <div className="mentor-students-page">
       <div className="container-fluid py-4">
@@ -136,8 +184,15 @@ const MentorStudents=()=>{
         <StudentGrid
           students={filteredStudents}
           loading={loading}
+          onScheduleSession={handleScheduleSession}
+          onMessage={handleMessageStudent}
         />
       </div>
+      <ScheduleCourseSessionModal
+      show={showScheduleModal}
+      onClose={handleCloseScheduleModal}
+      student={selectedStudent}
+      onScheduled={fetchStudents}/>
     </div>
     )
 }    

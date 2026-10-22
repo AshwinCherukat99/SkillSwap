@@ -273,7 +273,7 @@ body {
 
 @media (min-width: 768px) {
     .profile-main {
-        margin-left: 256px;
+        margin-left: 0;
         padding-left: 32px;
         padding-right: 32px;
     }

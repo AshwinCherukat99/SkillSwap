@@ -2,8 +2,8 @@ import React,{useEffect,useState} from 'react'
 
 import mentorApi from '../../../services/mentorApi'
 
-import SessionStats from '../../../components/user/upcoming_sessions/SessionStats'
-import SessionFilters from '../../../components/user/upcoming_sessions/SessionFilters'
+import SessionStats from '../../../components/mentor/upcoming_sessions/SessionStats'
+import SessionFilters from '../../../components/mentor/upcoming_sessions/SessionFilters'
 import UpcomingSessionCard from '../../../components/mentor/upcoming_sessions/UpcomingSessionCard'
 import EmptyState from '../../../components/mentor/upcoming_sessions/EmptyState'
 
@@ -56,7 +56,7 @@ const MentorUpcomingSessions=()=>{
         }
         try{
             await mentorApi.post(
-                `/sessions/mentor/course-sessions/${session.id}/cancel/`,
+                `/sessions/mentor/course-session/${session.id}/cancel/`,
                 {
                     cancellation_reason:'cancelled by mentor'
                 }

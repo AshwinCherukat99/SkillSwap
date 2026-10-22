@@ -93,27 +93,34 @@
     border-color: #b8c1ff;
 }
 
+
 .course-mentor-image,
 .course-mentor-placeholder {
     width: 52px;
     height: 52px;
+    min-width: 52px;
+    min-height: 52px;
     border-radius: 50%;
     flex-shrink: 0;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
 .course-mentor-image {
+    display: block;
     object-fit: cover;
+    object-position: center;
 }
 
 .course-mentor-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #e9ecef;
     color: #6c757d;
     font-size: 1.25rem;
 }
+
 
 /* -----------------------------------------
    Stats

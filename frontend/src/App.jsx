@@ -1,5 +1,7 @@
 import Login from './pages/user/login/Login' 
 import {BrowserRouter,Routes,Route,Navigate,} from 'react-router-dom'
+import {ToastContainer} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import ProtectedRoute from './components/ProtectedRoute' 
 import PublicRoute from './components/PublicRoute'
 import Feed from './pages/user/feed/Feed'
@@ -37,6 +39,7 @@ import LeaderBoard from './pages/user/leaderboard/LeaderBoard'
 import MentorEditProfile from './pages/mentor/edit_profile/MentorEditProfile'
 import MainLayout from './layouts/MainLayout'
 import MentorLayout from './layouts/MentorLayout'
+import AdminLayout from './layouts/AdminLayout'
 import MentorGroupChat from './pages/mentor/group_chat/MentorGroupChat'
 import MentorCourseManagement from './pages/mentor/course_mgmt/MentorCourseManagement'
 import MentorStudents from './pages/mentor/student_mgmt/MentorStudents'  
@@ -64,12 +67,33 @@ import ReportsManagement from './pages/admin/reports_mgmt/ReportsManagement'
 import MentorManagement from './pages/admin/mentor_mgmt/MentorManagement'
 import BadgeManagement from './pages/admin/badge_mgmt/BadgeManagement'
 import AdminSessionManagement from './pages/admin/session_mgmt/AdminSessionManagement'
+import AdminPaymentsDashboard from './pages/admin/payments_dashboard/AdminPaymentsDashboard'
+import PaymentTransactions from './pages/admin/transactions/PaymentTransactions'
+import ConversationsPage from './pages/user/direct_chat/ConversationsPage'
 import LessonPage from './pages/user/lesson_page/LessonPage'
+import VideoCallPage from './pages/video_call/VideoCallPage'
 import AIAssessment from './pages/user/ai_assessment/AIAssessment'
+import CreateBadge from './components/admin/badge_mgmt/CreateBadge'
+import SkillManagement from './pages/admin/skill_mgmt/SkillManagement'
+import MentorDirectChat from './pages/mentor/direct_chat/MentorDirectChat'
+import AssessmentResult from './pages/user/assessment_result/AssessmentResult'
+import MentorPayouts from './pages/admin/mentor_payouts/MentorPayouts'
+import MentorStudentProfile from './pages/mentor/student_profile/MentorStudentProfile'
+import EditBadge from './components/admin/badge_mgmt/EditBadge'
+import AdminMentorProfile from './pages/admin/mentor_profile/AdminMentorProfile'
+import AdminUserProfile from './pages/admin/user_profile/AdminUserProfile'
+import PublicUserProfile from './pages/user/user_profile/PublicUserProfile'
 
 function App(){
   return (
     <BrowserRouter>
+    <ToastContainer
+        position='top-right'
+        autoClose={5000}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        theme='light'/>
       <Routes>
         <Route path='/' element={
           <Home/>
@@ -205,6 +229,11 @@ function App(){
             <Chat/>
           </ProtectedRoute>
         }/>
+        <Route path='/direct-chat' element={
+          <ProtectedRoute>
+            <ConversationsPage/>
+          </ProtectedRoute>
+        }/>
         <Route path='/courses/:courseId/lessons/:lessonId' element={
           <ProtectedRoute>
             <LessonPage/>
@@ -213,6 +242,21 @@ function App(){
         <Route path='/courses/:courseId/assessment' element={
           <ProtectedRoute>
             <AIAssessment/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/video-call/:roomName/:conversationId' element={
+          <ProtectedRoute>
+            <VideoCallPage/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/courses/:courseId/assessment/:assessmentId/result' element={
+          <ProtectedRoute>
+            <AssessmentResult/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/:userId/profile/' element={
+          <ProtectedRoute>
+            <PublicUserProfile/>
           </ProtectedRoute>
         }/>
         </Route>
@@ -294,10 +338,21 @@ function App(){
             <EditCourse/>
           </MentorProtectedRoute>
         }/>
+        <Route path='/mentor/direct-chat/' element={
+          <MentorProtectedRoute>
+            <MentorDirectChat/>
+          </MentorProtectedRoute>
+        }/>   
+        <Route path='/mentor/students/:enrollmentId' element={
+          <MentorProtectedRoute>
+            <MentorStudentProfile/>
+          </MentorProtectedRoute>
+        }/>
         </Route>
         <Route path='/admin/login/' element={
           <AdminLogin/>
         }/>
+        <Route element={<AdminLayout/>}>
         <Route path='/admin/dashboard/' element={
           <AdminProtectedRoute>
             <AdminDashboard/>
@@ -353,6 +408,47 @@ function App(){
             <AdminSessionManagement/>
           </AdminProtectedRoute>
         }/>
+        <Route path='/admin/payment-management' element={
+          <AdminProtectedRoute>
+            <AdminPaymentsDashboard/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/payments/transactions' element={
+          <AdminProtectedRoute>
+            <PaymentTransactions/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/payments/mentor-payouts' element={
+          <AdminProtectedRoute>
+            <MentorPayouts/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/badges/create' element={
+          <AdminProtectedRoute>
+            <CreateBadge/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/badges/:badgeId/edit' element={
+          <AdminProtectedRoute>
+            <EditBadge/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/skill-management' element={
+          <AdminProtectedRoute>
+            <SkillManagement/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/mentor-management/:mentorId/' element={
+          <AdminProtectedRoute>
+            <AdminMentorProfile/>
+          </AdminProtectedRoute>
+        }/> 
+        <Route path='/admin/user-management/:userId/' element={
+          <AdminProtectedRoute>
+            <AdminUserProfile/>
+          </AdminProtectedRoute>
+        }/>
+        </Route>
       </Routes>
     </BrowserRouter>
   )

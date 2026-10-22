@@ -152,7 +152,7 @@ class LessonProgress(models.Model):
     )
     is_unlocked=models.BooleanField(default=False)
     is_completed=models.BooleanField(default=False)
-    unlocked_at=models.BooleanField(null=True,blank=True)
+    unlocked_at=models.DateTimeField(null=True,blank=True)
     completed_at=models.DateTimeField(null=True,blank=True)
     class Meta:
         constraints=[
@@ -193,8 +193,10 @@ class Assessment(models.Model):
         choices=Status.choices,
         default=Status.IN_PROGRESS
     )
-    started_at=models.DateTimeField(auto_now_add=True)
+    started_at=models.DateTimeField(null=True,blank=True)
     completed_at=models.DateTimeField(null=True,blank=True)
+    deadline=models.DateTimeField(null=True,blank=True)
+    duration_seconds=models.PositiveIntegerField(default=1800)
     def __str__(self):
         return f'{self.enrollment.user.username}-{self.course.title}'
 

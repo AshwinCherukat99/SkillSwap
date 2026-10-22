@@ -15,7 +15,7 @@ const CourseOverview=({course})=>{
 
                         <div className="course-thumbnail-wrapper">
 
-                            {course.thumbnail ? (
+                            {course.thumbnail_url ? (
 
                                 <img
                                     src={course.thumbnail_url}

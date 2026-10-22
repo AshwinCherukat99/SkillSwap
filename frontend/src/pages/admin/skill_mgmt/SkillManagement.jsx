@@ -2,6 +2,14 @@ import React,{useEffect,useState} from "react";
 
 import adminApi from '../../../services/adminApi'
 
+import './SkillManagement.css'
+
+import SkillManagementHeader from '../../../components/admin/skill_mgmt/SkillManagementHeader'
+import SkillList from '../../../components/admin/skill_mgmt/SkillList'
+import SkillSuggestionList from '../../../components/admin/skill_mgmt/SkillSuggestionList'
+import AddSkillModal from '../../../components/admin/skill_mgmt/AddSkillModal'
+import RejectSkillModal from '../../../components/admin/skill_mgmt/RejectSkillModal'
+
 const SkillManagement=()=>{
     const [skills,setSkills]=useState([])
     const [suggestions,setSuggestions]=useState([])
@@ -10,7 +18,7 @@ const SkillManagement=()=>{
     const [loadingSkills,setLoadingSkills]=useState(true)
     const [loadingSuggestions,setLoadingSuggestions]=useState(true)
     const [error,setError]=useState('')
-    const [showAddModel,setShowAddModal]=useState(false)
+    const [showAddModal,setShowAddModal]=useState(false)
     const [rejectSuggestion,setRejectSuggestion]=useState(null)
     const fetchSkills=async ()=>{
         try{
@@ -57,7 +65,8 @@ const SkillManagement=()=>{
     const handleAddSkill=async (data)=>{
         try{
             await adminApi.post(
-                '/admin/skills/'
+                '/admin/skills/',
+                data
             )
             setShowAddModal(false)
             await fetchSkills()

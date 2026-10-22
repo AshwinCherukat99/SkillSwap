@@ -692,7 +692,7 @@
 
 @media (min-width: 992px) {
     .myskills-main {
-        margin-left: 256px;
+        margin-left: 0;
     }
 }
 

@@ -1,8 +1,12 @@
 import React,{useEffect,useState,useRef} from "react";
 
-const MessageInput=({onSend,connected})=>{
+const MessageInput=({onSend,onUploadFiles,connected})=>{
     const [message,setMessage]=useState('')
     const textareaRef=useRef(null)     
+    const [uploading,setUploading]=useState(false)
+    const [uploadError,setUploadError]=useState('')
+    const fileInputRef=useRef(null)
+    const [selectedFiles,setSelectedFiles]=useState([])
     useEffect(()=>{
         const textarea=textareaRef.current
         if (!textarea){
@@ -28,12 +32,78 @@ const MessageInput=({onSend,connected})=>{
             sendMessage()
         }
     }
+    const handleFileSelection = (event) => {
+    const files = Array.from(event.target.files || []);
+
+    if (files.length) {
+        setSelectedFiles((previous) => [
+            ...previous,
+            ...files,
+        ]);
+        setUploadError("");
+    }
+
+    event.target.value = "";
+};
+const sendFiles = async () => {
+    if (!connected || !selectedFiles.length || uploading) {
+        return;
+    }
+
+    try {
+        setUploading(true);
+        setUploadError("");
+
+        await onUploadFiles(selectedFiles);
+
+        setSelectedFiles([]);
+    } catch (error) {
+        console.error("File upload failed:", error);
+
+        setUploadError(
+            error?.response?.data?.detail ||
+            error?.response?.data?.error ||
+            "File upload failed."
+        );
+    } finally {
+        setUploading(false);
+    }
+};
     return (
         <div className="chat-input-container">
 
             <div className="chat-input-box">
 
                 <div className="flex-grow-1">
+
+                    {selectedFiles.length > 0 && (
+    <div className="selected-files">
+        {selectedFiles.map((file, index) => (
+            <div
+                className="selected-file"
+                key={`${file.name}-${index}`}
+            >
+                <i className="bi bi-file-earmark"></i>
+
+                <span>{file.name}</span>
+
+                <button
+                    type="button"
+                    onClick={() =>
+                        setSelectedFiles((previous) =>
+                            previous.filter(
+                                (_, i) => i !== index
+                            )
+                        )
+                    }
+                    title="Remove file"
+                >
+                    <i className="bi bi-x"></i>
+                </button>
+            </div>
+        ))}
+    </div>
+)}
 
                     <textarea
                         ref={textareaRef}
@@ -57,11 +127,19 @@ const MessageInput=({onSend,connected})=>{
 
                     <div className="chat-input-tools">
 
+                        <input 
+                        ref={fileInputRef}
+                        type="file"
+                        multiple
+                        hidden
+                        onChange={handleFileSelection} />
+
                         <button
                             type="button"
                             className="btn btn-sm btn-link text-muted"
-                            disabled
-                            title="Attachments coming soon"
+                            disabled={!connected||uploading}
+                            title="Attach files"
+                            onClick={() => fileInputRef.current?.click()}
                         >
                             <i className="bi bi-paperclip"></i>
                         </button>
@@ -84,17 +162,33 @@ const MessageInput=({onSend,connected})=>{
                 <button
                     type="button"
                     className="btn btn-primary send-button"
-                    onClick={sendMessage}
+                    onClick={async () => {
+        if (message.trim()) {
+            sendMessage();
+        }
+
+        if (selectedFiles.length > 0) {
+            await sendFiles();
+        }
+    }}
                     disabled={
-                        !connected ||
-                        !message.trim()
-                    }
+        !connected ||
+        (!message.trim() && selectedFiles.length === 0) ||
+        uploading
+    }
                 >
                     <i className="bi bi-send-fill"></i>
                 </button>
 
             </div>
 
+               {uploading && (
+    <div className="chat-input-hint">Uploading files...</div>
+)}
+
+{uploadError && (
+    <div className="text-danger small mt-1">{uploadError}</div>
+)}     
 
             <div className="chat-input-hint">
 

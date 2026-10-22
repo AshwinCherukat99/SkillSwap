@@ -6,6 +6,8 @@ import ReviewsList from '../../../components/mentor/reviews/ReviewsList'
 import ReviewStats from '../../../components/mentor/reviews/ReviewStats'
 import ReviewToolbar from '../../../components/mentor/reviews/ReviewToolbar'
 
+import './MentorReviews.css'
+
 import mentorApi from '../../../services/mentorApi'
 
 const MentorReviews=()=>{

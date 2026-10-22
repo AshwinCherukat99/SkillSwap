@@ -1,0 +1,65 @@
+.admin-mentor-page {
+  min-height: 100vh;
+  background: #f8f9ff;
+}
+
+.mentor-avatar {
+  width: 112px;
+  height: 112px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border-radius: 18px;
+  background: #e9ecef;
+}
+
+.mentor-avatar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: #6c757d;
+}
+
+.metric-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  font-size: 1.25rem;
+}
+
+.profile-summary {
+  line-height: 1.8;
+  white-space: pre-line;
+}
+
+.status-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 50%);
+}
+
+.status-modal {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+}
+
+.admin-mentor-page .card {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 575.98px) {
+  .mentor-avatar {
+    width: 88px;
+    height: 88px;
+  }
+}

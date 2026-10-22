@@ -112,12 +112,12 @@ const ScheduleCourseSessionModal=({
         try{
             setSubmitting(true)
             const response=await mentorApi.post(
-                '/courses/mentor/sessions/schedule/',
+                '/sessions/mentor/schedule/',
                 payload
             )
             console.log('course session scheduled:',response.data)
             setSuccess('session scheduled successfully')
-            setTimeOut(()=>{
+            setTimeout(()=>{
                 if (onScheduled){
                     onScheduled(response.data)
                 }

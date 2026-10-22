@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useState} from 'react'
+import {useLocation,useSearchParams} from 'react-router-dom'
 import api from '../../../services/api'
 
 import CertificateHeader from '../../../components/user/certificates/CertificateHeader'
@@ -9,11 +10,14 @@ import CertificateGrid from '../../../components/user/certificates/CertificateGr
 import './Certificates.css'
 
 function Certificates(){
+    const location=useLocation()
+    const [searchParams]=useSearchParams()
     const [certificates,setCertificates]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
     const [search,setSearch]=useState('')
     const [selectedCategory,setSelectedCategory]=useState('all')
+    const selectedCertificateId=searchParams.get('certificateId')||location.state?.certificateId||null
     useEffect(()=>{
         const fetchCertificates=async ()=>{
             try{
@@ -30,17 +34,34 @@ function Certificates(){
         }
         fetchCertificates()
     },[])
-    const filteredCertificates=useMemo(()=>{
-        return certificates.filter((certificate)=>{
-            const searchValue=search.trim().toLowerCase()
-            const matchesSearch=!searchValue||certificate.course_title?.toLowerCase().includes(searchValue)||
-            certificate.certificate_number.toLowerCase().includes(searchValue)||
-            certificate.certificate_id.toLowerCase().includes(searchValue)||
-            certificate.course_category.toLowerCase().includes(searchValue)
-            const matchesCategory=selectedCategory==='all'||certificate.course_category===selectedCategory
-            return matchesSearch&&matchesCategory
-        })
-    },[certificates,search,selectedCategory])
+    
+const filteredCertificates = useMemo(() => {
+  return certificates.filter((certificate) => {
+    const searchValue = search.trim().toLowerCase()
+
+    const matchesSearch =
+      !searchValue ||
+      (certificate.course_title || '')
+        .toLowerCase()
+        .includes(searchValue) ||
+      String(certificate.certificate_number || '')
+        .toLowerCase()
+        .includes(searchValue) ||
+      String(certificate.certificate_id ?? '')
+        .toLowerCase()
+        .includes(searchValue) ||
+      (certificate.course_category || '')
+        .toLowerCase()
+        .includes(searchValue)
+
+    const matchesCategory =
+      selectedCategory === 'all' ||
+      certificate.course_category === selectedCategory
+
+    return matchesSearch && matchesCategory
+  })
+}, [certificates, search, selectedCategory])
+
     const [sortOrder,setSortOrder]=useState('newest')
     const sortedCertificates=useMemo(()=>{
         const result=[...filteredCertificates]
@@ -282,6 +303,7 @@ function Certificates(){
 
                 <CertificateGrid
                     certificates={sortedCertificates}
+                    selectedCertificateId={selectedCertificateId}
                 />
 
             </div>

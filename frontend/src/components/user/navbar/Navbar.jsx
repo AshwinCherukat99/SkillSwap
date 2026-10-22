@@ -1,12 +1,13 @@
 import React from 'react'
 import {useDispatch} from 'react-redux'
-import { NavLink } from 'react-router-dom'
+import { NavLink,useNavigate } from 'react-router-dom'
 import {Bell,MessageSquare,LogOut} from 'lucide-react'
 import { logout } from '../../../store/slices/authSlice'
 
 import './Navbar.css'
 
 const Navbar=()=>{
+    const navigate=useNavigate()
     const dispatch=useDispatch()
     const navItems=[
         {name:"Home",path:'/feed'},
@@ -15,7 +16,7 @@ const Navbar=()=>{
         {name:"Mentors",path:'/mentors'},
         { name: "Upcoming Sessions", path: "/upcoming_sessions" },
         { name: "Session History", path: "/session_history" },
-    { name: "Settings", path: "/settings" },
+    { name: "Group Chats", path: "/chat" },
     { name: "My Posts", path: "/my_posts" },
     { name: "Leaderboard", path: "/leaderboard" },
     { name: "Recommendations", path: "/recommendations" },
@@ -30,7 +31,7 @@ const Navbar=()=>{
         }
     return (
         <nav className="navbar skillswap-navbar">
-      <div className="container-fluid">
+      <div className="container-fluid align-items-center">
 
         {/* Logo */}
         <NavLink to="/" className="navbar-brand skillswap-logo">
@@ -63,7 +64,7 @@ const Navbar=()=>{
           </NavLink>
 
           {/* Chat */}
-          <NavLink to='/chat/' className='icon-btn' title='Chat'>
+          <NavLink to='/direct-chat/' className='icon-btn' title='Chat'>
             <MessageSquare size={20} />
           </NavLink>
           

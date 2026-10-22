@@ -17,6 +17,8 @@ import {
 
 import mentorApi from '../../../services/mentorApi'
 
+import './SessionHistory.css'
+
 import SessionHistoryHeader from "../../../components/mentor/session_history/SessionHistoryHeader";
 import SessionStats from "../../../components/mentor/session_history/SessionStats";
 import SessionFilters from "../../../components/mentor/session_history/SessionFilters";
@@ -135,7 +137,7 @@ const MentorSessionHistory=()=>{
         ).length
         const expired=sessions.filter(
             session=>session.status==='EXPIRED'
-        )
+        ).length
         const totalMinutes=sessions.reduce(
             (sum,session)=>sum+Number(session.duration_minutes||0),0
         )  

@@ -45,7 +45,7 @@ const MentorNavbar=()=>{
                 ))}
                 </div>
                 <div className='skillswap-actions'>
-                <NavLink to='mentor/group-chat/' className='icon-btn' title='Chat'>
+                <NavLink to='mentor/direct-chat/' className='icon-btn' title='Chat'>
                             <MessageSquare size={20} />
                           </NavLink>
                 <button type='button' className='icon-btn' title='LogOut' onClick={handleLogout}>

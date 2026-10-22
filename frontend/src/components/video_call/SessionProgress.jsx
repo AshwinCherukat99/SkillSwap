@@ -1,7 +1,7 @@
 import React,{useEffect,useState} from "react";
 
 const SessionProgress=({
-    duration=60
+    duration
 })=>{
     const [elapsedSeconds,setElapsedSeconds]=useState(0)
     useEffect(()=>{
@@ -16,7 +16,7 @@ const SessionProgress=({
         return ()=>clearInterval(interval)
     },[duration])
     const totalSeconds=duration*60
-    const progress=Math.min((elapsedSeconds/totalSeconds)/100,100)
+    const progress=Math.min((elapsedSeconds/totalSeconds)*100,100)
     const remainingSeconds=Math.max(totalSeconds-elapsedSeconds,0)    
     const minutes=Math.floor(remainingSeconds/60)
     const seconds=remainingSeconds%60

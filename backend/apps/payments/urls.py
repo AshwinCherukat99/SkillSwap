@@ -6,6 +6,10 @@ from .views import (
     MentorRevenueView,
     MentorRequestPayoutView,
     AdminPaymentDashboardView,
+    AdminTransactionListView,
+    AdminApproveMentorPayoutView,
+    AdminRejectMentorPayoutView,
+    AdminMentorPayoutListView
 )
 
 urlpatterns=[
@@ -34,4 +38,24 @@ urlpatterns=[
         AdminPaymentDashboardView.as_view(),
         name='admin-payment-dashboard',
     ),
+    path(
+        'admin/transactions/',
+        AdminTransactionListView.as_view(),
+        name='admin-payment-transactions',
+    ),
+    path(
+        'admin/payouts/',
+        AdminMentorPayoutListView.as_view(),
+        name='mentor-payout-list',
+    ),
+    path(
+        'admin/payouts/<int:payout_id>/approve/',
+        AdminApproveMentorPayoutView.as_view(),
+        name='approve-mentor-payout',
+    ),
+    path(
+        'admin/payouts/<int:payout_id>/reject/',
+        AdminRejectMentorPayoutView.as_view(),
+        name='reject-mentor-payout',
+    )
 ]

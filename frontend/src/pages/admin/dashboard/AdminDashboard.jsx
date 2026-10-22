@@ -6,7 +6,7 @@ import adminApi from '../../../services/adminApi'
 import KpiCard from '../../../components/admin/dashboard/KpiCard'
 import PlatformStatus from '../../../components/admin/dashboard/PlatformStatus'
 import RecentSessions from '../../../components/admin/dashboard/RecentSessions'
-import StatusBadge from '../../../components/admin/dashboard/StatusBadge'
+import SessionVolumeChart from '../../../components/admin/dashboard/SessionVolumeChart'
 
 import './AdminDashboard.css'
 
@@ -20,6 +20,36 @@ function AdminDashboard(){
     const admin=JSON.parse(
         localStorage.getItem('admin')||'null'
     )
+    const fetchDashboard=async ()=>{
+        try{
+            setLoading(true)
+            setError("")
+            const response=await adminApi.get(
+                '/admin/dashboard/'
+            )
+            console.log('dashbord api response:',response)
+            console.log('dashboard data:',response.data)
+            setDashboard(response.data)
+        }catch(error){
+            console.error("DASHBOARD API ERROR:", error);
+        console.error("ERROR RESPONSE:", error.response);
+        console.error("ERROR DATA:", error.response?.data);
+            console.error(
+                'failed to load admin dashboard:',
+                error
+            )
+            setError(
+                error.response?.data?.detail||
+                error.response?.data?.error||
+                'unable to load dashboard data'
+            )
+        }finally{
+            setLoading(false)
+        }
+    }
+    useEffect(()=>{
+        fetchDashboard()
+    },[])
     useEffect(()=>{
         const updateTime=()=>{
             const now=new Date()     
@@ -42,28 +72,7 @@ function AdminDashboard(){
         )
         return ()=>clearInterval(interval)
     },[])
-    const fetchDashboard=async ()=>{
-        try{
-            setLoading(true)
-            setError("")
-            const response=await adminApi.get(
-                '/admin/dashboard/'
-            )
-            setDashboard(response.data)
-        }catch(error){
-            console.error(
-                'failed to load admin dashboard:',
-                error
-            )
-            setError(
-                error.response?.data?.detail||
-                error.response?.data?.error||
-                'unable to load dashboard data'
-            )
-        }finally{
-            setLoading(false)
-        }
-    }
+    
     if (loading){
         <div className="admin-dashboard">
 
@@ -267,22 +276,15 @@ function AdminDashboard(){
 
                                         <span>
                                             <i className="legend-dot secondary" />
-                                            Workshops
+                                            Networking
                                         </span>
 
                                     </div>
 
                                 </div>
 
-                                <div className="session-chart">
-
-                                    <div className="session-chart-gradient" />
-
-                                    <div className="chart-line line-one" />
-
-                                    <div className="chart-line line-two" />
-
-                                </div>
+                                <SessionVolumeChart
+                                data={dashboard?.session_volume||[]}/>
 
                             </div>
 
@@ -298,7 +300,7 @@ function AdminDashboard(){
                                 }
                                 onViewAll={() =>
                                     navigate(
-                                        "/admin/sessions/"
+                                        "/admin/session-management/"
                                     )
                                 }
                             />

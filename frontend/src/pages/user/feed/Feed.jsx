@@ -3,6 +3,8 @@ import {useNavigate,Link} from 'react-router-dom'
 import {useDispatch,useSelector} from 'react-redux'
 import { updateUser } from '../../../store/slices/authSlice'
 
+import useRealtimeNotifications from '../../../hooks/useRealTimeNotifications'
+
 import {logout} from '../../../store/slices/authSlice'
 import api from '../../../services/api'
 
@@ -13,6 +15,7 @@ import EditPost from '../../../components/user/feed/EditPost'
 import './Feed.css'
 
 function Feed(){
+    useRealtimeNotifications('access_token')
     const navigate=useNavigate()
     const dispatch=useDispatch()
     const user=useSelector(
@@ -86,6 +89,7 @@ function Feed(){
             (post)=>post.id!==postId
         ))
 };
+    
     return (
         <div className="container-fluid py-4">
 

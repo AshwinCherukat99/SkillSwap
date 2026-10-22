@@ -139,10 +139,23 @@ function CourseHero({course}){
 
                                     {mentor.profile_image ? (
                                         <img
-                                            src={mentor.profile_image}
-                                            alt={mentor.username}
-                                            className="course-mentor-image"
-                                        />
+    src={mentor.profile_image}
+    alt={mentor.username || "Mentor"}
+    className="course-mentor-image"
+    style={{
+        width: "52px",
+        height: "52px",
+        minWidth: "52px",
+        maxWidth: "52px",
+        minHeight: "52px",
+        maxHeight: "52px",
+        objectFit: "cover",
+        objectPosition: "center",
+        borderRadius: "50%",
+        flexShrink: 0,
+        display: "block",
+    }}
+/>
                                     ) : (
                                         <div className="course-mentor-placeholder">
                                             <i className="bi bi-person"></i>

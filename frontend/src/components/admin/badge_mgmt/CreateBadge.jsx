@@ -16,7 +16,7 @@ const CreateBadge=()=>{
                 '/badges/admin/',
                 data,
             )
-            navigate('/badges/admin/')
+            navigate('/admin/badge-management')
         }catch(err){
             console.error('failed to create badge:',err)
         }finally{

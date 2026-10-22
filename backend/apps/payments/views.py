@@ -1,3 +1,4 @@
+from datetime import timedelta
 from decimal import Decimal,InvalidOperation
 from django.conf import settings
 from django.db import transaction
@@ -10,7 +11,7 @@ from .services.razorpay_service import create_course_order
 import hmac
 import hashlib
 from django.utils import timezone
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,Q
 from django.db.models.functions import TruncDate
 from apps.mentors.authentication import MentorJWTAuthentication
 from apps.accounts.permissions import IsAdmin
@@ -251,8 +252,7 @@ class MentorRequestPayoutView(APIView):
         },status=status.HTTP_201_CREATED,)
 
 class AdminPaymentDashboardView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def get(self,request):
         now=timezone.now()
         today=now.date()
@@ -380,3 +380,328 @@ class AdminPaymentDashboardView(APIView):
             },
             'transactions':transactions,
         },status=status.HTTP_200_OK)
+
+class AdminTransactionListView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request):
+        queryset=(CoursePayment.objects.select_related('student','course','mentor').order_by('-created_at'))
+        search=request.query_params.get('search','').strip()
+        if search:
+            queryset=queryset.filter(
+                Q(razropay_order_id__icontains=search)|
+                Q(razorpay_payment_id__icontains=search)|
+                Q(student__username__icontains=search)|
+                Q(student__email__icontains=search)|
+                Q(student__first_name__icontains=search)|
+                Q(student__last_name__icontains=search)|
+                Q(course__title__icontains=search)|
+                Q(mentor__username__icontains=search)|
+                Q(mentor__full_name__icontains=search)
+            )
+        status_filter=request.query_params.get('status','').strip()
+        valid_statuses={
+            CoursePayment.Status.CREATED,
+            CoursePayment.Status.PAID,
+            CoursePayment.Status.REFUNDED,
+            CoursePayment.Status.FAILED,
+        }
+        if status_filter in valid_statuses:
+            queryset=queryset.filter(status=status_filter)
+        date_filter=request.query_params.get('date','').strip()
+        now=timezone.now()
+        today=now.date()
+        if date_filter=='today':
+            queryset=queryset.filter(
+                created_at__date=today
+            )
+        elif date_filter=='week':
+            start_date=today-timedelta(days=today.weekday())
+            queryset=queryset.filter(created_at__gte=start_date)
+        elif date_filter=='month':
+            queryset=queryset.filter(
+                created_at__year=today.year,
+                created_at__month=today.month,
+            )
+        total_transactions=queryset.count()
+        total_value=(
+            queryset.aggregate(total=Sum('amount'))['total'] or Decimal('0.00')
+        )
+        successful=queryset.filter(
+            status=CoursePayment.Status.PAID,
+        ).count()
+        failed=queryset.filter(
+            status=CoursePayment.Status.FAILED
+        ).count()
+        if total_transactions:
+            success_rate=(
+                Decimal(successful)/Decimal(total_transactions)*Decimal('100')
+            )
+        else:
+            success_rate=Decimal('0.00')
+        transactions=[]
+        for payment in queryset:
+            student_name=(
+                payment.student.get_full_name()
+                or payment.student.username
+            )
+            transactions.append({
+                'id':payment.id,
+                'transaction_id':(payment.razorpay_payment_id or payment.razorpay_order_id),
+                'order_id':payment.razorpay_order_id,
+                'user':{
+                    'id':payment.student.id,
+                    'username':payment.student.username,
+                    'email':payment.student.email,
+                    'profile_image':(payment.student.profile_image.url
+                                     if getattr(
+                                         payment.student,
+                                         'profile_image',
+                                         None
+                                     ) else None)
+                },
+                'course':{
+                    'id':payment.course.id,
+                    'title':payment.course.title,
+                },
+                'mentor':{
+                    'id':payment.mentor.id,
+                    'username':payment.mentor.username,
+                    'name':(payment.mentor.full_name or payment.mentor.username),
+                },
+                'amount':str(payment.amount),
+                'platform_fee':str(payment.platform_fee),
+                'mentor_amount':str(payment.mentor_amount),
+                'method':'Razorpay',
+                'status':payment.status,
+                'created_at':payment.created_at,
+                'paid_at':payment.paid_at,
+            })
+        return Response({
+            'stats':{
+                'total_transactions':total_transactions,
+                'total_value':str(total_value),
+                'successful':successful,
+                'failed':failed,
+                'success_rate':str(success_rate.quantize(Decimal('0.01')))
+            },
+            'transactions':transactions,
+        },status=status.HTTP_200_OK,)
+
+class AdminApproveMentorPayoutView(APIView):
+    permission_classes=[IsAdmin]
+    @transaction.atomic
+    def post(self,request,payout_id):
+        try:
+            payout=(
+            MentorPayout.objects.select_for_update().select_related('mentor').get(id=payout_id)
+        )
+        except MentorPayout.DoesNotExist:
+            return Response(
+                {
+                    'detail':'payout request was not found'
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if payout.status!=MentorPayout.Status.REQUESTED:
+            return Response(
+                {
+                    'detail':'cannot approve a payout with status {payout.status}'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        profile=getattr(payout.mentor,'payout_profile',None)
+        if not profile or not profile.is_verified:
+            return Response(
+                {
+                    'detail':'mentor payout profile is not verified'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        wallet,_=MentorWallet.objects.select_for_update().get_or_create(
+            mentor=payout.mentor
+        )
+        if wallet.pending_balance<payout.amount:
+            return Response(
+                {
+                    'detail':'wallet pending balance is insufficient for this payout'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        payout.status=MentorPayout.Status.APPROVED
+        payout.approved_at=timezone.now()
+        payout.save(update_fields=['status','updated_at'])
+        return Response(
+            {
+                'message':'payout approved successfully',
+                'payout':{
+                    'id':payout.id,
+                    'amount':str(payout.amount),
+                    'status':payout.status,
+                    'approved_at':payout.approved_at,
+                }
+            }
+        )
+
+class AdminRejectMentorPayoutView(APIView):
+    permission_classes=[IsAdmin]
+    @transaction.atomic
+    def post(self,request,payout_id):
+        reason=str(request.data.get('reason','')).strip()
+        if not reason:
+            return Response(
+                {
+                    'detail':'a rejection reason is required'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            payout=(
+                MentorPayout.objects.select_for_update().select_related('mentor').get(id=payout_id)
+            )
+        except MentorPayout.DoesNotExist:
+            return Response(
+                {
+                    'detail':'payout request not found'
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        if payout.status!=MentorPayout.Status.REQUESTED:
+            return Response(
+                {
+                    'detail':'cannot reject a payout with status {payout.status}'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        wallet,_=MentorWallet.objects.select_for_update().get_or_create(mentor=payout.mentor)
+        if wallet.pending_balance<payout.amount:
+            return Response(
+                {
+                    'detail':'wallet pending balance is insufficient for this payout'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )          
+        wallet.pending_balance-=payout.amount
+        wallet.available_balance+=payout.amount
+        wallet.save(
+            update_fields=[
+                'pending_balance',
+                'available_balance',
+                'updated_at',
+            ]
+        )
+        payout.status=MentorPayout.Status.REJECTED
+        payout.failure_reason=reason
+        payout.save(
+            update_fields=[
+                'status',
+                'failure_reason'
+            ]
+        )
+        WalletTransaction.objects.create(
+            wallet=wallet,
+            transaction_type=WalletTransaction.TransactionType.ADJUSTMENT,
+            direction=WalletTransaction.Direction.CREDIT,
+            amount=payout.amount,
+            balance_after=wallet.available_balance,
+            description=f'Payout #{payout.id} rejected, amount returned to available balance',
+        )
+        return Response(
+            {
+                'message':'payout rejected and amount returned to available balance',
+                'payout':{
+                    'id':payout.id,
+                    'amount':str(payout.amount),
+                    'status':payout.status,
+                    'failure_reason':payout.failure_reason,
+                },
+                'wallet':{
+                    'available_balance':str(wallet.available_balance),
+                    'pending_balance':str(wallet.pending_balance)
+                }
+            },status=status.HTTP_200_OK,
+        )
+
+class AdminMentorPayoutListView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request):
+        payouts=MentorPayout.objects.select_related(
+            'mentor',
+            'mentor__payout_profile',
+            'mentor__wallet',
+        ).order_by('-requested_at')
+        status_filter=request.query_params.get('status','').upper()
+        if status_filter in MentorPayout.Status.values:
+            payouts=payouts.filter(status=status_filter)
+        date_filter=request.query_params.get('date','').lower()
+        today=timezone.localdate()
+        if date_filter=='today':
+            payouts=payouts.filter(requested_at__date=today)
+        elif date_filter=='week':
+            start=today-timezone.timedelta(days=today.weekday())
+            payouts=payouts.filter(requested_at__gte=start)
+        elif date_filter=='month':
+            payouts=payouts.filter(
+                requested_at__month=today.month,
+                requested_at__year=today.year,
+            )
+        amount_filter=request.query_params.get('amount','')
+        if amount_filter=='under_10000':
+            payouts=payouts.filter(amount__lt=10000)
+        elif amount_filter=='10000_50000':
+            payouts=payouts.filter(amount__gte=10000,amount__lte=50000)
+        elif amount_filter=='over_50000':
+            payouts=payouts.filter(amount__gt=50000)
+        results=[]
+        for payout in payouts:
+            mentor=payout.mentor
+            wallet=getattr(mentor,'wallet',None)
+            profile=getattr(mentor,'payout_profile',None)
+            results.append({
+                'id':payout.id,
+                'payout_id':f'PAYOUT-{payout.id:04d}',
+                'mentor_name':str(mentor),
+                'mentor_id':mentor.pk,
+                'amount':str(payout.amount),
+                'available_balance':(str(wallet.available_balance) if wallet else '0.00'),
+                'pending_balance':(str(wallet.pending_balance) if wallet else '0.00'),
+                'requested_at':payout.requested_at,
+                'approved_at':payout.approved_at,
+                'completed_at':payout.completed_at,
+                'status':payout.status,
+                'failure_reason':payout.failure_reason,
+                'payment_reference':payout.payment_reference,
+                'payout_profile_verified':bool(profile and profile.is_verified),
+                'payout_method_configured':bool(profile and profile.razorpay_fund_account_id),
+            })
+        all_payouts=MentorPayout.objects.all()
+        month_payouts=all_payouts.filter(
+            requested_at__month=today.month,
+            requested_at__year=today.year,
+        )
+        return Response(
+            {
+                'stats':{
+                    'total_pending_amount':(
+                        all_payouts.filter(
+                            status__in=[
+                                MentorPayout.Status.REQUESTED,
+                                MentorPayout.Status.PROCESSING,
+                                MentorPayout.Status.APPROVED,
+                            ]
+                        ).aggregate(total=Sum('amount'))['total'] or 0
+                    ),
+                    'pending_requests':all_payouts.filter(
+                        status=MentorPayout.Status.REQUESTED,
+                    ).count(),
+                    'approved_this_month':(month_payouts.filter(
+                        status=MentorPayout.Status.APPROVED,
+                    ).aggregate(total=Sum('amount'))['total'] or 0),
+                    'rejected_this_month':(
+                        month_payouts.filter(
+                            status=MentorPayout.Status.REJECTED,
+                        ).aggregate(total=Sum('amount'))['total'] or 0
+                    )
+                },
+                'payouts':results,
+            }
+        )

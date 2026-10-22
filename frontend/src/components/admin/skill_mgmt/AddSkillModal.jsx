@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 
 const AddSkillModal=({
     show,
@@ -9,6 +9,13 @@ const AddSkillModal=({
     const [slug,setSlug]=useState('')
     const [loading,setLoading]=useState(false)
     const [error,setError]=useState('')
+    useEffect(()=>{
+        if (show){
+            setName('')
+            setSlug('')
+            setError('')
+        }
+    },[show])
     if (!show){
         return null
     }
@@ -118,7 +125,7 @@ const AddSkillModal=({
                                         rows="3"
                                         placeholder="Slug text of the skill..."
                                         value={
-                                            description
+                                            slug
                                         }
                                         onChange={(event) =>
                                             setSlug(

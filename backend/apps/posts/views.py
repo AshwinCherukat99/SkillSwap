@@ -6,6 +6,7 @@ from rest_framework import status
 from django.db.models import Count
 from rest_framework.parsers import MultiPartParser, FormParser
 from apps.notifications.models import Notification
+from apps.badges.services import BadgeService
 
 from .models import Post,PostComment,PostLike
 from .serializers.initialize import PostSerializer,CreatePostSerializer,PostCommentSerializer,CreateCommentSerialzer
@@ -41,6 +42,7 @@ class CreatePostView(APIView):
         post=serializer.save(
             user_author=request.user
         )
+        BadgeService.evaluate_user(request.user)
         response_serializer = PostSerializer(
             post,
             context={
@@ -232,6 +234,7 @@ class PostCommentsView(APIView):
             post=post,
             user=request.user
         )
+        BadgeService.evaluate_user(request.user)
         response_serializer=PostCommentSerializer(
             comment,
             context={

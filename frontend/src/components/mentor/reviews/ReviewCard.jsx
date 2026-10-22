@@ -1,9 +1,59 @@
-import {useState} from 'react'
+import {useState,useCallback,useEffect} from 'react'
+
+import ReportModal from '../../../pages/report_modal/ReportModal'
+import mentorApi from '../../../services/mentorApi'
 
 const ReviewCard=({review,onReply,replyLoading})=>{
+    const [reportTarget,setReportTarget]=useState(null)
+    const [reportToast,setReportToast]=useState('')
     const [message,setMessage]=useState("")
     const [expanded,setExpanded]=useState(false)
     const profileImage=review?.reviewer_image?review.reviewer_image.startsWith('http')?review.reviewer_image:`http://127.0.0.1:8000${review.reviewer_image}`:null
+    const person=review.reviewer
+    const handleCloseReport=useCallback(()=>{
+        setReportTarget(null)
+    },[])
+    const handleReportSuccess=(message)=>{
+        setReportToast(message)
+    }
+    const onReportUser = () => {
+  const reportedUserId = person?.id ?? review?.reviewer_id;
+
+  if (reportedUserId == null) {
+    console.error("Review data:", review);
+    alert("Unable to identify the reviewer. Check the review API response.");
+    return;
+  }
+
+  setReportTarget({
+    type: "USER",
+    id: reportedUserId,
+    reportedUserId,
+  });
+};
+
+const onReportReview = () => {
+  const reportedUserId = person?.id ?? review?.reviewer_id;
+
+  if (review?.id == null || reportedUserId == null) {
+    console.error("Review data:", review);
+    alert("Unable to identify the review or its author.");
+    return;
+  }
+
+  setReportTarget({
+    type: "REVIEW",
+    id: review.id,
+    reportedUserId,
+  });
+};
+    useEffect(()=>{
+        if (!reportToast) return
+        const timeout=setTimeout(()=>{
+            setReportToast('')
+        },4000)
+        return ()=>clearTimeout(timeout)
+    },[reportToast])
     const getInitials=()=>{
         const name=review?.reviewer_name||review?.reviewer_username||'Student'
         return name.split(' ').map((word)=>word[0]).join('').slice(0,2).toUpperCase()
@@ -58,70 +108,81 @@ const ReviewCard=({review,onReply,replyLoading})=>{
 
                 {/* Header */}
                 <div className="d-flex justify-content-between align-items-start gap-3 mb-3">
+  {/* Reviewer details */}
+  <div className="d-flex gap-3">
+    {profileImage ? (
+      <img
+        src={profileImage}
+        alt={review.reviewer_name}
+        className="review-avatar"
+      />
+    ) : (
+      <div className="review-avatar review-avatar-fallback">
+        {getInitials()}
+      </div>
+    )}
 
-                    <div className="d-flex gap-3">
+    <div>
+      <h5 className="mb-0 fw-bold">
+        {review.reviewer_name}
+      </h5>
 
-                        {profileImage ? (
+      {review.is_verified && (
+        <span className="verified-badge">
+          <i className="bi bi-patch-check-fill"></i>
+          Verified
+        </span>
+      )}
 
-                            <img
-                                src={profileImage}
-                                alt={review.reviewer_name}
-                                className="review-avatar"
-                            />
+      <p className="review-meta mb-0">
+        {review.course_title}
+        {" • "}
+        {formatDate(review.created_at)}
+      </p>
+    </div>
+  </div>
 
-                        ) : (
+  {/* Top-right controls */}
+  <div className="d-flex flex-column align-items-end gap-3">
 
-                            <div className="review-avatar review-avatar-fallback">
-                                {getInitials()}
-                            </div>
+    <div className="dropdown">
+      <button
+        type="button"
+        className="btn btn-light btn-sm rounded-pill d-flex align-items-center gap-1"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <i className="bi bi-exclamation-circle"></i>
+        <span>Report</span>
+      </button>
 
-                        )}
+      <ul className="dropdown-menu dropdown-menu-end shadow-sm border-0">
+        <li>
+          <button
+            type="button"
+            className="dropdown-item d-flex align-items-center gap-2"
+            onClick={onReportUser}
+          >
+            <i className="bi bi-person-exclamation text-danger"></i>
+            Report User
+          </button>
+        </li>
 
-
-                        <div>
-
-                            <div className="d-flex align-items-center gap-2 flex-wrap">
-
-                                <h5 className="mb-0 fw-bold">
-                                    {review.reviewer_name}
-                                </h5>
-
-
-                                {review.is_verified && (
-
-                                    <span className="verified-badge">
-
-                                        <i className="bi bi-patch-check-fill"></i>
-
-                                        Verified
-
-                                    </span>
-
-                                )}
-
-                            </div>
-
-
-                            <p className="review-meta mb-0">
-
-                                {review.course_title}
-
-                                {" • "}
-
-                                {formatDate(review.created_at)}
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    {renderStars(
-                        Number(review.rating || 0)
-                    )}
-
-                </div>
+        <li>
+          <button
+            type="button"
+            className="dropdown-item d-flex align-items-center gap-2"
+            onClick={onReportReview}
+          >
+            <i class="bi bi-file-earmark-text"></i>
+            Report Review
+          </button>
+        </li>
+      </ul>
+    </div>
+    {renderStars(Number(review.rating || 0))}
+  </div>
+</div>
 
 
                 {/* Review text */}
@@ -272,6 +333,34 @@ const ReviewCard=({review,onReply,replyLoading})=>{
 
                 </div>
 
+            )}
+
+            {reportTarget&&(
+                <ReportModal
+                target={reportTarget}
+                apiClient={mentorApi}
+                onClose={handleCloseReport}
+                onSuccess={handleReportSuccess}/>
+            )}
+
+            {reportToast&&(
+                <div
+        className="report-toast"
+        role="status"
+        aria-live="polite"
+    >
+        <i className="bi bi-check-circle-fill" />
+
+        <span>{reportToast}</span>
+
+        <button
+            type="button"
+            onClick={() => setReportToast("")}
+            aria-label="Dismiss notification"
+        >
+            &times;
+        </button>
+    </div>
             )}
 
         </div>

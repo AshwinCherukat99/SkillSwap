@@ -35,7 +35,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG",cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [".trycloudflare.com","localhost","127.0.0.1",]
 
 
 # Application definition
@@ -120,8 +120,19 @@ DATABASES = {
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
-        "HOST": config("DB_HOST"),
+        "HOST": 'localhost',
         "PORT": config("DB_PORT"),
+    }
+}
+
+
+CACHES={
+    "default":{
+        "BACKEND":"django_redis.cache.RedisCache",
+        "LOCATION":"redis://redis:6379/1",
+        "OPTIONS":{
+            "CLIENT_CLASS":"django_redis.client.DefaultClient"
+        }
     }
 }
 
@@ -222,3 +233,24 @@ PLATFORM_FEE_PERCENT = Decimal(
 )
 
 X_FRAME_OPTIONS='ALLOWALL'
+
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "Asia/Kolkata"
+
+CELERY_ENABLE_UTC=True             
+
+CELERY_BEAT_SCHEDULE = {
+    'expire-sessions-every-minute': {
+        'task': 'apps.sessions_mgmt.tasks.expire_sessions',
+        'schedule': 60.0,
+    },
+    'send-due-admin-notifications-every-minute': {
+        'task': 'apps.notifications.tasks.send_due_admin_notifications',
+        'schedule': 60.0,
+    },
+}

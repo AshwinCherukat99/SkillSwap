@@ -6,7 +6,7 @@ class AdminSkillExchangeSessionSerializer(serializers.ModelSerializer):
     session_id=serializers.SerializerMethodField()
     session_type=serializers.SerializerMethodField()
     recipient=serializers.SerializerMethodField()
-    receiver=serializers.SerializerMethodField()
+    requester=serializers.SerializerMethodField()
     skill=serializers.SerializerMethodField()
     rating=serializers.SerializerMethodField()
     class Meta:
@@ -16,7 +16,7 @@ class AdminSkillExchangeSessionSerializer(serializers.ModelSerializer):
             'session_id',
             'session_type',
             'recipient',
-            'receiver',
+            'requester',
             'skill',
             'scheduled_start',
             'duration_minutes',
@@ -123,3 +123,11 @@ class AdminCourseSessionSerializer(serializers.ModelSerializer):
                 if getattr(user,'profile_image',None) else None
             )
         }
+    def get_course(self,obj):
+        course=obj.enrollment.course   
+        return {
+            'id':course.id,
+            'title':course.title,
+        }
+    def get_rating(self,obj):
+        return None

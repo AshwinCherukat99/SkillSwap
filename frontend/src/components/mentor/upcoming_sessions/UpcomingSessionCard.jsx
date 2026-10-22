@@ -1,10 +1,13 @@
-import {React,useEffect,useState} from 'react'
+import React,{useEffect,useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 
 import {CalendarDays,Clock3,Lock,Video,X} from 'lucide-react'
 
 import CountDown from './CountDown'
 
 const UpcomingSessionCard=({session,onCancel})=>{
+    const navigate=useNavigate()
+    const roomName=`course-session-${session.id}`
     const [canJoin,setCanJoin]=useState(
         new Date(session.scheduled_start).getTime()<=Date.now()
     )
@@ -22,7 +25,14 @@ const UpcomingSessionCard=({session,onCancel})=>{
     const endTime=new Date(date.getTime()+session.duration_minutes*60000)
     const initials=session.student_name?.split(' ').map(word=>word[0]).join('').slice(0,2).toUpperCase()
     const handleJoin=()=>{
-        console.log('joining session:',session.id)
+        if (!session.conversation_id){
+            console.error(
+                'missing conversation id for session:',session.id
+            )
+            return 
+        }
+        const roomName=`session-${session.id}`
+        navigate(`/video-call/${roomName}/${session.conversation_id}`)
     }
     const formattedDate = date.toLocaleDateString('en-US', {
         weekday: 'short',

@@ -1,8 +1,8 @@
 import React,{useEffect,useState} from 'react'
 
-const CountDown=({scheduledStart})=>{
+const CountDown=({targetDate})=>{
     const calculateRemaining=()=>{
-        const target=new Date(scheduledStart).getTime()
+        const target=new Date(targetDate).getTime()
         const now=Date.now()
         return Math.max(
             0,
@@ -10,12 +10,12 @@ const CountDown=({scheduledStart})=>{
         )
     }
     const [remaining,setRemaining]=useState(calculateRemaining())
-    useEffect=(()=>{
+    useEffect(()=>{
         const timer=setInterval(()=>{
             setRemaining(calculateRemaining())
         },1000)
         return ()=>clearInterval(timer)
-    },[scheduledStart])
+    },[targetDate])
     const totalSeconds=Math.floor(
         remaining/1000
     )
@@ -27,7 +27,7 @@ const CountDown=({scheduledStart})=>{
     )
     const seconds=totalSeconds%60
     const format=(value)=>{
-        String(value).padStart(2,'0')
+        return String(value).padStart(2,'0')
     }
     if (remaining<=0){
         return (

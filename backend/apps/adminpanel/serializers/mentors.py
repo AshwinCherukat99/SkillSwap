@@ -10,6 +10,7 @@ class AdminMentorListSerializer(serializers.ModelSerializer):
     organization=serializers.SerializerMethodField()
     students_count=serializers.SerializerMethodField()
     courses_count=serializers.SerializerMethodField()
+    current_profession=serializers.SerializerMethodField()
     status=serializers.CharField(read_only=True)
     class Meta:
         model=Mentor
@@ -138,3 +139,65 @@ class AdminMentorUpdateSerializer(serializers.ModelSerializer):
             'profile_image',
             'is_active',
         ]
+
+class AdminMentorProfileSerializer(serializers.ModelSerializer):
+    qualification=serializers.SerializerMethodField()
+    current_profession=serializers.SerializerMethodField()
+    organization=serializers.SerializerMethodField()
+    experience_years=serializers.SerializerMethodField()
+    professional_summary=serializers.SerializerMethodField()
+    teaching_niche=serializers.SerializerMethodField()
+    profile_image=serializers.SerializerMethodField()
+    class Meta:
+        model=Mentor
+        fields=[
+            'id',
+            'full_name',
+            'username',
+            'email',
+            'profile_image',
+            'phone_number',
+            'status',
+            'is_active',
+            'is_verified',
+            'rating',
+            'total_reviews',
+            'qualification',
+            'current_profession',
+            'organization',
+            'experience_years',
+            'professional_summary',
+            'teaching_niche',
+            'created_at',
+            'updated_at',
+        ]
+    def get_profile(self,obj):
+        try:
+            return obj.profile
+        except Mentor.profile.RelatedObjectDoesNotExist:
+            return None
+    def _profile_value(self,obj,field):
+        profile=self.get_profile(obj)
+        if profile is None:
+            return None
+        return getattr(profile,field,None)
+    def get_qualification(self,obj):
+        return self._profile_value(obj,'qualification')
+    def get_current_profession(self,obj):
+        return self._profile_value(obj,'current_profession')
+    def get_organization(self,obj):
+        return self._profile_value(obj,'organization')
+    def get_experience_years(self,obj):
+        return self._profile_value(obj,'experience_years')
+    def get_professional_summary(self,obj):
+        return self._profile_value(obj,'professional_summary') 
+    def get_teaching_niche(self,obj): 
+        return self._profile_value(obj,'teaching_niche')
+    def get_profile_image(self,obj):
+        request=self.context.get('request')
+        if not obj.profile_image:
+            return None
+        image_url=obj.profile_image.url
+        if request:
+            return request.build_absolute_uri(image_url)
+        return image_url

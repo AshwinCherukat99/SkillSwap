@@ -4,7 +4,7 @@ import {CalendarDays,Clock3,UserRound,GraduationCap} from 'lucide-react'
 
 import CountDownSession from './CountDownSession'        
 
-const AcceptedSessionCard=({session})=>{
+const AcceptedSessionCard=({session,onExpired})=>{
     const isSkillExchange=session.type==='SKILL EXCHANGE'
     const formatDate=(date)=>{
         return new Date(date).toLocaleDateString(
@@ -18,7 +18,7 @@ const AcceptedSessionCard=({session})=>{
         )
     }
     const formatTime=(date)=>{
-        return new Date(data).toLocaleTimeString(
+        return new Date(date).toLocaleTimeString(
             'en-IN',
                 {
                     hour: 'numeric',
@@ -117,10 +117,16 @@ const AcceptedSessionCard=({session})=>{
 
             <div className="accepted-session-countdown">
 
-                <CountdownSession
+                <CountDownSession
                     scheduledStart={
                         session.scheduled_start
                     }
+                    durationMinutes={
+                        session.duration_minutes
+                    }
+                    roomName={`session-${session.id}`}
+                    conversationId={session.conversation_id}   
+                    onExpired={()=>onExpired(session.id,session.type)}
                 />
 
             </div>

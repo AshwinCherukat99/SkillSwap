@@ -9,7 +9,7 @@ const MentorTable=({
     onEdit,
     onAction
 })=>{
-    const getStatusClass=({status})=>{
+    const getStatusClass=(status)=>{
         if (status==='ACTIVE')
             return 'mentor-status-active'
         if (status==='SUSPENDED')

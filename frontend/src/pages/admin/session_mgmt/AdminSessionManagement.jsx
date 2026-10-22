@@ -1,4 +1,5 @@
 import React,{useEffect,useState} from "react";
+import { useSearchParams } from "react-router-dom";
 
 import adminApi from '../../../services/adminApi'
 
@@ -11,6 +12,7 @@ import ActivityHeatmap from '../../../components/admin/session_mgmt/ActivityHeat
 import './AdminSessionManagement.css'
 
 const AdminSessionManagement=()=>{
+    const [searchParams]=useSearchParams()
     const [sessions,setSessions]=useState([])
     const [stats,setStats]=useState({
         total_sessions:0,
@@ -42,24 +44,26 @@ const AdminSessionManagement=()=>{
         },
     })
     const [tab,setTab]=useState('ALL')
-    const [search,setSearch]=useState('')
+    const [search,setSearch]=useState(searchParams.get('search')||'')
     const [status,setStatus]=useState('')
     const [sessionType,setSessionType]=useState('ALL')
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
     useEffect(()=>{
         fetchSessions()
-    },[tab,status,sessionType])
+    },[tab,status,sessionType,search])
     const fetchSessions=async ()=>{
         try{
             setLoading(true)
             setError('')
             const response=await adminApi.get(
                 '/sessions/admin/',{
-                    tab,
+                    params:{
+                        tab,
                     status,
                     session_type:sessionType,
                     search,
+                    }
                 }
             )
             setSessions(response.data.sessions||[])
@@ -74,6 +78,66 @@ const AdminSessionManagement=()=>{
     }
     const handleSearchSubmit=()=>{
         fetchSessions()
+    }
+    const handleCancel=async (session)=>{
+        const reason=window.prompt('enter cancellation reason:')
+        if (!reason||!reason.trim()){
+            return
+        }
+        try{
+            await adminApi.post(
+                `/sessions/admin/${session.session_type}/${session.id}/action/`,
+                {
+                    action:'CANCEL',
+                    reason:reason.trim(),
+                }
+            )
+            await fetchSessions()
+        }catch(err){
+            console.error('failed to cancel session:',err)
+            setError(err.response?.data?.detail||'failed to cancel session')
+        }
+    }
+    const handleReschedule=async (session)=>{
+        const newDate=window.prompt(
+            'enter new date and time(YYYY-MM-DDTHH:mm):'
+        )
+        if (!newDate||!newDate.trim()){
+            return
+        }
+        try{
+            await adminApi.post(
+            `/sessions/admin/${session.session_type}/${session.id}/action/`,
+            {
+                action:'RESCHEDULE',
+                scheduled_start:newDate.trim(),
+            }
+            )
+            await fetchSessions()
+        }catch(err){
+            console.error('failed to reschedule session:',err)
+            setError(err.response?.data?.detail||'failed to reschedule session')
+        }
+    }
+    const handleComplete=async (session)=>{
+        const confirmed=window.confirm(
+            'are you sure you want to mark this session as completed?:'
+        )
+        if (!confirmed){
+            return
+        }
+        try{
+            await adminApi.post(
+                `/sessions/admin/${session.session_type}/${session.id}/action/`,
+                {
+                    action:'COMPLETE',
+                }
+            )
+            await fetchSessions()
+        }catch(err){
+            console.error('failed to complete sessions:',err)
+            setError(err.response?.data?.detail||'failed to mark session as completed')
+        }
     }
     const tabs=[
         {
@@ -247,7 +311,10 @@ const AdminSessionManagement=()=>{
                     ) : (
 
                         <SessionTable
-                            sessions={sessions}
+                            sessions={sessions}        
+                            onCancel={handleCancel}
+                            onReschedule={handleReschedule}
+                            onComplete={handleComplete}
                         />
 
                     )}

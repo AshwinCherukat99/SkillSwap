@@ -14,6 +14,8 @@ import './CourseDetail.css'
 const MentorCourseDetail=()=>{
     const {courseId}=useParams()
     const navigate=useNavigate()
+    const [actionLoading,setActionLoading]=useState(false)
+    const [successMessage,setSuccessMessage]=useState('')
     const [course,setCourse]=useState(null)
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
@@ -35,6 +37,26 @@ const MentorCourseDetail=()=>{
         }
         fetchCourse()
     },[courseId])
+    const handleSubmitForReview=async ()=>{
+        try{
+            setActionLoading(true)
+            setError('')
+            setSuccessMessage('')
+            const response=await mentorApi.post(
+                `/courses/mentor/${courseId}/submit-review/`
+            )
+            setCourse((previous)=>({
+                ...previous,
+                status:response.data.course.status
+            }))
+            setSuccessMessage('course submitted for review successfully')
+        }catch(err){
+            console.error('failed to submit course for review:',err)
+            setError(err.response?.data?.error||'failed to submit course for review')
+        }finally{
+            setActionLoading(false)
+        }
+    }
     if (loading){
         return (
             <div className="container-fluid py-5 text-center">
@@ -76,6 +98,44 @@ const MentorCourseDetail=()=>{
 
             <main className="container-fluid px-4 py-4">
 
+                {successMessage && (
+        <div
+            className="alert alert-success alert-dismissible fade show"
+            role="alert"
+        >
+            <i className="bi bi-check-circle-fill me-2"></i>
+
+            {successMessage}
+
+            <button
+                type="button"
+                className="btn-close"
+                onClick={() =>
+                    setSuccessMessage('')
+                }
+            />
+        </div>
+    )}
+
+    {error && (
+        <div
+            className="alert alert-danger alert-dismissible fade show"
+            role="alert"
+        >
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+
+            {error}
+
+            <button
+                type="button"
+                className="btn-close"
+                onClick={() =>
+                    setError('')
+                }
+            />
+        </div>
+    )}
+
                 <CourseHeader
                     course={course}
                     onBack={() =>
@@ -86,6 +146,8 @@ const MentorCourseDetail=()=>{
                             `/mentor/courses/${course.id}/edit`
                         )
                     }
+                    onSubmitForReview={handleSubmitForReview}
+                    submitLoading={actionLoading}
                 />
 
                 <CourseOverview

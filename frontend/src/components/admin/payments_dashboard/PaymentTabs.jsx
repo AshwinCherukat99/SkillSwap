@@ -1,4 +1,4 @@
-function PaymnentTabs({
+function PaymentTabs({
     activeTab,
     onTabChange
 }){

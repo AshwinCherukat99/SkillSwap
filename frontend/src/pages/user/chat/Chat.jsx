@@ -65,6 +65,15 @@ const Chat=()=>{
                 api.get(`/chat/conversations/${conversationId}/messages/`),
                 api.get(`/chat/conversations/${conversationId}/members/`)
             ])
+            console.log("MY USER ID:", currentUserId);
+console.log(
+    "MESSAGE SENDERS:",
+    messagesResponse.data.map((message) => ({
+        id: message.id,
+        sender: message.sender,
+        content: message.content,
+    }))
+);
             setMessages(messagesResponse.data)
             setMembers(membersResponse.data)
         }catch(error){
@@ -98,10 +107,13 @@ const Chat=()=>{
             try{
                 const data=JSON.parse(event.data)
                 console.log('websocket message:',data)
-                if (data.type==='message'){
-                    setMessages(
-                        previous=>[...previous,data.message,]
-                    )
+                if (data.type==='message' && data.message){
+                    setMessages((previous)=>{
+                        if (previous.some((msg)=>msg.id===data.message.id)){
+                            return previous
+                        }
+                        return [...previous,data.message]
+                    })
                 }
             }catch(error){
                 console.error('invalid websocket message:',error)
@@ -136,55 +148,21 @@ const Chat=()=>{
             console.error('websocket is not connected')
         }
     }
+    const uploadFiles=async (files)=>{
+        if (!selectedGroup) return
+        const formData=new FormData()
+        files.forEach((file)=>{
+            formData.append('files',file)
+        })
+        await api.post(
+            `/chat/conversations/${selectedGroup.id}/attachments/upload/`,
+            formData,
+        )
+    }
     return (
         <div className="chat-page">
 
-            <header className="chat-topbar">
-
-                <div className="container-fluid">
-
-                    <div className="d-flex align-items-center justify-content-between">
-
-                        <div>
-
-                            <h4 className="fw-bold text-primary mb-0">
-                                SkillSwap
-                            </h4>
-
-                            <small className="text-muted">
-                                Community
-                            </small>
-
-                        </div>
-
-
-                        <div className="d-flex align-items-center gap-3">
-
-                            <button
-                                className="btn btn-light rounded-circle"
-                                type="button"
-                            >
-                                <i className="bi bi-bell"></i>
-                            </button>
-
-
-                            <button
-                                className="btn btn-light rounded-circle"
-                                type="button"
-                            >
-                                <i className="bi bi-gear"></i>
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </header>
-
-
-            <main className="chat-layout">
+           <main className="chat-layout">
 
                 {/* LEFT */}
 
@@ -248,6 +226,7 @@ const Chat=()=>{
                                 onSend={
                                     sendMessage
                                 }
+                                onUploadFiles={uploadFiles}
                                 connected={
                                     connected
                                 }

@@ -1,6 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
+from django.db import transaction
 
 from datetime import timedelta
 
@@ -11,11 +12,15 @@ from rest_framework import status
 
 from .models import CourseSession,SkillExchangeSession
 from apps.courses.models import CourseEnrollment
+from apps.accounts.models import User
+from apps.skills.models import Skill,UserSkill
 from .serializers.course_session import MentorCourseSessionCreateSerializer
 from .serializers.session_history import SkillExchangeSessionHistorySerializer,CourseSessionHistorySerializer,MentorCourseSessionHistorySerializer
 from .serializers.upcoming_session import UpcomingSkillExchangeSerializer,UpcomingCourseSessionSerializer,MentorUpcomingSessionSerializer
 from .serializers.session_request import FriendSessionRequestSerializer,RecievedSessionRequestSerializer
 from .serializers.admin import AdminCourseSessionSerializer,AdminSkillExchangeSessionSerializer
+
+from apps.chat.services import create_skill_conversation,create_course_conversation
 
 from apps.accounts.permissions import IsAdmin
 from apps.mentors.authentication import MentorJWTAuthentication
@@ -77,7 +82,7 @@ class MentorScheduleCourseSessionView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         student_conflict=CourseSession.objects.filter(
-            enrollment_user=enrollment.user,
+            enrollment__user=enrollment.user,
             status=CourseSession.Status.SCHEDULED,
             scheduled_start__lt=scheduled_end
         ).filter(
@@ -92,15 +97,20 @@ class MentorScheduleCourseSessionView(APIView):
                     ),
                 },status=status.HTTP_400_BAD_REQUEST,
             )
-        session=serializer.save(
+        with transaction.atomic():
+            session=serializer.save(
             mentor=mentor,
             status=CourseSession.Status.SCHEDULED,
         )
+            conversation=create_course_conversation(session)
         response_serializer=MentorCourseSessionCreateSerializer(
             session
         )
         return Response(
-                response_serializer.data,
+            {
+                **response_serializer.data,
+                'conversation_id':conversation.id,
+            },
                 status=status.HTTP_201_CREATED,
         )
 
@@ -311,7 +321,7 @@ class SessionRequestActionView(APIView):
         action=request.data.get('action')
         if action=='ACCEPT':
             session.status=(
-                SkillExchangeSession.Status.SCHEDULED,
+                SkillExchangeSession.Status.SCHEDULED
             )
             session.accepted_at=timezone.now()
             session.rejection_reason=''
@@ -323,6 +333,7 @@ class SessionRequestActionView(APIView):
                     'updated_at',
                 ]
             )
+            conversation=create_skill_conversation(session)
             return Response(
                 {
                     'message':'session request accepted',
@@ -332,6 +343,7 @@ class SessionRequestActionView(APIView):
                             'request':request,
                         }
                     ).data,
+                    'conversation_id':conversation.id,
                 },
                 status=status.HTTP_200_OK,
             )
@@ -502,6 +514,96 @@ class MentorCancelSessionView(APIView):
             },status=status.HTTP_200_OK,
         )
 
+class SessionRequestSkillOptionsView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request,recipient_id):
+        recipient=get_object_or_404(
+            User,
+            id=recipient_id
+        )
+        requester=request.user
+        requester_wanted_ids = set(
+            UserSkill.objects.filter(
+                user=requester,
+                skill_type=UserSkill.SkillType.WANT,
+                skill__is_active=True,
+            ).values_list(
+                'skill_id',
+                flat=True
+            )
+        )
+
+        requester_offered_ids = set(
+            UserSkill.objects.filter(
+                user=requester,
+                skill_type=UserSkill.SkillType.OFFER,
+                skill__is_active=True,
+            ).values_list(
+                'skill_id',
+                flat=True
+            )
+        )
+
+        recipient_wanted_ids = set(
+            UserSkill.objects.filter(
+                user=recipient,
+                skill_type=UserSkill.SkillType.WANT,
+                skill__is_active=True,
+            ).values_list(
+                'skill_id',
+                flat=True
+            )
+        )
+
+        recipient_offered_ids = set(
+            UserSkill.objects.filter(
+                user=recipient,
+                skill_type=UserSkill.SkillType.OFFER,
+                skill__is_active=True,
+            ).values_list(
+                'skill_id',
+                flat=True
+            )
+        )
+
+        
+        skills_to_learn_ids = (
+            requester_wanted_ids &
+            recipient_offered_ids
+        )
+
+        
+        skills_to_offer_ids = (
+            requester_offered_ids &
+            recipient_wanted_ids
+        )
+
+        skills_to_learn = Skill.objects.filter(
+            id__in=skills_to_learn_ids,
+            is_active=True,
+        ).order_by('name')
+
+        skills_to_offer = Skill.objects.filter(
+            id__in=skills_to_offer_ids,
+            is_active=True,
+        ).order_by('name')
+        return Response({
+            'skills_to_learn':[
+                {
+                    'id':skill.id,
+                    'name':skill.name
+                }
+                for skill in skills_to_learn
+            ],
+            'skills_to_offer':[
+                {
+                    'id':skill.id,
+                    'name':skill.name
+                }
+                for skill in skills_to_offer
+            ]
+        })
+
 class SendSessionRequestView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self,request):
@@ -638,12 +740,13 @@ class MentorCourseSessionHistoryView(APIView):
         )
 
 class AdminSessionManagementView(APIView):
-    authentication_classes=[IsAdmin]
-    permission_classes=[IsAuthenticated]
+    permission_classes=[IsAdmin]
     def get(self,request):
+        now=timezone.now()
+        tab=request.query_params.get('tab','ALL')
         session_type=request.query_params.get('session_type','ALL')
         status_filter=request.query_params.get('status')
-        search=request.query_params.get('status','').strip()
+        search=request.query_params.get('search','').strip()
         sessions=[]
         if session_type in ['ALL','SKILL_EXCHANGE']:
             skill_sessions=SkillExchangeSession.objects.select_related(
@@ -652,7 +755,53 @@ class AdminSessionManagementView(APIView):
                 'skill_wanted',
                 'skill_offered',
             )
-            if status_filter:
+            if tab=='UPCOMING':
+                upcoming_ids=[]
+                for session in skill_sessions:
+                    if (session.status==SkillExchangeSession.Status.SCHEDULED and session.scheduled_start>now):
+                        upcoming_ids.append(session.id)
+                skill_sessions=skill_sessions.filter(
+                    id__in=upcoming_ids
+                )
+            elif tab=='ONGOING':
+                ongoing_ids=[]
+                for session in skill_sessions:
+                    if session.status!=SkillExchangeSession.Status.SCHEDULED:
+                        continue
+                    end_time=(session.scheduled_start+timedelta(minutes=session.duration_minutes))
+                    if (session.scheduled_start<=now and now<end_time):
+                        ongoing_ids.append(session.id)
+                skill_sessions=skill_sessions.filter(
+                    id__in=ongoing_ids
+                )
+            elif tab == 'COMPLETED':
+
+                skill_sessions = skill_sessions.filter(
+        status=SkillExchangeSession.Status.COMPLETED
+    )
+
+
+            elif tab == 'CANCELLED':
+
+                skill_sessions = skill_sessions.filter(
+        status=SkillExchangeSession.Status.CANCELLED
+    )
+
+
+            elif tab == 'REJECTED':
+
+                skill_sessions = skill_sessions.filter(
+        status=SkillExchangeSession.Status.REJECTED
+    )
+
+
+            elif tab == 'EXPIRED':
+
+                skill_sessions = skill_sessions.filter(
+        status=SkillExchangeSession.Status.EXPIRED
+    )
+
+            if status_filter and tab=='ALL':
                 skill_sessions=skill_sessions.filter(
                 status=status_filter
             )
@@ -680,7 +829,74 @@ class AdminSessionManagementView(APIView):
                     'enrollment__course',
                 )
             )
-            if status_filter:
+            if tab == 'UPCOMING':
+
+                upcoming_ids = []
+
+                for session in course_sessions:
+
+                    if (
+            session.status == CourseSession.Status.SCHEDULED
+            and session.scheduled_start > now
+        ):
+                        upcoming_ids.append(session.id)
+
+                course_sessions = course_sessions.filter(
+        id__in=upcoming_ids
+    )
+
+
+            elif tab == 'ONGOING':
+
+                ongoing_ids = []
+
+                for session in course_sessions:
+
+                    if session.status != CourseSession.Status.SCHEDULED:
+                        continue
+
+                    end_time = (
+            session.scheduled_start
+            + timedelta(minutes=session.duration_minutes)
+        )
+
+                    if (
+            session.scheduled_start <= now
+            and now < end_time
+        ):
+                        ongoing_ids.append(session.id)
+
+                course_sessions = course_sessions.filter(
+        id__in=ongoing_ids
+    )
+
+
+            elif tab == 'COMPLETED':
+
+                course_sessions = course_sessions.filter(
+        status=CourseSession.Status.COMPLETED
+    )
+
+
+            elif tab == 'CANCELLED':
+
+                course_sessions = course_sessions.filter(
+        status=CourseSession.Status.CANCELLED
+    )
+
+
+            elif tab == 'REJECTED':
+
+    
+                course_sessions = course_sessions.none()
+
+
+            elif tab == 'EXPIRED':
+
+                course_sessions = course_sessions.filter(
+        status=CourseSession.Status.EXPIRED
+    )
+            if status_filter and tab=='ALL':
                 course_sessions=course_sessions.filter(
                     status=status_filter
                 )
@@ -721,7 +937,7 @@ class AdminSessionManagementView(APIView):
                 status=SkillExchangeSession.Status.CANCELLED
             ).count()+
             course_queryset.filter(
-                status=CourseSession.Status.COMPLETED
+                status=CourseSession.Status.CANCELLED
             ).count()
         )
         rejected=skill_queryset.filter(
@@ -743,17 +959,30 @@ class AdminSessionManagementView(APIView):
                         status=CourseSession.Status.SCHEDULED
                     ).count()
                 )
-        now=timezone.now()
-        ongoing_skill=skill_queryset.filter(
+        ongoing_skill=0
+        upcoming_skill=0
+        skill_sessions=skill_queryset.filter(
             status=SkillExchangeSession.Status.SCHEDULED,
-            scheduled_start__lte=now
-        ).count()
-        ongoing_course=course_queryset.filter(
+        )
+        for session in skill_sessions:
+            end_time=(session.scheduled_start+timedelta(minutes=session.duration_minutes))
+            if session.scheduled_start<=now<end_time:
+                ongoing_skill+=1
+            elif now<session.scheduled_start:
+                upcoming_skill+=1
+        ongoing_course=0
+        upcoming_course=0
+        course_sessions=course_queryset.filter(
             status=CourseSession.Status.SCHEDULED,
-            scheduled_start__lte=now
-        ).count()
+        )
+        for session in course_sessions:
+            end_time=(session.scheduled_start+timedelta(minutes=session.duration_minutes))
+            if session.scheduled_start<=now<end_time:
+                ongoing_course+=1
+            elif now<session.scheduled_start:
+                upcoming_course+=1
         ongoing=ongoing_skill+ongoing_course
-        upcoming=scheduled-ongoing
+        upcoming=upcoming_skill+upcoming_course
         skill_duration=list(
             skill_queryset.values_list(
                 'duration_minutes',
@@ -813,4 +1042,135 @@ class AdminSessionManagementView(APIView):
                 'sessions':sessions,
             },
             status=status.HTTP_200_OK,
+        )
+
+class AdminSessionActionView(APIView):
+    permission_classes=[IsAdmin]
+    @transaction.atomic
+    def post(self,request,session_type,session_id):
+        action=request.data.get('action','').upper().strip()
+        if session_type=='SKILL_EXCHANGE':
+            session=get_object_or_404(
+                SkillExchangeSession,
+                id=session_id,
+            )
+        elif session_type=='COURSE':
+            session=get_object_or_404(
+                CourseSession,
+                id=session_id,
+            )
+        else:
+            return Response(
+                {
+                    'detail':'invalid session type'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if action=='CANCEL':
+            if session.status!='SCHEDULED':
+                return Response(
+                    {
+                        'detail':('only scheduled sessions can be cancelled')
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            reason=request.data.get('reason','session cancelled by administrator').strip()
+            session.status='CANCELLED'
+            session.cancelled_at=timezone.now()
+            session.cancellation_reason=reason
+            session.save(
+                update_fields=[
+                    'status',
+                    'cancelled_at',
+                    'cancellation_reason',
+                    'updated_at',
+                ]
+            )
+            return Response(
+                {
+                    'message':'session cancelled successfully',
+                    'session_id':session.id,
+                    'status':session.status,
+                },
+                status=status.HTTP_200_OK,
+            )
+        if action=='RESCHEDULE':
+            if session.status!='SCHEDULED':
+                return Response(
+                    {
+                        'detail':('only scheuduled sessions can be rescheduled')
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            new_start=request.data.get('scheduled_start')
+            if not new_start:
+                return Response(
+                    {
+                        'detail':'scheduled start is required'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            from django.utils.dateparse import parse_datetime
+            new_start=parse_datetime(new_start)
+            if not new_start:
+                return Response(
+                    {
+                        'detail':('invalid scheduled_start format')
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            session.scheduled_start=new_start
+            session.save(
+                update_fields=[
+                    'scheduled_start',
+                    'updated_at',
+                ]
+            )
+            return Response(
+                {
+                    'message':'session rescheduled successfully',
+                    'session_id':session.id,
+                    'scheduled_start':session.scheduled_start,
+                    'status':session.status,
+                },
+                status=status.HTTP_200_OK,
+            )
+        if action=='COMPLETE':
+            if session.status!='SCHEDULED':
+                return Response(
+                    {
+                        'detail':('only scheduled sessions can be marked as completed')
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            session.status='COMPLETED'
+            if isinstance(session,CourseSession):
+                session.completed_at=timezone.now()
+                session.save(
+                    update_fields=[
+                        'status',
+                        'completed_at',
+                        'updated_at',
+                    ]
+                )
+            else:
+                session.save(
+                    update_fields=[
+                        'status',
+                        'updated_at',
+                    ]
+                )
+            return Response(
+                {
+                    'message':'session marked as completed',
+                    'session_id':session.id,
+                    'status':session.status,
+                },
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            {
+                'detail':'invalid action'
+            },
+            status=status.HTTP_400_BAD_REQUEST,
         )

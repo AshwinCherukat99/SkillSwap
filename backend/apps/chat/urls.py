@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import (MentorGroupListView,ConversationMembersView,ConversationMessagesView,UserConversationMembersView,UserConversationMessagesView,UserGroupListView)
+from .views import (MentorGroupListView,VideoCallDetailsView,ChatAttachmentUploadView,ConversationMembersView,ConversationMessagesView,UserConversationMembersView,UserConversationMessagesView,UserGroupListView,ConversationListView,DirectConversationMessagesView,DirectConversationView,MentorDirectConversationMessagesView,MentorConversationListView,MentorStartDirectChatView)
 
 urlpatterns=[
     path(
@@ -33,4 +33,44 @@ urlpatterns=[
         UserConversationMembersView.as_view(),
         name='user-conversation-members',
     ),
+    path(
+        'conversations/',
+        ConversationListView.as_view(),
+        name='conversation-list',
+    ),
+    path(
+        'conversations/direct/<int:conversation_id>/messages/',
+        DirectConversationMessagesView.as_view(),
+        name='conversation-messages',
+    ),
+    path(
+        'conversations/direct/',
+        DirectConversationView.as_view(),
+        name='direct-conversation'
+    ),
+    path(
+        'mentor/direct-chat/',
+        MentorConversationListView.as_view(),
+        name='mentor-conversation-list',
+    ),
+    path(
+        'mentor/direct-chat/<int:conversation_id>/messages/',
+        MentorDirectConversationMessagesView.as_view(),
+        name='mentor-direct-conversation-messages',
+    ),
+    path(
+        'mentor/direct-chat/start/',
+        MentorStartDirectChatView.as_view(),
+        name='mentor-start-direct-chat',
+    ),
+    path(
+        'conversations/<int:conversation_id>/attachments/upload/',
+        ChatAttachmentUploadView.as_view(),
+        name='chat-attachment-upload',
+    ),
+    path(
+        'video-call/<int:conversation_id>/details/',
+        VideoCallDetailsView.as_view(),
+        name='video-call-details'
+    )
 ]

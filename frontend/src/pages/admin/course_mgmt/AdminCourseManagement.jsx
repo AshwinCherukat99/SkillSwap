@@ -1,4 +1,5 @@
 import React,{useState,useEffect} from "react";
+import {useSearchParams} from 'react-router-dom'
 
 import adminApi from '../../../services/adminApi'
 
@@ -9,6 +10,7 @@ import CourseDetailsModal from "../../../components/admin/course_mgmt/CourseDeta
 import RejectCourseModal from "../../../components/admin/course_mgmt/RejectCourseModal";
 
 const AdminCourseManagement=()=>{
+    const [searchParams]=useSearchParams()
     const [courses,setCourses]=useState([])
     const [stats,setStats]=useState({
         total_courses:0,
@@ -17,7 +19,7 @@ const AdminCourseManagement=()=>{
         drafts:0,
         rejected:0,
     })
-    const [search,setSearch]=useState('')
+    const [search,setSearch]=useState(searchParams.get('search')||'')
     const [statusFilter,setStatusFilter]=useState('')
     const [loading,setLoading]=useState(true)
     const [actionLoading,setActionLoading]=useState(false)
@@ -29,7 +31,13 @@ const AdminCourseManagement=()=>{
             setLoading(true)
             setError('')
             const response=await adminApi.get(
-                '/admin/courses/'
+                '/admin/courses/',
+                {
+                    params:{
+                        search,
+                        status:statusFilter,
+                    }
+                }
             )
             setCourses(response.data.courses||[])
             setStats(response.data.stats||[])

@@ -9,6 +9,7 @@ from django.db.models import Count,Q
 from django.shortcuts import get_object_or_404
 
 from .models import UserBadge,Badge
+from .services import BadgeService
 from .serializers.initialization import BadgeSerializer
 from .serializers.admin import AdminBadgeCreateSerializer,AdminBadgeUpdateSerializer
 
@@ -16,6 +17,7 @@ class BadgeDashboardView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         user=request.user
+        total_xp=user.xp
         user_badges=UserBadge.objects.filter(
             user=user
         ).select_related(
@@ -47,6 +49,7 @@ class BadgeDashboardView(APIView):
         stats_data={
             'total_badges':total_badges,
             'earned_badges':earned_badges_count,
+            'total_xp':total_xp,
         }
         first_badge=UserBadge.objects.filter(
             user=user
@@ -76,13 +79,13 @@ class BadgeDashboardView(APIView):
             {
                 'stats':stats_data,
                 'badges':badge_data,
+                'milestones':milestones,
             },
             status=status.HTTP_200_OK,
         )
 
 class AdminBadgeListCreateView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def get(self,request):
         badges=Badge.objects.all().prefetch_related('rules').annotate(awarded_count_db=Count('user_badges')).order_by('-created_at')
         search=request.query_params.get('search')
@@ -128,8 +131,7 @@ class AdminBadgeListCreateView(APIView):
         )
 
 class AdminBadgeDetailView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def get_object(self,badge_id):
         return get_object_or_404(
             Badge.objects.prefetch_related('rules'),
@@ -162,4 +164,25 @@ class AdminBadgeDetailView(APIView):
         badge.delete()
         return Response(
             status=status.HTTP_204_NO_CONTENT,
+        )
+
+class EvaluateMyBadgesView(APIView):
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        newly_earned=BadgeService.evaluate_user(request.user)
+        return Response(
+            {
+                'message':'badge evaluation completed',
+                'newly_earned':[
+                    {
+                        'id':badge.id,
+                        'name':badge.name,
+                        'xp_reward':badge.xp_reward
+                    }
+                    for badge in newly_earned
+                ],
+                'xp':request.user.xp,
+                'current_streak':request.user.current_streak,
+            },
+            status=status.HTTP_200_OK,
         )

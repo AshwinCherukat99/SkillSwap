@@ -1,62 +1,48 @@
-import React from "react";
-import {useParams} from 'react-router-dom'
 
-import useWebRTC from "../../hooks/useWebRTC";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import getValidVideoAccessToken from "../../utils/getValidVideoAccessToken";
+import ActiveVideoCall from "../../components/video_call/ActiveVideoCall";
 
-const VideoCallPage=()=>{
-    const {roomName}=useParams()
-    const {
-        localVideoRef,
-        remoteVideoRef,
-        connected,
-        micEnabled,
-        cameraEnabled,
-        createOffer,
-        toggleMicrophone,
-        toggleCamera,
-        leaveCall,
-        shareScreen,
-    }=useWebRTC(roomName)
-    return (
-        <div className="video-call-page">
+import './VideoCallPage.css'
 
-            <VideoCallHeader
-                connected={connected}
-            />
+const VideoCallPage = () => {
+  const { roomName, conversationId } = useParams();
+  const [accessToken, setAccessToken] = useState(null);
+  const [tokenError, setTokenError] = useState("");
 
-            <main className="video-call-main">
+  useEffect(() => {
+    let cancelled = false;
 
-                <section className="video-section">
+    getValidVideoAccessToken()
+      .then((token) => {
+        if (!cancelled) setAccessToken(token);
+      })
+      .catch((error) => {
+        console.error("Unable to prepare video call token:", error);
+        if (!cancelled) setTokenError(error.message);
+      });
 
-                    <VideoGrid
-                        localVideoRef={localVideoRef}
-                        remoteVideoRef={remoteVideoRef}
-                    />
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-                    <SessionProgress />
+  if (tokenError) {
+    return <p>{tokenError}</p>;
+  }
 
-                </section>
+  if (!accessToken) {
+    return <p>Preparing secure video connection...</p>;
+  }
 
-                <CallSidebar />
+  return (
+    <ActiveVideoCall
+      roomName={roomName}
+      conversationId={conversationId}
+      accessToken={accessToken}
+    />
+  );
+};
 
-            </main>
-
-            <CallControls
-                micEnabled={micEnabled}
-                cameraEnabled={cameraEnabled}
-                onToggleMicrophone={
-                    toggleMicrophone
-                }
-                onToggleCamera={
-                    toggleCamera
-                }
-                onLeave={leaveCall}
-                onStartCall={createOffer}
-                onShareScreen={shareScreen}
-            />
-
-        </div>
-    )
-}
-
-export default VideoCallPage
+export default VideoCallPage;

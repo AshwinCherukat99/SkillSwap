@@ -1,7 +1,9 @@
-import {useState} from "react";
+import {useState,useEffect,useCallback} from "react";
 import {useSelector} from 'react-redux'
 import CommentSection from "../feed/CommentSection";
 import api from "../../../services/api";
+
+import ReportModal from "../../../pages/report_modal/ReportModal";
 
 function PostCard({
     post,
@@ -15,6 +17,8 @@ function PostCard({
         const [likesCount,setLikesCount]=useState(post.likes_count||0)
         const [showComments,setShowComments]=useState(false)
         const [deleting,setDeleting]=useState(false)
+        const [reportTarget,setReportTarget]=useState(null)
+        const [reportToast,setReportToast]=useState('')
         const author=post.author
         const isOwnPost =
         currentUser &&
@@ -113,6 +117,41 @@ const handleLike=async ()=>{
             setDeleting(false)
         }
     }
+    const onReportUser=(author)=>{
+        if (!author?.id){
+            alert('unable to identify reported user')
+            return
+        }
+        setReportTarget({
+            type:'USER',
+            id:author.id,
+            ...{reportedUserId:author.id}
+        })
+    }
+    const onReportPost=(post)=>{
+        if (!post?.id||!post?.author?.id){
+            alert('unable to identify post or its author') 
+            return
+        }
+        setReportTarget({
+            type:'POST',
+            id:post.id,
+            ...{reportedUserId:post?.author?.id}
+        })
+    }
+    const showReportToast=(message)=>{
+        setReportToast(message)
+    }
+    useEffect(()=>{
+        if (!reportToast) return
+        const timeout=setTimeout(()=>{
+            setReportToast('')
+        },4000)
+        return ()=>clearTimeout(timeout)
+    },[reportToast])
+    const handleCloseReport = useCallback(() => {
+  setReportTarget(null);
+}, []);
     return (
         <div className="card post-card border-0 shadow-sm rounded-4">
 
@@ -223,6 +262,45 @@ const handleLike=async ()=>{
 
                         </div>
 
+                    )}
+
+                    {!isOwnPost&&(
+                        <div className="dropdown">
+        <button
+            type="button"
+            className="btn btn-light btn-sm rounded-pill d-flex align-items-center gap-1"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+            aria-label="Report options"
+        >
+            <i className="bi bi-exclamation-circle" />
+            <span>Report</span>
+        </button>
+
+        <ul className="dropdown-menu dropdown-menu-end shadow-sm border-0">
+            <li>
+                <button
+                    type="button"
+                    className="dropdown-item d-flex align-items-center gap-2"
+                    onClick={() => onReportUser?.(author)}
+                >
+                    <i className="bi bi-person-exclamation text-danger" />
+                    Report User
+                </button>
+            </li>
+
+            <li>
+                <button
+                    type="button"
+                    className="dropdown-item d-flex align-items-center gap-2"
+                    onClick={() => onReportPost?.(post)}
+                >
+                    <i className="bi bi-flag text-danger" />
+                    Report Post
+                </button>
+            </li>
+        </ul>
+    </div>
                     )}
 
                 </div>
@@ -348,6 +426,39 @@ const handleLike=async ()=>{
 
 
             </div>
+
+                
+{/* REPORT MODAL */}
+{reportTarget && (
+    <ReportModal
+        target={reportTarget}
+        apiClient={api}
+        onClose={handleCloseReport}
+        onSuccess={showReportToast}
+    />
+)}
+
+{/* SUCCESS TOAST */}
+{reportToast && (
+    <div
+        className="report-toast"
+        role="status"
+        aria-live="polite"
+    >
+        <i className="bi bi-check-circle-fill" />
+
+        <span>{reportToast}</span>
+
+        <button
+            type="button"
+            onClick={() => setReportToast("")}
+            aria-label="Dismiss notification"
+        >
+            &times;
+        </button>
+    </div>
+)}
+
 
         </div>
     );

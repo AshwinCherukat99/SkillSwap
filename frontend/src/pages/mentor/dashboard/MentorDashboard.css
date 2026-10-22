@@ -343,7 +343,7 @@ body {
 ========================= */
 
 .main-content {
-    margin-left: 256px;
+    margin-left: 0;
     padding: 96px 32px 48px;
 }
 

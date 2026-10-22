@@ -7,6 +7,8 @@ import SessionStats from '../../../components/user/upcoming_sessions/SessionStat
 import SessionRequestCard from '../../../components/user/upcoming_sessions/SessionRequestCard'         
 import AcceptedSessionCard from '../../../components/user/upcoming_sessions/AcceptedSessionCard'
 
+import './UpcomingSessions.css'
+
 const UpcomingSessions=()=>{
     const [sessions,setSessions]=useState([])
     const [requests,setRequests]=useState([])
@@ -21,6 +23,16 @@ const UpcomingSessions=()=>{
     const [loading,setLoading]=useState(true)
     const [requestLoading,setRequestLoading]=useState(true)
     const [error,setError]=useState("")
+    const handleSessionExpired=(sessionId,sessionType)=>{
+        setSessions((previous)=>
+        previous.filter(
+            session=>
+                !(
+                    session.id===sessionId &&
+                    session.type===sessionType
+                )
+        ))
+    }
     const fetchSessions=async ()=>{
         try{
             setLoading(true)
@@ -77,7 +89,7 @@ const UpcomingSessions=()=>{
     const handleRequestAction=async (sessionId,action)=>{
         try{
             await api.post(
-                `/sessions/requests/${sessionId}/action/`,
+                `/sessions/requests/${sessionId}/action`,
                 {
                     action,
                 }
@@ -278,6 +290,7 @@ const UpcomingSessions=()=>{
                                             session={
                                                 session
                                             }
+                                            onExpired={handleSessionExpired}
                                         />
 
                                     )

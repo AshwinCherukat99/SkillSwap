@@ -49,11 +49,22 @@ const MentorCourseManagement=()=>{
         if (!searchTerm.trim()){
             return courses
         } 
-        const search=searchTerm.toLowerCase()
+        const search=searchTerm.trim().toLowerCase()
         return courses.filter((course)=>{
-            course.title?.toLowerCase().includes(search)||
-            course.category?.toLowerCase().includes(search)||
-            course.description?.toLowerCase().includes(search)
+            const title=String(course.title??'').toLowerCase()
+            const category=String(
+                typeof course.category==='object'
+                ?course.category?.name??''
+                :course.category??''
+            ).toLowerCase()
+            const description=String(
+                course.description??''
+            ).toLowerCase()
+            return (
+                title.includes(search)||
+            category.includes(search)||
+            description.includes(search)
+            )
         },[courses,searchTerm])
     })
     return (

@@ -1,60 +1,123 @@
+
 .skillswap-navbar {
-  height: 64px;
+  min-height: 64px;
   background-color: #e5e5e5;
-  padding: 0 12px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
 }
 
-/* SkillSwap logo */
+.skillswap-navbar > .container-fluid {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 6px;
+  min-width: 0;
+  padding: 0;
+}
+
+/* Logo */
 .skillswap-logo {
   color: #3730d9 !important;
   font-size: 20px;
   font-weight: 700;
-  margin-right: 28px;
+  margin: 0 0 0 0;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+  text-decoration: none;
 }
+
 
 /* Navigation links */
 .skillswap-nav {
   display: flex !important;
   flex-direction: row !important;
   align-items: center;
-  gap: 4px;
+  gap: 0;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.skillswap-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .skillswap-link {
   color: #444 !important;
-  font-size: 13px;
-  padding: 8px 6px !important;
+  font-size: 12px;
+  padding: 12px 7px !important;
   white-space: nowrap;
+  flex: 0 0 auto;
+  line-height: 1.4;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
 }
 
 .skillswap-link:hover {
   color: #3730d9 !important;
 }
 
-/* Active page */
 .skillswap-link.active {
   color: #3730d9 !important;
-  border-bottom: 2px solid #3730d9;
+  border-bottom-color: #3730d9;
 }
 
-/* Notification / Chat / Logout */
+/* Keep logo and action icons visible */
+.skillswap-logo,
+.skillswap-actions {
+  flex-shrink: 0;
+}
+
 .skillswap-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-left: auto;
+  gap: 10px;
+  margin-left: 4px;
 }
 
+
 .icon-btn {
+  width: 28px;
+  height: 32px;
+  padding: 0;
   border: none;
   background: transparent;
   color: #333;
-  padding: 2px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  text-decoration: none;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .icon-btn:hover {
   color: #3730d9;
+}
+
+/* Smaller screens */
+@media (max-width: 992px) {
+  .skillswap-navbar {
+    padding: 8px 16px;
+  }
+
+  .skillswap-navbar > .container-fluid {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .skillswap-nav {
+    order: 3;
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .skillswap-actions {
+    margin-left: auto;
+  }
 }

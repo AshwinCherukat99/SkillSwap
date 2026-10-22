@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Q,Count
 from django.utils import timezone
+from datetime import timedelta
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -16,7 +17,9 @@ from apps.mentors.models import Mentor,MentorDocument,MentorVerification
 from apps.courses.models import Course
 from apps.skills.models import Skill,SuggestedSkill
 from apps.reports.models import Report
+from apps.sessions_mgmt.models import SkillExchangeSession,CourseSession
 
+from apps.accounts.serializers.mentor import AdminUserRatingSerializer
 from .serializers.auth import AdminLoginSerializer
 from .serializers.mentor_verification import (
     RejectMentorSerializer,
@@ -24,9 +27,9 @@ from .serializers.mentor_verification import (
 )
 from .serializers.course import AdminCourseDetailSerializer,AdminCourseListSerializer,AdminCourseModuleSerializer,AdminCourseLessonSerializer,AdminCourseRejectSerializer
 from .serializers.skills import AdminSkillSerializer,SuggestedSkillSerializer
-from .serializers.users import AdminUserSerializer       
+from .serializers.users import AdminUserSerializer,AdminUserDetailSerializer       
 from .serializers.reviews import AdminReviewSerializer,ReviewReportSerializer
-from .serializers.mentors import (AdminMentorListSerializer,AdminMentorDetailSerializer,AdminMentorUpdateSerializer)
+from .serializers.mentors import (AdminMentorListSerializer,AdminMentorDetailSerializer,AdminMentorUpdateSerializer,AdminMentorProfileSerializer)
 
 from .services import (
     approve_mentor,
@@ -62,7 +65,7 @@ class AdminLoginView(APIView):
 class MentorVerificationListView(APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
-        verifications=(MentorVerification.objects.select_related('mentor').order_by('-created_at'))
+        verifications=(MentorVerification.objects.select_related('mentor').filter(status=MentorVerification.Status.PENDING).order_by('-created_at'))
         mentors=[]
         for verification in verifications:
             mentor=verification.mentor
@@ -165,6 +168,62 @@ class MentorVerificationDetailView(APIView):
                     }
                     for document in documents
                 ],
+            },
+            status=status.HTTP_200_OK,
+        )
+    def patch(self,request,mentor_id):
+        mentor=get_object_or_404(
+            Mentor,
+            id=mentor_id
+        )
+        verification=get_object_or_404(
+            MentorVerification,
+            mentor=mentor,
+        )
+        allowed_fields={
+            'identity_verified',
+            'education_verified',
+            'certifications_verified',
+            'portfolio_verified',
+        }
+        field=request.data.get('field')
+        value=request.data.get('value')
+        if field not in allowed_fields:
+            return Response(
+                {
+                    'error':'invalid verification field'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not isinstance(value,bool):
+            return Response(
+                {
+                    'error':'verification value must be true or false'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        setattr(
+            verification,
+            field,
+            value,
+        )
+        verification.save(
+            update_fields=[field]
+        )
+        return Response(
+            {
+                'message':'verification updated successfully',
+                'verification':{
+                    "status": verification.status,
+                    "identity_verified": verification.identity_verified,
+                    "education_verified": verification.education_verified,
+                    "certifications_verified": verification.certifications_verified,
+                    "portfolio_verified": verification.portfolio_verified,
+                    "internal_notes": verification.internal_notes,
+                    "rejection_reason": verification.rejection_reason,
+                    "created_at": verification.created_at,
+                    "reviewed_at": verification.reviewed_at,
+                },
             },
             status=status.HTTP_200_OK,
         )
@@ -422,10 +481,10 @@ class AdminSkillListCreateView(APIView):
         serializer=AdminSkillSerializer(
             data=request.data,
         )
-        if serializer.is_valid:
+        if serializer.is_valid():
             skill=serializer.save()
             return Response(
-                AdminSkillSerializer(serializer).data,
+                AdminSkillSerializer(skill).data,
                 status=status.HTTP_201_CREATED,
             )
         return Response(
@@ -580,8 +639,9 @@ class AdminUserManagementView(APIView):
         IsAuthenticated
     ]
     def get(self,request):
-        user=User.objects.filter(
-            role=User.Role.USER
+        users=User.objects.filter(
+            role=User.Role.USER,
+            mentor_profile__isnull=True
         ).order_by('-date_joined')
         search=request.query_params.get(
             'search',''
@@ -601,7 +661,8 @@ class AdminUserManagementView(APIView):
                 status=user_status
             )
         all_users=User.objects.filter(
-            role=User.Role.USER
+            role=User.Role.USER,
+            mentor_profile__isnull=True
         )
         total_users=all_users.count()
         active_users=all_users.filter(
@@ -843,7 +904,7 @@ class AdminReviewManagementView(APIView):
             )
         total_reviews=UserRating.objects.count()
         hidden_reviews=UserRating.objects.filter(is_hidden=True).count()
-        reported_reviews=(Report.objects.filter(target_type=Report.TargetType.REVIEW).values('target_id').distint().count())
+        reported_reviews=(Report.objects.filter(target_type=Report.TargetType.REVIEW).values('target_id').distinct().count())
         return Response(
             {
                 'reviews':data,
@@ -1000,8 +1061,7 @@ class AdminReviewReportUpdateView(APIView):
             )
 
 class AdminMentorManagementView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def get(self,request):
         mentors=Mentor.objects.select_related('profile').all()
         search=request.query_params.get('search','').strip()
@@ -1024,6 +1084,8 @@ class AdminMentorManagementView(APIView):
                     status=mentor_status
                 )
         mentors=mentors.order_by('-created_at')
+        print('MENTOR COUNT:',mentors.count())
+        print('MENTOR STATUS:',list(mentors.values_list('id','username','status')))
         serializer=AdminMentorListSerializer(
             mentors,
             many=True,
@@ -1039,8 +1101,7 @@ class AdminMentorManagementView(APIView):
         )
 
 class AdminMentorStatsView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def get(self,request):
         total=Mentor.objects.count()
         active=Mentor.objects.filter(
@@ -1086,8 +1147,7 @@ class AdminMentorDetailView(APIView):
         )
 
 class AdminMentorActionView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def post(self,request,mentor_id):
         mentor=get_object_or_404(
             Mentor,
@@ -1127,8 +1187,7 @@ class AdminMentorActionView(APIView):
         )
 
 class AdminMentorUpdateView(APIView):
-    permission_classes=[IsAuthenticated]
-    authentication_classes=[IsAdmin]
+    permission_classes=[IsAdmin]
     def patch(self,request,mentor_id):
         mentor=get_object_or_404(
             Mentor,
@@ -1145,3 +1204,336 @@ class AdminMentorUpdateView(APIView):
             serializer.data,
             status=status.HTTP_200_OK,
         )
+
+class AdminDashboardView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request):
+        now=timezone.now()
+        total_users=User.objects.filter(
+            role=User.Role.USER
+        ).count()
+        active_users=User.objects.filter(
+            role=User.Role.USER,
+            status=User.Status.ACTIVE,
+        ).count()     
+        blocked_users=User.objects.filter(
+            role=User.Role.USER,
+            status=User.Status.BLOCKED,
+        ).count()
+        suspended_users=User.objects.filter(
+            role=User.Role.USER,
+            status=User.Status.SUSPENDED,
+        ).count()
+        skill_sessions=SkillExchangeSession.objects.all()
+        skill_today=skill_sessions.filter(
+            scheduled_start__date=now.date()
+        )
+        skill_active=skill_sessions.filter(
+            status=SkillExchangeSession.Status.SCHEDULED,
+            scheduled_start__lte=now,
+            scheduled_start__gte=now-timedelta(minutes=120)
+        )
+        skill_completed=skill_sessions.filter(
+            status=SkillExchangeSession.Status.COMPLETED
+        ).count()
+        skill_pending=skill_sessions.filter(
+            status=SkillExchangeSession.Status.REQUESTED,
+        ).count()
+        course_sessions=CourseSession.objects.all()
+        course_today=course_sessions.filter(
+            scheduled_start__date=now.date()
+        )
+        course_active=course_sessions.filter(
+            status=CourseSession.Status.SCHEDULED,
+            scheduled_start__lte=now,
+            scheduled_start__gte=now-timedelta(minutes=120),
+        )
+        course_completed=course_sessions.filter(
+            status=CourseSession.Status.COMPLETED
+        ).count()
+        sessions_today=(
+            skill_today.count()+course_today.count()
+        )
+        active_sessions=(
+            skill_active.count()+course_active.count()
+        )
+        completed_sessions=(
+            skill_completed+course_completed
+        )
+        online_user_ids=set()
+        for session in skill_active.select_related('requester','recipient'):
+            online_user_ids.add(session.requester_id)
+            online_user_ids.add(session.recipient_id)
+        for session in course_active.select_related('enrollment__user'):
+            if session.enrollment.user_id:
+                online_user_ids.add(session.enrollment.user_id)
+        online_users=len(online_user_ids)
+        user_growth=[]
+        session_volume=[]
+        for month_offset in range(5,-1,-1):
+            first_day=(now.replace(
+                day=1,
+                hour=0,
+                minute=0,
+                second=0,
+                microsecond=0,
+            )-timedelta(days=month_offset*30))
+            if first_day.month==12:
+                next_month=first_day.replace(
+                    year=first_day.year+1,
+                    month=1
+                )
+            else:
+                next_month=first_day.replace(
+                    month=first_day.month+1
+                )
+            mentoring_count=SkillExchangeSession.objects.filter(
+                scheduled_start__gte=first_day,
+                scheduled_start__lt=next_month,
+            ).count()
+            networking_count=CourseSession.objects.filter(
+                scheduled_start__gte=first_day,
+                scheduled_start__lt=next_month,
+            ).count()
+            session_volume.append({
+                'label':first_day.strftime('%b'),
+                'mentoring':mentoring_count,
+                'networking':networking_count,
+            })
+            count=User.objects.filter(
+                role=User.Role.USER,
+                date_joined__gte=first_day,
+                date_joined__lt=next_month,
+            ).count()
+            user_growth.append({
+                'label':first_day.strftime('%b'),
+                'value':count,
+            })
+        max_growth=max(
+            [item['value'] for item in user_growth],
+            default=1
+        )
+        for item in user_growth:
+            item['height']=(
+                (item['value']/max_growth)*100
+                if max_growth else 0
+            )
+        recent_sessions=[]
+        recent_skill_sessions=(
+            skill_sessions.select_related('requester','recipient','skill_wanted').order_by('-scheduled_start')[:10]
+        )
+        for session in recent_skill_sessions:
+            participants=[]
+            for user in [
+                session.requester,
+                session.recipient,
+            ]:
+                participants.append({
+                    'id':user.id,
+                    'username':user.username,
+                    'profile_image':(user.profile_image.url if user.profile_image else None)
+                })
+            recent_sessions.append({
+                'id':f'skill-{session.id}',
+                'title':(
+                    f'{session.requester.username}->{session.recipient.username}'
+                ),
+                'time':session.scheduled_start.isoformat(),
+                'participants':participants,
+                'extra':0,
+                'category':(
+                    session.skill_wanted.name if session.skill_wanted else 'Skill Exchange'
+                ),
+                'status':session.status.title(),
+                'statusType':session.status.lower(),
+                'scheduled_start':session.scheduled_start,
+            })
+        recent_course_sessions=(
+            course_sessions.select_related(
+                'enrollment__user',
+                'enrollment__course',
+                'mentor__user'
+            ).order_by('-scheduled_start')[:10]
+        )
+        for session in recent_course_sessions:
+            participants=[]
+            student=session.enrollment.user
+            if student:
+                participants.append({
+                    'id':student.id,
+                    'username':student.username,
+                    'profile_image':(student.profile_image.url if student.profile_image else None)
+                })
+            mentor_user=session.mentor.user
+            if mentor_user:
+                participants.append({
+                    'id':mentor_user.id,
+                    'username':mentor_user.username,
+                    'profile_image':(session.mentor.profile_image.url
+    if session.mentor.profile_image
+    else (
+        mentor_user.profile_image.url
+        if mentor_user.profile_image
+        else None
+    ))
+                })
+            recent_sessions.append({
+                'id':f'course-{session.id}',
+                'title':(
+                    session.enrollment.course.title if session.enrollment.course else 'course session'
+                ),
+                'time':session.scheduled_start.isoformat(),
+                'participants':participants,
+                'extra':0,
+                'category':'Course',
+                'status':session.status.title(),
+                'statusType':session.status.lower(),
+                'scheduled_start':session.scheduled_start,
+            })
+        recent_sessions.sort(
+            key=lambda x:x['scheduled_start'],
+            reverse=True,
+        )
+        recent_sessions=recent_sessions[:8]
+        for session in recent_sessions:
+            session.pop('scheduled_start',None)
+        kpis = [
+            {
+                "title": "Total Users",
+                "value": total_users,
+                "change": f"{active_users} active",
+                "changeType": "positive",
+                "icon": "group",
+                "iconClass": "kpi-blue",
+                "filledIcon": False,
+            },
+            {
+                "title": "Active Users",
+                "value": active_users,
+                "change": f"{blocked_users} blocked",
+                "changeType": (
+                    "negative"
+                    if blocked_users > 0
+                    else "positive"
+                ),
+                "icon": "person_check",
+                "iconClass": "kpi-green",
+                "filledIcon": False,
+            },
+            {
+                "title": "Sessions Today",
+                "value": sessions_today,
+                "change": f"{active_sessions} active now",
+                "changeType": "positive",
+                "icon": "video_camera_front",
+                "iconClass": "kpi-purple",
+                "filledIcon": True,
+            },
+            {
+                "title": "Completed Sessions",
+                "value": completed_sessions,
+                "change": f"{skill_completed + course_completed} completed",
+                "changeType": "positive",
+                "icon": "task_alt",
+                "iconClass": "kpi-orange",
+                "filledIcon": True,
+            },
+            {
+                "title": "Pending Requests",
+                "value": skill_pending,
+                "change": "Skill exchanges",
+                "changeType": "neutral",
+                "icon": "pending_actions",
+                "iconClass": "kpi-yellow",
+                "filledIcon": False,
+            },
+        ]
+        return Response({
+            "hero": {
+                "message": (
+                    "Here's what's happening "
+                    "across SkillSwap today."
+                )
+            },
+
+            "kpis": kpis,
+
+            "user_growth": user_growth,
+
+            "recent_sessions": recent_sessions,
+
+            'session_volume':session_volume,
+
+            "platform_status": {
+                "online_users": online_users,
+                "active_sessions": active_sessions,
+            },
+
+            "summary": {
+                "total_users": total_users,
+                "active_users": active_users,
+                "blocked_users": blocked_users,
+                "suspended_users": suspended_users,
+                "sessions_today": sessions_today,
+                "active_sessions": active_sessions,
+                "completed_sessions": completed_sessions,
+                "pending_requests": skill_pending,
+            }
+        })
+
+class AdminMentorDetailView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request,pk):
+        if not request.user.is_staff:
+            return Response(
+                {
+                    'detail':'administrator access required'
+                },
+                status=403
+            )
+        mentor=get_object_or_404(
+            Mentor.objects.select_related('profile'),
+            pk=pk,
+        )
+        reviews=UserRating.objects.none()
+        if mentor.user_id:
+            reviews=(
+                UserRating.objects.filter(
+                    rated_user_id=mentor.user_id,
+                    is_hidden=False
+                )
+                .select_related('rated_by')
+                .order_by('-created_at')
+            )
+        serializer=AdminMentorProfileSerializer(
+            mentor,
+            context={'request':request}
+        )
+        return Response(
+            {
+                'mentor':serializer.data,
+                'reviews':AdminUserRatingSerializer(
+                    reviews,
+                    many=True
+                ).data
+            }
+        )
+
+class AdminUserDetailView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request,user_id):
+        if not request.user.is_staff:
+            return Response(
+                {
+                    'detail':'administrator access required'
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+        user=get_object_or_404(
+            User,
+            pk=user_id
+        )
+        return Response(AdminUserDetailSerializer(
+            user,
+            context={'request':request},
+        ).data)

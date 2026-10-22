@@ -1,5 +1,6 @@
 from apps.mentors.models import Mentor
 from apps.courses.models import Course
+from apps.accounts.models import UserRating
 from rest_framework import serializers
 
 class MentorListSerializer(serializers.ModelSerializer):
@@ -80,4 +81,25 @@ class MentorListSerializer(serializers.ModelSerializer):
                 "title": course.title,
             }
             for course in courses
+        ]
+
+class AdminUserRatingSerializer(serializers.ModelSerializer):
+    reviewer_username=serializers.CharField(
+        source='rated_by.username',
+        read_only=True,
+    )
+    reviewer_full_name=serializers.CharField(
+        source='rated_by.full_name',
+        read_only=True,
+        default=''
+    )
+    class Meta:
+        model=UserRating
+        fields=[
+            'id',
+            'reviewer_username',
+            'reviewer_full_name',
+            'rating',
+            'review',
+            'created_at',
         ]

@@ -2,6 +2,10 @@ import {useEffect,useState,useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {useSelector} from 'react-redux'
 
+import api from '../../../services/api'
+
+import RequestSessionModal from '../request_session/RequestSessionModal'
+
 import './Recommendations.css' 
 
 const API_BASE_URL=import.meta.env.VITE_API_BASE_URL||'http://127.0.0.1:8000'
@@ -11,6 +15,16 @@ function Recommendations(){
     const accessToken=useSelector(
         (state)=>state.auth.accessToken
     )
+    const [showRequestModal,setShowRequestModal]=useState(false)
+    const [selectedUser,setSelectedUser]=useState(null)
+    const handleRequestSession=(user)=>{
+        setSelectedUser(user)
+        setShowRequestModal(true)
+    }
+    const handleCloseRequestModal=()=>{
+        setShowRequestModal(false)
+        setSelectedUser(null)
+    }
     const [recommendations,setRecommendations]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")  
@@ -125,14 +139,22 @@ function Recommendations(){
             (a,b)=>getMatchPercentage(b)-getMatchPercentage(a)
         )
     },[recommendations])
-    const handleRequestSession=(user)=>{
-        navigate(`/sessions/request/${user.id}`)
-    }
-    const handleMessage=(user)=>{
-        navigate(`/messages/?user=${user.id}`)
+    const handleMessage=async (user)=>{
+        try{
+            const response=await api.post(
+                '/chat/conversations/direct/',
+                {
+                    user_id:user.id
+                }
+            )
+            const conversationId=response.data.id
+            navigate(`/direct-chat/?conversation=${conversationId}`)
+        }catch(err){
+            console.error('failed to open conversation:',err)
+        }
     }
     const handleViewProfile=(user)=>{
-        navigate(`/profile/${user.id}/`)
+        navigate(`/${user.id}/profile/`)
     }
 const handleAddFriend = async (user) => {
     try {
@@ -879,6 +901,17 @@ const handleAddFriend = async (user) => {
                 }
 
             </div>
+
+            <RequestSessionModal
+    show={showRequestModal}
+    onClose={handleCloseRequestModal}
+    recipient={selectedUser}
+    skillWanted={selectedUser?.skill_wanted}
+    skillOffered={selectedUser?.skill_offered}
+    onSuccess={(data) => {
+        console.log('Session request sent successfully:', data)
+    }}
+/>            
 
         </div>
     )

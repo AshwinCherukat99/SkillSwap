@@ -383,6 +383,9 @@ const handleSubmit = async (e) => {
                                     onChange={
                                         (e)=>setFullName(e.target.value)
                                     }
+                                    minLength={2}
+                                    maxLength={150}
+                                    pattern=".*[A-Za-z].*"
                                     placeholder="John Doe"
                                     required
                                 />
@@ -403,6 +406,9 @@ const handleSubmit = async (e) => {
                                     onChange={
                                         (e)=>setUsername(e.target.value)
                                     }
+                                    minLength={3}
+                                    maxLength={30}  
+                                    pattern="[A-Za-z][A-Za-z0-9_]{2,29}"
                                     placeholder="johndoe123"
                                     required
                                 />
@@ -443,6 +449,8 @@ const handleSubmit = async (e) => {
                                 onChange={
                                     (e)=>setPhoneNumber(e.target.value)
                                 }
+                                pattern="[6-9][0-9]{9}"
+                                maxLength={10}
                                 placeholder="9999999999"
                                 required
                             />
@@ -473,6 +481,9 @@ const handleSubmit = async (e) => {
                                         onChange={
                                             (e)=>setPassword(e.target.value)
                                         }
+                                        minLength={8}
+                                        maxLength={128}      
+                                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,128}"
                                         placeholder="••••••••"
                                         required
                                     />

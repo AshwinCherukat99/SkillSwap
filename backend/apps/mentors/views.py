@@ -97,7 +97,7 @@ class MentorRegisterView(APIView):
             request.data.getlist("document_types")
         )
         serializer=MentorRegisterSerializer(
-            data=request.data
+            data=data
         )
         serializer.is_valid(
             raise_exception=True
@@ -421,6 +421,11 @@ class MentorDashboardView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        courses=Course.objects.filter(
+            mentor=mentor,
+            status=Course.Status.PUBLISHED,
+            is_active=True,
+        ).values('slug')
         profile_image=None
         if mentor.profile_image:
             profile_image=request.build_absolute_uri(
@@ -453,7 +458,8 @@ class MentorDashboardView(APIView):
                     'teaching_niche':(
                                                                 profile.teaching_niche if profile else ''
                                                             ),
-                }
+                },
+                'courses':list(courses),
             },
             status=status.HTTP_200_OK,
         )

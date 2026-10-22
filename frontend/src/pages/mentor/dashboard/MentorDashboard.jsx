@@ -7,6 +7,7 @@ function MentorDashboard() {
     const navigate=useNavigate()
     const [mentor,setMentor]=useState(null)
     const [dashboard,setDashboard]=useState(null)
+    const [courses,setCourses]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
     const handleLogout=()=>{
@@ -21,6 +22,7 @@ function MentorDashboard() {
                 const response=await mentorApi.get('/mentors/dashboard/')
                 setMentor(response.data.mentor)
                 setDashboard(response.data)
+                setCourses(response.data.courses||[])
             }catch(error){
                 console.log('failed to load mentor dashboard:',error)
                 if (error.response?.status===401){
@@ -58,29 +60,6 @@ function MentorDashboard() {
         },
     ];
 
-    const achievements = [
-        {
-            icon: "csv",
-            title: "Mentor of Month",
-            type: "green",
-        },
-        {
-            icon: "favorite",
-            title: "Comm. Favorite",
-            type: "primary",
-        },
-        {
-            icon: "auto_stories",
-            title: "Deep Author",
-            type: "gray",
-        },
-        {
-            icon: "psychology",
-            title: "AI Pioneer",
-            type: "gray",
-        },
-    ];
-
     const chartBars = [
         { label: "May", height: "60%", value: 120 },
         { label: "Jun", height: "75%", value: 145 },
@@ -111,7 +90,7 @@ function MentorDashboard() {
                                     alt={mentor.full_name}
                                 />
 
-                                <div className="verified-badge">
+                                {isVerified&&(<div className="verified-badge">
                                     <span
                                         className="material-symbols-outlined"
                                         style={{
@@ -121,7 +100,7 @@ function MentorDashboard() {
                                     >
                                         verified
                                     </span>
-                                </div>
+                                </div>)}
                             </div>
 
                             <div className="profile-info">
@@ -136,26 +115,18 @@ function MentorDashboard() {
                                 </div>
 
                                 <div className="profile-meta">
-                                    <div className="location">
-                                        <span className="material-symbols-outlined">
-                                            location_on
-                                        </span>
-
-                                        Bangalore, India
-                                    </div>
 
                                     <div className="tags">
-                                        <span className="tag">
-                                            #python
-                                        </span>
-
-                                        <span className="tag">
-                                            #django
-                                        </span>
-
-                                        <span className="tag">
-                                            #rest-apis
-                                        </span>
+                                        {courses.map((course)=>(
+                                            <span className="tag" key={course.slug}>
+                                                #{course.slug}
+                                            </span>
+                                        ))}
+                                        {courses.length===0&&(
+                                            <span className="tag">
+                                                no published courses yet
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -170,11 +141,6 @@ function MentorDashboard() {
                                     Edit Profile
                                 </button>
 
-                                <button className="share-btn">
-                                    <span className="material-symbols-outlined">
-                                        share
-                                    </span>
-                                </button>
                             </div>
                         </div>
                     </section>
@@ -254,21 +220,6 @@ function MentorDashboard() {
                             </h3>
                         </div>
 
-                        <div className="glass kpi-card">
-                            <div className="d-flex align-items-center justify-content-between mb-2">
-                                <span className="kpi-icon material-symbols-outlined">
-                                    verified_user
-                                </span>
-                            </div>
-
-                            <p className="kpi-label">
-                                Reputation
-                            </p>
-
-                            <h3 className="kpi-value">
-                                98%
-                            </h3>
-                        </div>
                     </section>)}
 
                     {/* CONTENT GRID */}
@@ -441,7 +392,7 @@ function MentorDashboard() {
                             {/* QUICK ACTIONS */}
                             {isVerified&&(<div className="d-flex flex-column gap-3">
 
-                                <button className="quick-action">
+                                <button className="quick-action" onClick={()=>navigate('/mentor/courses/create_course/')}>
                                     <div className="quick-icon primary">
                                         <span className="material-symbols-outlined">
                                             add_circle
@@ -459,7 +410,7 @@ function MentorDashboard() {
                                     </div>
                                 </button>
 
-                                                                <button className="quick-action">
+                                                                <button className="quick-action" onClick={()=>navigate('/mentor/revenue/')}>
                                     <div className="quick-icon dark">
                                         <span className="material-symbols-outlined">
                                             account_balance_wallet
@@ -478,42 +429,6 @@ function MentorDashboard() {
                                 </button>
                             </div>)}
 
-
-                            {/* ACHIEVEMENTS */}
-                            {isVerified&&(<div className="glass section-card">
-                                <h3 className="section-title">
-                                    Achievements
-                                </h3>
-
-                                <div className="achievement-grid">
-                                    {achievements.map(
-                                        (achievement) => (
-                                            <div
-                                                className="achievement"
-                                                key={
-                                                    achievement.title
-                                                }
-                                            >
-                                                <div
-                                                    className={`achievement-icon ${achievement.type}`}
-                                                >
-                                                    <span className="material-symbols-outlined">
-                                                        {
-                                                            achievement.icon
-                                                        }
-                                                    </span>
-                                                </div>
-
-                                                <p className="achievement-title">
-                                                    {
-                                                        achievement.title
-                                                    }
-                                                </p>
-                                            </div>
-                                        )
-                                    )}
-                                </div>
-                            </div>)}
                         </div>
                     </div>
                 </div>

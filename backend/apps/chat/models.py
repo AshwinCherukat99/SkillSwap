@@ -5,6 +5,21 @@ class Conversation(models.Model):
     class ConversationType(models.TextChoices):
         DIRECT='DIRECT','Direct'
         GROUP='GROUP','Group'
+        VIDEO_CALL='VIDEO_CALL','Video Call'
+    course_session=models.OneToOneField(
+        'sessions_mgmt.CourseSession',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='video_conversation',
+    )
+    skill_exchange_session=models.OneToOneField(
+        'sessions_mgmt.SkillExchangeSession',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='video_conversation',
+    )
     conversation_type=models.CharField(
         max_length=10,
         choices=ConversationType.choices
@@ -27,6 +42,16 @@ class Conversation(models.Model):
     updated_at=models.DateTimeField(
         auto_now=True
     )
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        linked_sessions=[
+            self.course_session_id,
+            self.skill_exchange_session_id,
+        ]
+        if sum(value is not None for value in linked_sessions)>1:
+            raise ValidationError(
+                'a conversation can link to only one session type'
+            )
     def __str__(self):
         return self.name or f'Conversation {self.id}'
 
@@ -125,6 +150,8 @@ class MessageAttachment(models.Model):
     uploaded_at=models.DateTimeField(
         auto_now_add=True
     )
+    def __str__(self):
+        return self.original_name
 
 class MessageRead(models.Model):
     message=models.ForeignKey(

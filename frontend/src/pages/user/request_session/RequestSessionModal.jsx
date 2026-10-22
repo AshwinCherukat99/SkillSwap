@@ -8,10 +8,12 @@ const RequestSessionModal=({
     show,
     onClose,
     recipient,
-    skillWanted,
-    skillOffered,
     onSuccess
 })=>{
+    const [skillsToLearn,setSkillsToLearn]=useState([])
+    const [skillsToOffer,setSkillsToOffer]=useState([])
+    const [selectedSkillWanted,setSelectedSkillWanted]=useState('')
+    const [selectedSkillOffered,setSelectedSkillOffered]=useState('')
     const [date,setDate]=useState('')
     const [time,setTime]=useState('')
     const [duration,setDuration]=useState(60)
@@ -27,7 +29,11 @@ const RequestSessionModal=({
             setMessage('')
             setLoading(false)
             setSuccess(false)
-            setError('')
+            setError('')          
+            setSkillsToLearn([]),
+            setSkillsToOffer([]),
+            setSelectedSkillWanted(''),
+            setSelectedSkillOffered('')
         }
     },[show])         
     useEffect(()=>{
@@ -38,6 +44,34 @@ const RequestSessionModal=({
             document.body.style.overflow=''
         }
     },[show])
+    useEffect(()=>{
+        const loadSkillOptions=async ()=>{
+            if (!show||!recipient?.id){
+                return
+            }
+            try{
+                setError('')
+                const response=await api.get(
+                    `/sessions/session-requests/options/${recipient.id}/`
+                )
+                setSkillsToLearn(response.data.skills_to_learn||[])
+                setSkillsToOffer(response.data.skills_to_offer||[])
+                setSelectedSkillWanted('')
+                setSelectedSkillOffered('')
+            }catch(err){
+                console.error(
+                'failed to load session skill options:',
+                err
+            );
+
+            setError(
+                err.response?.data?.detail ||
+                'Unable to load compatible skills'
+            );
+            }
+        }
+        loadSkillOptions()
+    },[show,recipient?.id])
     if (!show){
         return null
     }
@@ -48,11 +82,11 @@ const RequestSessionModal=({
             setError('recipient information is missing')
             return
         }
-        if (!skillWanted?.id){
+        if (!selectedSkillWanted){
             setError('please select a skill you want to learn')
             return
         }
-        if (!skillOffered?.id){
+        if (!selectedSkillOffered){
             setError('please select a skill you can offer')
             return
         }
@@ -67,9 +101,9 @@ const RequestSessionModal=({
     }
     const payload={
         recipient:recipient.id,
-        skill_wanted:skillWanted.id,
-        skill_offered:skillOffered.id,
-        scheduled_start:scheduledStart,
+        skill_wanted:Number(selectedSkillWanted),
+        skill_offered:Number(selectedSkillOffered),
+        scheduled_start:selectedDateTime.toISOString(),
         duration_minutes:Number(duration),
         message:message,
     }
@@ -337,10 +371,22 @@ const RequestSessionModal=({
                                     Skill You Want to Learn
                                 </label>
 
-                                <div className="skill-preview">
-                                    {skillWanted?.name ||
-                                        "Not selected"}
-                                </div>
+                                <select className='form-select session-input'
+                                value={selectedSkillWanted}
+                                onChange={(e)=>setSelectedSkillWanted(e.target.value)}
+                                required>
+
+                                    <option value="">
+                                        Select a Skill
+                                    </option>
+
+                                    {skillsToLearn.map((skill)=>(
+                                        <option key={skill.id} value={skill.id}>
+                                            {skill.name}
+                                        </option>
+                                    ))}
+
+                                </select>
 
                             </div>
 
@@ -348,13 +394,30 @@ const RequestSessionModal=({
                             <div className="col-md-6">
 
                                 <label className="form-label">
-                                    Skill You Offer
+                                    Skill You Want to Offer
                                 </label>
 
-                                <div className="skill-preview">
-                                    {skillOffered?.name ||
-                                        "Not selected"}
-                                </div>
+                                <select
+        className="form-select session-input"
+        value={selectedSkillOffered}
+        onChange={(e) =>
+            setSelectedSkillOffered(e.target.value)
+        }
+        required
+    >
+        <option value="">
+            Select a skill
+        </option>
+
+        {skillsToOffer.map((skill) => (
+            <option
+                key={skill.id}
+                value={skill.id}
+            >
+                {skill.name}
+            </option>
+        ))}
+    </select>
 
                             </div>
 

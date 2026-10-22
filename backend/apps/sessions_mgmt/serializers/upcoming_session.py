@@ -1,11 +1,13 @@
 from rest_framework import serializers
 
+from apps.chat.models import Conversation
 from ..models import SkillExchangeSession,CourseSession
 
 class UpcomingSkillExchangeSerializer(serializers.ModelSerializer):
     type=serializers.SerializerMethodField()
     title=serializers.SerializerMethodField()
     person_name=serializers.SerializerMethodField()
+    conversation_id=serializers.SerializerMethodField()
     class Meta:
         model=SkillExchangeSession
         fields=[
@@ -19,6 +21,7 @@ class UpcomingSkillExchangeSerializer(serializers.ModelSerializer):
             'duration_minutes',
             'status',
             'message',
+            'conversation_id',
         ]
     def get_type(self,obj):
         return 'SKILL_EXCHANGE'
@@ -32,11 +35,17 @@ class UpcomingSkillExchangeSerializer(serializers.ModelSerializer):
         if obj.requester_id==request.user.id:
             return obj.recipient.username
         return obj.requester.username
+    def get_conversation_id(self, obj):
+        try:
+            return obj.video_conversation.id
+        except Conversation.DoesNotExist:
+            return None
 
 class UpcomingCourseSessionSerializer(serializers.ModelSerializer):
     type=serializers.SerializerMethodField()
     title=serializers.SerializerMethodField()
     person_name=serializers.SerializerMethodField()
+    conversation_id=serializers.SerializerMethodField()
     class Meta:
         model=CourseSession
         fields=[
@@ -48,6 +57,7 @@ class UpcomingCourseSessionSerializer(serializers.ModelSerializer):
             'duration_minutes',
             'status',
             'message',
+            'conversation_id',
         ]
     def get_type(self,obj):
         return 'MENTOR'
@@ -55,6 +65,11 @@ class UpcomingCourseSessionSerializer(serializers.ModelSerializer):
         return obj.enrollment.course.title 
     def get_person_name(self,obj):
         return (obj.mentor.full_name or obj.mentor.username)
+    def get_conversation_id(self,obj):
+        try:
+            return obj.video_conversation.id
+        except Conversation.DoesNotExist:
+            return None
 
 class MentorUpcomingSessionSerializer(serializers.ModelSerializer):
     title=serializers.CharField(
@@ -70,6 +85,7 @@ class MentorUpcomingSessionSerializer(serializers.ModelSerializer):
         source='enrollment.course.title',
         read_only=True,
     )
+    conversation_id=serializers.SerializerMethodField()
     class Meta:
         model=CourseSession
         fields=[
@@ -82,6 +98,7 @@ class MentorUpcomingSessionSerializer(serializers.ModelSerializer):
             'duration_minutes',
             'status',
             'message',
+            'conversation_id',
         ]
         read_only_fields=fields
     def get_student_name(self,obj):
@@ -90,3 +107,8 @@ class MentorUpcomingSessionSerializer(serializers.ModelSerializer):
             user.get_full_name() 
             or user.username
         )
+    def get_conversation_id(self,obj):
+        try:
+            return obj.video_conversation.id
+        except Conversation.DoesNotExist:
+            return None

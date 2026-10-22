@@ -172,3 +172,72 @@
     background: #d1e7dd;
     color: #198754;
 }
+
+
+.assessment-timer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #212529;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.timer-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: #e7f1ff;
+    color: #0d6efd;
+    font-size: 22px;
+}
+
+.timer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.timer-label {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.timer-value {
+    font-size: 24px;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.timer-warning {
+    border-color: #ffc107;
+    background: #fff8e1;
+}
+
+.timer-warning .timer-icon {
+    background: #ffecb5;
+    color: #856404;
+}
+
+.timer-critical {
+    border-color: #dc3545;
+    background: #fff0f0;
+    color: #b02a37;
+}
+
+.timer-critical .timer-icon {
+    background: #f8d7da;
+    color: #dc3545;
+}
+
+.timer-warning-text {
+    margin-left: auto;
+    font-size: 12px;
+    font-weight: 600;
+}

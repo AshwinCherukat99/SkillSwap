@@ -102,3 +102,15 @@
     }
 
 }
+
+.certificate-card {
+  transition:
+    box-shadow 0.25s ease,
+    outline-color 0.25s ease;
+}
+
+.certificate-card-selected {
+  outline: 3px solid var(--bs-primary);
+  outline-offset: 3px;
+  box-shadow: 0 0.5rem 1.5rem rgba(13, 110, 253, 0.18) !important;
+}

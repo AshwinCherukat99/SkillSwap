@@ -384,8 +384,14 @@ def get_recommended_users(user):
         user_can_teach=(
             offered_skill_ids & other_wanted_ids
         )
+        total_skills=len(wanted_skill_ids)+len(offered_skill_ids)
+        other_total_skills=len(other_offered_ids)+len(other_wanted_ids)
+        if total_skills>other_total_skills:
+            total=total_skills
+        else:
+            total=other_total_skills
         if user_can_learn and user_can_teach:
-            match_score=len(user_can_learn)+len(user_can_teach)
+            match_score=(len(user_can_learn)+len(user_can_teach))/total*100
             recommendations.append(
                 {
                     'user':other_user,

@@ -11,7 +11,7 @@ const StudentCard=({student,onScheduleSession,onMessage})=>{
         <div className="col-12 col-md-6">
             <div className="mentor-student-card h-100">
 
-                <div className="d-flex justify-content-between align-items-start mb-4">
+                <div className="d-flex justify-content-between align-items-start mb-1">
 
                     <div className="d-flex align-items-center gap-3">
 
@@ -74,7 +74,7 @@ const StudentCard=({student,onScheduleSession,onMessage})=>{
                     </div>
 
 
-                    <div className="d-flex flex-column gap-2">
+                    <div className="d-flex flex-column gap-1">
 
                         {student.courses.map((course) => {
 
@@ -101,7 +101,7 @@ const StudentCard=({student,onScheduleSession,onMessage})=>{
 
                                     {/* Course title + percentage */}
 
-                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                    <div className="d-flex justify-content-between align-items-center mb-1">
 
                                         <span
                                             className="badge bg-primary-subtle text-primary"
@@ -223,7 +223,7 @@ const StudentCard=({student,onScheduleSession,onMessage})=>{
 
                             <i className="bi bi-camera-video me-1"></i>
 
-                            Request Session
+                            Schedule Session
 
                         </button>
 

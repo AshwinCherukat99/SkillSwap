@@ -4,8 +4,9 @@ const CallControls=({
     onToggleMicrophone,
     onToggleCamera,
     onLeave,
-    onStartCall,
-    onShareScreen
+    onShareScreen,
+    isHandRaised,
+    onToggleHand,
 })=>{
     return (
         <footer className="call-controls">
@@ -38,16 +39,15 @@ const CallControls=({
             </button>
 
 
-            <button title="Share screen">
-                <i className="bi bi-display" />
-            </button>
-
-
             <div className="control-divider" />
 
 
-            <button title="Raise hand">
-                <i className="bi bi-hand-index-fill" />
+            <button className={
+                `control-button ${isHandRaised?'active-control':''}`
+            }
+            onClick={onToggleHand}
+            title={isHandRaised?'lower hand':'raise hand'}>
+                <i className="bi bi-hand-index-fill"/>
             </button>
 
 

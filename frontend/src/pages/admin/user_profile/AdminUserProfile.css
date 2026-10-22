@@ -1,0 +1,37 @@
+.user-profile-container {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.user-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(18, 28, 42, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.user-modal-card {
+  width: 100%;
+  max-width: 560px;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+
+.user-profile-container .card {
+  transition: box-shadow 0.2s ease;
+}
+
+.user-profile-container .card:hover {
+  box-shadow: 0 0.35rem 1.2rem rgba(25, 35, 60, 0.07) !important;
+}
+
+@media (max-width: 576px) {
+  .user-profile-container .card-body {
+    padding: 1.25rem !important;
+  }
+}

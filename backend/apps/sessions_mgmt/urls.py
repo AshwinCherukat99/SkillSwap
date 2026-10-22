@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView,AdminSessionManagementView
+from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView,AdminSessionManagementView,SessionRequestSkillOptionsView,AdminSessionActionView
 
 urlpatterns=[
     path(
@@ -39,6 +39,11 @@ urlpatterns=[
         name='mentor-cancel-course-session',
     ),
     path(
+        'session-requests/options/<int:recipient_id>/',
+        SessionRequestSkillOptionsView.as_view(),
+        name='session-request-skill-options',
+    ),
+    path(
         'session-requests/send/',
         SendSessionRequestView.as_view(),
         name='send-session-request',
@@ -67,5 +72,10 @@ urlpatterns=[
         'admin/',
         AdminSessionManagementView.as_view(),
         name='admin-session-management',
+    ),
+    path(
+        'admin/<str:session_type>/<int:session_id>/action/',
+        AdminSessionActionView.as_view(),
+        name='admin-session-action',
     ),
 ]

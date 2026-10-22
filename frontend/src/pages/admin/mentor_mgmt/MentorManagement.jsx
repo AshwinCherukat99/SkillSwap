@@ -1,10 +1,12 @@
-import React,{use, useCallback,useEffect,useState} from 'react'
+import React,{useCallback,useEffect,useState} from 'react'
 
 import {useNavigate} from 'react-router-dom'
 
 import MentorStats from '../../../components/admin/mentor_mgmt/MentorStats'
 import MentorFilters from '../../../components/admin/mentor_mgmt/MentorFilters'
 import MentorTable from '../../../components/admin/mentor_mgmt/MentorTable'
+
+import EditMentorModal from '../edit_mentor_modal/EditMentorModal'
 
 import adminApi from '../../../services/adminApi'
 
@@ -23,7 +25,8 @@ const MentorManagement=()=>{
     const [activeTab,setActiveTab]=useState('ALL')
     const [search,setSearch]=useState('')
     const [loading,setLoading]=useState(true)
-    const [statsLoading,setStatsLoading]=useState(true)
+    const [statsLoading,setStatsLoading]=useState(true)  
+    const [editingMentor,setEditingMentor]=useState(null)
     const fetchStats=async ()=>{
         try{
             setStatsLoading(true)
@@ -41,11 +44,37 @@ const MentorManagement=()=>{
                 setLoading(true)
                 const data=await adminApi.get(
                     '/admin/mentor-management/',{
-                        status:activeTab,
-                        search
+                        params:{
+                            status:activeTab,
+                            search
+                        }
                     }
                 )
-                setMentors(data.mentors||[])
+                console.log(
+    '========== MENTOR API DEBUG =========='
+)
+
+console.log('FULL RESPONSE:', data)
+
+console.log(
+    'data.mentors:',
+    data?.mentors
+)
+
+console.log(
+    'data.data:',
+    data?.data
+)
+
+console.log(
+    'data.data?.mentors:',
+    data?.data?.mentors
+)
+
+console.log(
+    '======================================='
+)
+                setMentors(data.data.mentors||[])
             }catch(err){
                 console.error('failed to load mentors:',err)
             }finally{
@@ -66,12 +95,13 @@ const MentorManagement=()=>{
         mentor,
         destination=null
     )=>{
+        const mentorName=mentor.full_name||mentor.username
         if (destination==='courses'){
-            navigate()
+            navigate(`/admin/course-management?search=${encodeURIComponent(mentorName)}`)
             return
         }
         if (destination==='sessions'){
-            navigate()
+            navigate(`/admin/session-management?search=${encodeURIComponent(mentorName)}`)
             return
         }
         if (destination==='payouts'){
@@ -81,7 +111,7 @@ const MentorManagement=()=>{
         navigate(`/admin/mentor-management/${mentor.id}/`)
     }
     const handleEdit=(mentor)=>{
-        navigate(`/admin/mentor-management/${mentor.id}/edit/`)
+        setEditingMentor(mentor)
     }
     const handleAction=async (mentor,action)=>{
         let confirmationMessage=''
@@ -101,7 +131,9 @@ const MentorManagement=()=>{
         try{
             await adminApi.post(
                 `/admin/mentor-management/${mentor.id}/action/`,
-                action
+                {
+                    action
+                }
             )
             await Promise.all([
                 fetchMentors(),
@@ -191,6 +223,17 @@ const MentorManagement=()=>{
                 </div>
 
             </div>
+
+            {editingMentor&&(
+                <EditMentorModal
+                mentor={editingMentor}
+                onClose={()=>setEditingMentor(null)}
+                onUpdated={async ()=>{
+                    setEditingMentor(null)
+                    await fetchUsers()
+                }}
+                />
+            )}
 
         </div>
     )

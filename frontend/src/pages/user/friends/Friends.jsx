@@ -1,18 +1,22 @@
 import React,{useEffect,useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 
-import friendsApi from '../../../services/friendsApi' 
+import friendsApi from '../../../services/friendsApi'         
+import api from '../../../services/api'
 
 import FriendStats from '../../../components/user/friends/FriendStats'
 import FriendsToolbar from '../../../components/user/friends/FriendsToolbar'
 import EmptyFriends from '../../../components/user/friends/EmptyFriends'
 import FriendCard from '../../../components/user/friends/FriendCard'
 import FriendRequests from '../../../components/user/friends/FriendRequests'
+import RequestSessionModal from '../request_session/RequestSessionModal'
 
 import './Friends.css'
 
 const Friends=()=>{
     const navigate=useNavigate()
+    const [showRequestModal,setShowRequestModal]=useState(false)
+    const [selectedFriend,setSelectedFriend]=useState(null)
     const [friends,setFriends]=useState([])
     const [stats,setStats]=useState({
         total_friends:0,
@@ -55,13 +59,30 @@ const Friends=()=>{
         fetchFriends()
     },[search,filter,sort])
     const handleProfile=(friend)=>{
-        navigate(`/profile/${friend.id}/`)
+        navigate(`/${friend.id}/profile/`)
     }
-    const handleChat=(friend)=>{
-        navigate(`/chat/${friend.id}`)
+    const handleChat=async (friend)=>{
+        try{
+            const response=await api.post(
+            '/chat/conversations/direct/',
+            {
+                user_id:friend.id
+            }
+        )
+        const conversationId=response.data.id
+        navigate(`/direct-chat/?conversation=${conversationId}`)
+        }catch(err){
+            console.error('failed to open conversation:',err)
+            setError(err.response?.data?.detail||'unable to open conversation')
+        }
     }
     const handleRequestSession=(friend)=>{
-        navigate(`/friends/${friend.id}/request-session`)
+        setSelectedFriend(friend)
+        setShowRequestModal(true)
+    }
+    const handleCloseRequestModal=()=>{
+        setShowRequestModal(false)
+        setSelectedFriend(null)
     }
     return (
         <div className="friends-page">
@@ -157,6 +178,17 @@ const Friends=()=>{
                 </div>
 
             </div>
+
+                <RequestSessionModal
+                show={showRequestModal}
+                onClose={handleCloseRequestModal}
+                recipient={selectedFriend}
+                skillWanted={selectedFriend?.skill_wanted}
+                skillOffered={selectedFriend?.skill_offered}
+                onSuccess={(data)=>{
+                    console.log('session request sent successfully:',data)
+                    handleCloseRequestModal()
+                }}/>
 
         </div>
     )

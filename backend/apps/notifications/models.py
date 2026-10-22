@@ -171,7 +171,7 @@ class AdminNotification(models.Model):
             'Sent'
         )
         SCHEDULED=(
-            'SCEHDULED',
+            'SCHEDULED',
             'Scheduled'
         )
         CANCELLED=(

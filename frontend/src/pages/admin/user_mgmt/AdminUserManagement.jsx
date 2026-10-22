@@ -1,15 +1,18 @@
 import React,{useEffect,useState,useCallback} from "react";
+import { useNavigate } from "react-router-dom";
 
 import UserStats from "../../../components/admin/user_mgmt/UserStats";
 import UserFilters from "../../../components/admin/user_mgmt/UserFilters";
 import UserTable from "../../../components/admin/user_mgmt/UserTable";
 import ConfirmUserActionModal from "../../../components/admin/user_mgmt/ConfirmUserActionModal";
+import EditUserModal from "../edit_user_modal/EditUserModal";
 
 import './AdminUserManagement.css'
 
 import adminApi from '../../../services/adminApi'
 
 const AdminUserManagement=()=>{
+    const navigate=useNavigate()
     const [users,setUsers]=useState([])
     const [stats,setStats]=useState({
         total_users:0,
@@ -27,6 +30,7 @@ const AdminUserManagement=()=>{
         user:null,
     })
     const [actionLoading,setActionLoading]=useState(false)
+    const [editingUser,setEditingUser]=useState(null)
     const fetchUsers=useCallback(
         async ()=>{
             try{
@@ -67,9 +71,10 @@ const AdminUserManagement=()=>{
     }
     const handleView=(user)=>{
         console.log('view user:',user.id)
+        navigate(`/admin/user-management/${user.id}/`)
     }
     const handleEdit=(user)=>{
-        console.log('edit user:',user.id)
+        setEditingUser(user)
     }
     const openActionModal=(type,user)=>{
         setActionModal({
@@ -120,6 +125,7 @@ const AdminUserManagement=()=>{
         if (!user){
             return {}
         }
+        const name=user.full_name||user.username||'this user'
         const content={
             block:{
                 title:'Block User',
@@ -274,6 +280,16 @@ const AdminUserManagement=()=>{
                     })
                 }
             />
+
+            {editingUser&&(
+                <EditUserModal
+                user={editingUser}
+                onClose={()=>setEditingUser(null)}
+                onUpdated={async ()=>{
+                    setEditingUser(null)
+                    await fetchUsers()
+                }}/>
+            )}
 
         </div>
     )

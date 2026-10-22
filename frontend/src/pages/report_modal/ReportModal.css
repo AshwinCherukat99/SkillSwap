@@ -1,0 +1,533 @@
+
+/* =========================================
+   SKILLSWAP — REPORT MODAL
+   Modern, responsive, accessible styling
+========================================= */
+
+.report-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.68);
+
+  /* Keep the backdrop stable; no blinking animation */
+  opacity: 1;
+  animation: none;
+}
+
+/* =========================================
+   MODAL CONTAINER
+========================================= */
+
+.report-modal {
+  position: relative;
+  isolation: isolate;
+
+  width: min(100%, 540px);
+  max-height: min(86vh, 760px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  background: #ffffff;
+  color: #1e293b;
+
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 20px;
+
+  box-shadow:
+    0 24px 80px rgba(15, 23, 42, 0.28),
+    0 4px 16px rgba(15, 23, 42, 0.08);
+
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  filter: none;
+  animation: none;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.report-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+
+  padding: 26px 28px 22px;
+
+  background: linear-gradient(
+    135deg,
+    #fff7f7 0%,
+    #ffffff 75%
+  );
+
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.report-modal-header h5 {
+  margin: 12px 0 5px;
+  color: #0f172a;
+  font-size: 1.3rem;
+  font-weight: 750;
+  letter-spacing: -0.035em;
+}
+
+.report-modal-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Warning icon */
+
+.report-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+
+  color: #dc2626;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 14px;
+
+  font-size: 1.25rem;
+}
+
+/* Close button */
+
+.report-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  width: 36px;
+  height: 36px;
+  padding: 0;
+
+  color: #64748b;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+
+  font-size: 1.6rem;
+  line-height: 1;
+
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.report-modal-close:hover:not(:disabled) {
+  color: #b91c1c;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.report-modal-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* =========================================
+   TWO-STEP PROGRESS INDICATOR
+========================================= */
+
+.report-progress {
+  display: flex;
+  gap: 7px;
+  padding: 0 28px;
+  margin-top: 20px;
+}
+
+.report-progress-step {
+  flex: 1;
+  height: 4px;
+
+  background: #e2e8f0;
+  border-radius: 999px;
+
+  transition: background-color 180ms ease;
+}
+
+.report-progress-step.active {
+  background: #dc2626;
+}
+
+/* =========================================
+   MODAL BODY
+========================================= */
+
+.report-modal-body {
+  padding: 24px 28px 28px;
+}
+
+.report-modal-body h6 {
+  margin: 0 0 8px;
+
+  color: #0f172a;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.report-help-text {
+  margin: 0 0 20px;
+
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* =========================================
+   REPORT TYPE OPTIONS
+========================================= */
+
+.report-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.report-type-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  min-height: 52px;
+  padding: 13px 15px;
+  margin: 0;
+
+  color: #334155;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.report-type-option:hover {
+  background: #fffafa;
+  border-color: #fca5a5;
+}
+
+.report-type-option.selected {
+  color: #991b1b;
+  background: #fff5f5;
+  border-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.08);
+}
+
+.report-type-option input[type="radio"] {
+  flex-shrink: 0;
+
+  width: 17px;
+  height: 17px;
+  margin: 0;
+
+  accent-color: #dc2626;
+  cursor: pointer;
+}
+
+.report-type-option span {
+  flex: 1;
+  font-size: 0.92rem;
+  font-weight: 550;
+}
+
+.report-type-option .bi-check-circle-fill {
+  color: #dc2626;
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   DESCRIPTION TEXTAREA
+========================================= */
+
+.report-description {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 15px;
+
+  color: #1e293b;
+  background: #ffffff;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+
+  font: inherit;
+  font-size: 0.92rem;
+  line-height: 1.65;
+
+  resize: vertical;
+  box-shadow: none;
+
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.report-description::placeholder {
+  color: #94a3b8;
+}
+
+.report-description:hover {
+  border-color: #94a3b8;
+}
+
+.report-description:focus {
+  color: #1e293b;
+  background: #ffffff;
+  border-color: #ef4444;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.report-character-count {
+  margin-top: 8px;
+
+  color: #94a3b8;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+/* =========================================
+   VALIDATION / ERROR MESSAGE
+========================================= */
+
+.report-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  margin-top: 16px;
+  padding: 12px 14px;
+
+  color: #991b1b;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+
+  font-size: 0.86rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.report-error i {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* =========================================
+   FOOTER / ACTION BUTTONS
+========================================= */
+
+.report-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 18px 28px 24px;
+  border-top: 1px solid #f1f5f9;
+  background: #ffffff;
+}
+
+.report-modal-footer .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  min-height: 44px;
+  padding: 10px 18px;
+
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 650;
+
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.report-modal-footer .btn-light {
+  color: #475569;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+}
+
+.report-modal-footer .btn-light:hover:not(:disabled) {
+  color: #0f172a;
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.report-modal-footer .btn-primary {
+  color: #ffffff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.report-modal-footer .btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+}
+
+.report-modal-footer .btn-danger {
+  color: #ffffff;
+  background: #dc2626;
+  border: 1px solid #dc2626;
+}
+
+.report-modal-footer .btn-danger:hover:not(:disabled) {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.report-modal-footer .btn:focus-visible,
+.report-modal-close:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.45);
+  outline-offset: 3px;
+}
+
+.report-modal-footer .btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =========================================
+   SUCCESS TOAST
+========================================= */
+
+.report-toast {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1000000;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: min(420px, calc(100vw - 32px));
+  padding: 16px 18px;
+
+  color: #166534;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 14px;
+
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.15);
+
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.report-toast > i {
+  flex-shrink: 0;
+  font-size: 1.2rem;
+}
+
+.report-toast > span {
+  flex: 1;
+}
+
+.report-toast button {
+  flex-shrink: 0;
+  padding: 0 2px;
+
+  color: #166534;
+  background: transparent;
+  border: 0;
+
+  font-size: 1.4rem;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+/* =========================================
+   RESPONSIVE LAYOUT
+========================================= */
+
+@media (max-width: 576px) {
+  .report-modal-backdrop {
+    align-items: center;
+    padding: 12px;
+  }
+
+  .report-modal {
+    width: 100%;
+    max-height: 90dvh;
+    border-radius: 16px;
+  }
+
+  .report-modal-header {
+    padding: 20px 20px 18px;
+  }
+
+  .report-modal-header h5 {
+    font-size: 1.15rem;
+  }
+
+  .report-progress {
+    padding: 0 20px;
+    margin-top: 16px;
+  }
+
+  .report-modal-body {
+    padding: 20px;
+  }
+
+  .report-type-option {
+    min-height: 48px;
+    padding: 12px;
+  }
+
+  .report-modal-footer {
+    gap: 10px;
+    padding: 16px 20px 20px;
+  }
+
+  .report-modal-footer .btn {
+    min-height: 42px;
+    padding: 9px 13px;
+    font-size: 0.85rem;
+  }
+
+  .report-toast {
+    top: 12px;
+    right: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-modal *,
+  .report-toast {
+    scroll-behavior: auto;
+    transition: none !important;
+    animation: none !important;
+  }
+}

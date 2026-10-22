@@ -53,7 +53,7 @@ function Notifications(){
     const handleMarkAllAsRead=async ()=>{
         try {
             await api.patch(
-                "notifications/read_all"
+                "/notifications/read_all/"
             )
             setNotifications(
                 (currentNotifications)=>

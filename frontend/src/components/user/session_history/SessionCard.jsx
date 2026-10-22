@@ -9,7 +9,7 @@ const SessionCard=({session,onClick})=>{
             return 'unknown date'
         }
         return new Date(
-            dateString.toLocaleDateString(
+            dateString).toLocaleDateString(
                 'en-IN',
                 {
                     day:'numeric',
@@ -17,7 +17,6 @@ const SessionCard=({session,onClick})=>{
                     year:'numeric',
                 }
             )
-        )
     }
     const formatTime=(dateString)=>{
         if (!dateString){

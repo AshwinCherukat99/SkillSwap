@@ -1,10 +1,51 @@
-import React from 'react'
+import React,{useEffect,useState,useRef} from 'react'
 import {useNavigate} from 'react-router-dom'
 
-function CertificateCard({certificate}){
+import api from '../../../services/api'
+
+function CertificateCard({certificate,isSelected=False}){
     const navigate=useNavigate()
+    const [downloading,setDownloading]=useState(false)
+    const cardRef=useRef(null)
+    useEffect(()=>{
+        if (isSelected){
+            cardRef.current?.scrollIntoView({
+                behaviour:'smooth',
+                block:'center',
+            })
+        }
+    },[isSelected])
     const handleViewCertificate=()=>{
         navigate(`/certificates/${certificate.certificate_id}`)
+    }
+    const handleDownloadCertificate=async ()=>{
+        if (!certificate.is_valid||downloading) return
+        try{
+            setDownloading(true)
+            const response=await api.get(
+                `/certificates/${certificate.certificate_id}/download/`,
+                {
+                    responseType:'blob'
+                }
+            )
+            const blob=new Blob(
+                [response.data],
+                {type:'application/pdf'}
+            )
+            const url=window.URL.createObjectURL(blob)
+            const link=document.createElement('a')
+            link.href=url
+            link.download=`SkillSwap-Certificate-${certificate.certificate_number}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            link.remove()
+            window.URL.revokeObjectURL(url)
+        }catch(err){
+            console.error('certificate download failed-',err)
+            alert('unablet to download certificate. please try again')
+        }finally{
+            setDownloading(false)
+        }
     }
     const formatDate = (date) => {
         if (!date) return "—";
@@ -16,7 +57,9 @@ function CertificateCard({certificate}){
         });
     };
     return (
-        <div className="col-12 col-md-6 col-xl-4">
+        <div ref={cardRef} className={`card h-100 border-0 shadow-sm certificate-card ${
+    isSelected ? 'certificate-card-selected' : ''
+  }`}>
             <div className="card h-100 border-0 shadow-sm certificate-card">
 
                 {/* Certificate Preview */}
@@ -91,7 +134,7 @@ function CertificateCard({certificate}){
                             </span>
 
                             <span className="small fw-semibold">
-                                {certificate.score}%
+                                {certificate.score}/10.00
                             </span>
                         </div>
 
@@ -110,18 +153,37 @@ function CertificateCard({certificate}){
                 </div>
 
                 {/* Footer */}
-                <div className="card-footer bg-white border-0 px-4 pb-4">
+<div className="card-footer bg-white border-0 px-4 pb-4">
+    <div className="d-flex gap-2 flex-column flex-md-row">
+        <button
+            type="button"
+            className="btn btn-outline-primary flex-fill"
+            onClick={handleViewCertificate}
+        >
+            <i className="bi bi-eye me-2"></i>
+            View Certificate
+        </button>
 
-                    <button
-                        type="button"
-                        className="btn btn-primary w-100"
-                        onClick={handleViewCertificate}
-                    >
-                        <i className="bi bi-file-earmark-certificate me-2"></i>
-                        View Certificate
-                    </button>
-
-                </div>
+        <button
+            type="button"
+            className="btn btn-primary flex-fill"
+            onClick={handleDownloadCertificate}
+            disabled={!certificate.is_valid || downloading}
+        >
+            {downloading ? (
+                <>
+                    <span className="spinner-border spinner-border-sm me-2"></span>
+                    Generating PDF...
+                </>
+            ) : (
+                <>
+                    <i className="bi bi-download me-2"></i>
+                    Download Certificate
+                </>
+            )}
+        </button>
+    </div>
+</div>
 
             </div>
         </div>

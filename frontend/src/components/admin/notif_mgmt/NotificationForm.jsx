@@ -201,6 +201,11 @@ function NotificationForm({editingNotification,quickAction,onSaved,onDiscard,sho
                 )
                 if (scheduledAt){
                     showAlert('notification scheduled successfully','success')
+                }else{
+                    showAlert(
+                        'notification sent successfully',
+                        'success'
+                    )
                 }
             }
             if (onSaved){

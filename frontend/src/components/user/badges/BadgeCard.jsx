@@ -16,7 +16,9 @@ function BadgeCard({badge}){
 
                 <div className="badge-icon">
 
-                    {badge.icon}
+                    <span className="material-symbols-outlined">
+                        {badge.icon}
+                    </span>
 
                 </div>
 

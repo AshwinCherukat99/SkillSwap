@@ -36,6 +36,7 @@ class AdminReviewSerializer(serializers.ModelSerializer):
             'reviewer_username',
             'reviewed_user_id',
             'reviewed_user_username',
+            'reviewed_user_name',
             'rating',
             'review',
             'is_hidden',

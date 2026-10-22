@@ -43,7 +43,7 @@ function Badges(){
             return badge.earned===true
         }
         if (activeFilter==='locked'){
-            return badge.locked===false
+            return badge.earned===false
         }
         return true
     })

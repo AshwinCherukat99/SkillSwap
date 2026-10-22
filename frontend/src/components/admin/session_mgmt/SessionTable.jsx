@@ -37,7 +37,10 @@ const formatTime=(date)=>{
         }
     )
 }
-const SessionTable=({sessions})=>{
+const SessionTable=({sessions,
+    onCancel,
+    onReschedule,
+onComplete})=>{
     return (
         <div className="card border-0 shadow-sm rounded-4 overflow-hidden">
 
@@ -127,7 +130,7 @@ const SessionTable=({sessions})=>{
                                     <td>
 
                                         <Person
-                                            person={session.mentor||session.requester}
+                                            person={session.mentor||session.recipient}
                                         />
 
                                     </td>
@@ -137,7 +140,7 @@ const SessionTable=({sessions})=>{
                                     <td>
 
                                         <Person
-                                            person={session.learner||session.receiver}
+                                            person={session.learner||session.requester}
                                         />
 
                                     </td>
@@ -240,22 +243,39 @@ const SessionTable=({sessions})=>{
 
                                             <ul className="dropdown-menu dropdown-menu-end">
 
-                                                <li>
-                                                    <button className="dropdown-item">
-                                                        <i className="bi bi-eye me-2"></i>
-                                                        View Details
-                                                    </button>
-                                                </li>
-
                                                 {session.status ===
                                                     "SCHEDULED" && (
 
-                                                    <li>
-                                                        <button className="dropdown-item text-danger">
+                                                    <>
+                                                        <li>
+                                                        <button 
+                                                        type='button'
+                                                        className="dropdown-item"
+                                                        onClick={()=>onReschedule(session)}>
+                                                            <i className="bi bi-calendar-event me-2"></i>
+                                                            Reschedule Session
+                                                        </button>
+                                                    </li>
+                                                        <li>
+                                                        <button 
+                                                        type='button'
+                                                        className="dropdown-item text-success"
+                                                        onClick={()=>onComplete(session)}>
+                                                            <i className="bi bi-x-circle me-2"></i>
+                                                            Mark As Completed
+                                                        </button>
+                                                    </li>
+                                                        <li>
+                                                        <button 
+                                                        type='button'
+                                                        className="dropdown-item text-danger"
+                                                        onClick={()=>onCancel(session)}>
                                                             <i className="bi bi-x-circle me-2"></i>
                                                             Cancel Session
                                                         </button>
                                                     </li>
+                                                    </>
+
 
                                                 )}
 

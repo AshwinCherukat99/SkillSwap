@@ -1,0 +1,722 @@
+.admin-payments-dashboard {
+    min-height: 100vh;
+    background: #f8f9ff;
+    color: #121c2a;
+}
+
+
+/* ============================= */
+/* Overview Cards */
+/* ============================= */
+
+.payment-overview-card {
+    min-height: 175px;
+    padding: 24px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(199, 196, 216, 0.2);
+    box-shadow: 0 2px 8px rgba(18, 28, 42, 0.04);
+    transition: all 0.2s ease;
+}
+
+
+.payment-overview-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(18, 28, 42, 0.08);
+}
+
+
+.payment-card-primary {
+    border-color: rgba(79, 70, 229, 0.12);
+}
+
+
+.payment-card-gold {
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+
+.payment-card-danger {
+    border-color: rgba(186, 26, 26, 0.12);
+}
+
+
+.payment-card-growth {
+    border-color: rgba(0, 108, 73, 0.12);
+}
+
+
+.payment-card-secondary {
+    border-color: rgba(0, 108, 73, 0.12);
+}
+
+
+.payment-card-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: rgba(79, 70, 229, 0.1);
+
+    color: #4f46e5;
+
+    font-size: 20px;
+}
+
+
+.payment-card-gold .payment-card-icon {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+
+.payment-card-danger .payment-card-icon {
+    background: rgba(186, 26, 26, 0.1);
+    color: #ba1a1a;
+}
+
+
+.payment-card-secondary .payment-card-icon {
+    background: rgba(0, 108, 73, 0.1);
+    color: #006c49;
+}
+
+
+.payment-card-growth .payment-card-icon {
+    background: rgba(0, 108, 73, 0.1);
+    color: #006c49;
+}
+
+
+/* ============================= */
+/* Tabs */
+/* ============================= */
+
+.payment-tabs {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+
+    border-bottom: 1px solid rgba(119, 117, 135, 0.25);
+
+    padding: 0 8px;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+}
+
+
+.payment-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+
+.payment-tab {
+    border: 0;
+    background: transparent;
+
+    padding: 0 0 14px;
+
+    color: #464555;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    white-space: nowrap;
+
+    border-bottom: 2px solid transparent;
+
+    transition: all 0.2s ease;
+}
+
+
+.payment-tab:hover {
+    color: #3525cd;
+}
+
+
+.payment-tab.active {
+    color: #3525cd;
+    border-bottom-color: #3525cd;
+    font-weight: 700;
+}
+
+
+/* ============================= */
+/* Panels */
+/* ============================= */
+
+.payment-panel {
+    padding: 24px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, 0.75);
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border: 1px solid rgba(199, 196, 216, 0.2);
+
+    box-shadow: 0 2px 8px rgba(18, 28, 42, 0.04);
+}
+
+
+/* ============================= */
+/* Revenue Chart */
+/* ============================= */
+
+.revenue-growth-panel {
+    height: 320px;
+    overflow: hidden;
+    position: relative;
+}
+
+
+.revenue-chart {
+    position: relative;
+    height: 190px;
+    width: 100%;
+}
+
+
+.revenue-chart svg {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    opacity: 0.4;
+}
+
+
+.revenue-chart-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    pointer-events: none;
+}
+
+
+/* ============================= */
+/* Donut Chart */
+/* ============================= */
+
+.donut-chart {
+    width: 128px;
+    height: 128px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #4f46e5 0deg 270deg,
+            #f59e0b 270deg 324deg,
+            #d9e3f6 324deg 360deg
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.donut-chart::before {
+    content: '';
+
+    width: 88px;
+    height: 88px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    position: absolute;
+}
+
+
+.donut-value {
+    position: relative;
+    z-index: 2;
+
+    text-align: center;
+
+    font-size: 12px;
+}
+
+
+.legend-dot {
+    display: inline-block;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    margin-right: 6px;
+}
+
+
+.legend-primary {
+    background: #4f46e5;
+}
+
+
+.legend-gold {
+    background: #f59e0b;
+}
+
+
+.legend-neutral {
+    background: #d9e3f6;
+}
+
+
+.legend-primary-light {
+    background: rgba(79, 70, 229, 0.35);
+}
+
+
+/* ============================= */
+/* Bar Chart */
+/* ============================= */
+
+.bar-chart {
+    height: 128px;
+
+    display: flex;
+    align-items: flex-end;
+
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding: 0 8px;
+}
+
+
+.bar-group {
+    flex: 1;
+
+    height: 100%;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: flex-end;
+
+    gap: 3px;
+}
+
+
+.bar {
+    width: 100%;
+
+    border-radius: 4px 4px 0 0;
+}
+
+
+.bar.payout {
+    background: rgba(79, 70, 229, 0.2);
+}
+
+
+.bar.profit {
+    background: #4f46e5;
+}
+
+
+.h-30 {
+    height: 30%;
+}
+
+
+.h-40 {
+    height: 40%;
+}
+
+
+.h-50 {
+    height: 50%;
+}
+
+
+.h-60 {
+    height: 60%;
+}
+
+
+.h-75 {
+    height: 75%;
+}
+
+
+.h-90 {
+    height: 90%;
+}
+
+
+.h-100 {
+    height: 100%;
+}
+
+
+/* ============================= */
+/* Success Radial */
+/* ============================= */
+
+.success-radial {
+    width: 128px;
+    height: 128px;
+
+    border-radius: 50%;
+
+    background:
+        conic-gradient(
+            #006c49 var(--success-rate),
+            rgba(0, 108, 73, 0.12) 0
+        );
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.success-radial::before {
+    content: '';
+
+    position: absolute;
+
+    width: 96px;
+    height: 96px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+}
+
+
+.success-radial-content {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+}
+
+
+.success-radial-content strong {
+    font-size: 20px;
+    font-weight: 800;
+
+    color: #006c49;
+}
+
+
+.success-radial-content span {
+    font-size: 8px;
+
+    color: #777587;
+
+    text-transform: uppercase;
+}
+
+
+/* ============================= */
+/* Payment Method */
+/* ============================= */
+
+.success-method {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 8px 12px;
+
+    background: #eff4ff;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+}
+
+
+.success-method span {
+    color: #006c49;
+    font-weight: 600;
+}
+
+
+/* ============================= */
+/* Transactions */
+/* ============================= */
+
+.payment-panel .table {
+    margin-bottom: 0;
+}
+
+
+.payment-panel .table thead th {
+    background: #eff4ff;
+
+    color: #777587;
+
+    font-size: 10px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+
+    font-weight: 700;
+
+    border-bottom: 0;
+
+    padding: 14px 16px;
+
+    white-space: nowrap;
+}
+
+
+.payment-panel .table tbody td {
+    padding: 16px;
+
+    font-size: 13px;
+
+    border-color: rgba(199, 196, 216, 0.15);
+
+    white-space: nowrap;
+}
+
+
+.transaction-id {
+    color: #3525cd;
+
+    font-family: monospace;
+
+    font-weight: 600;
+}
+
+
+.transaction-avatar {
+    width: 28px;
+    height: 28px;
+
+    border-radius: 50%;
+
+    background: #d9e3f6;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+.course-tag {
+    background: #dee9fc;
+
+    padding: 4px 8px;
+
+    border-radius: 5px;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+}
+
+
+.transaction-status {
+    display: inline-block;
+
+    padding: 5px 12px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    text-transform: uppercase;
+}
+
+
+.transaction-status-success {
+    color: #006c49;
+
+    background: rgba(108, 248, 187, 0.2);
+}
+
+
+.transaction-status-pending {
+    color: #3525cd;
+
+    background: rgba(79, 70, 229, 0.12);
+}
+
+
+.transaction-status-refunded {
+    color: #45484f;
+
+    background: rgba(196, 198, 206, 0.35);
+}
+
+
+.transaction-status-failed {
+    color: #ba1a1a;
+
+    background: rgba(255, 218, 214, 0.6);
+}
+
+
+/* ============================= */
+/* Today's Summary */
+/* ============================= */
+
+.today-summary-item {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    padding: 12px;
+
+    border-radius: 12px;
+
+    background: #eff4ff;
+}
+
+
+.today-summary-item span {
+    color: #777587;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+.today-summary-item strong {
+    font-size: 14px;
+}
+
+
+.today-icon {
+    width: 32px;
+    height: 32px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+}
+
+
+.today-icon-success {
+    background: rgba(0, 108, 73, 0.1);
+
+    color: #006c49;
+}
+
+
+.today-icon-primary {
+    background: rgba(79, 70, 229, 0.1);
+
+    color: #4f46e5;
+}
+
+
+/* ============================= */
+/* Financial Health */
+/* ============================= */
+
+.payment-health-progress {
+    height: 8px;
+
+    background: #d9e3f6;
+
+    border-radius: 999px;
+
+    overflow: hidden;
+}
+
+
+.financial-status {
+    background: rgba(79, 70, 229, 0.05);
+
+    border: 1px solid rgba(79, 70, 229, 0.1);
+
+    border-radius: 12px;
+}
+
+
+/* ============================= */
+/* Responsive */
+/* ============================= */
+
+@media (max-width: 1199px) {
+
+    .payment-tabs {
+        gap: 20px;
+    }
+
+}
+
+
+@media (max-width: 768px) {
+
+    .admin-payments-dashboard {
+        padding: 0;
+    }
+
+
+    .payment-overview-card {
+        min-height: auto;
+    }
+
+
+    .revenue-growth-panel {
+        height: 300px;
+    }
+
+
+    .payment-tabs {
+        gap: 20px;
+    }
+
+
+    .payment-tab {
+        font-size: 13px;
+    }
+
+}

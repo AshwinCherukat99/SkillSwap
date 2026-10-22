@@ -281,7 +281,15 @@ function MentorRegister() {
                 "document_types",
                 item.category
             );
-        });
+        });  
+
+        if (formData.password!==formData.password2){
+            setFieldErrors((previous)=>({
+                ...previous,
+                password2:'passwords do not match'
+            })) 
+            return
+        }
 
         console.log("FORM DATA:", formData);
 
@@ -573,7 +581,10 @@ function MentorRegister() {
                                             }
                                             placeholder="e.g. Dr. Jordan Vance"
                                             type="text"
-                                            required
+                                            required 
+                                            minLength={2} 
+                                            maxLength={100}
+                                            pattern="[A-Za-z][A-Za-z .'-]*"
                                         />
                                     </div>
 
@@ -608,8 +619,9 @@ function MentorRegister() {
                                             onChange={
                                                 handleChange
                                             }
-                                            placeholder="+91 9876543210"
+                                            placeholder="9876543210"
                                             required
+                                            pattern="[6-9][0-9]{9}"
                                         />
                                     </div>
 
@@ -627,6 +639,9 @@ function MentorRegister() {
                                             onChange={
                                                 handleChange
                                             }
+                                            minLength={3}
+                                            maxLength={30}
+                                            pattern="[A-Za-z][A-Za-z0-9_]*"
                                             placeholder="GoodDoctor78"
                                             required
                                         />
@@ -649,6 +664,9 @@ function MentorRegister() {
                                             }
                                             placeholder="••••••••"
                                             required
+                                            minLength={8}
+                                            maxLength={128}
+                                            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,128}"
                                         />
 
                                         <div className="mentor-password-meter">
@@ -797,6 +815,8 @@ function MentorRegister() {
                                             type='text'
                                             placeholder="e.g. Senior Software Architect"
                                             required
+                                            minLength={2}
+                                            maxLength={100}
                                         />
                                     </div>
 
@@ -818,6 +838,8 @@ function MentorRegister() {
                                             placeholder="e.g. Google, Stanford University"
                                             type="text"
                                             required
+                                            minLength={2}
+                                            maxLength={150}
                                         />
                                     </div>
                                 </div>
@@ -826,6 +848,28 @@ function MentorRegister() {
                             {/* =================================
                                 DOCUMENTS
                             ================================== */}
+
+                            
+<div className="alert alert-info mb-3">
+  <h6 className="alert-heading">Required Documents</h6>
+  <p className="mb-2">
+    To apply for mentorship, you must submit at least one document
+    for each of the following categories:
+  </p>
+
+  <ul className="mb-2">
+    <li>Identity — Government-issued ID or other identity proof</li>
+    <li>Education — Degree, diploma, or educational certificate</li>
+    <li>Certification — Professional certificates or credentials</li>
+    <li>Portfolio — Portfolio, project samples, or work evidence</li>
+  </ul>
+
+  <small>
+    All four categories are mandatory. Accepted formats: PDF, JPG, and PNG.
+    Maximum file size: 20 MB per document.
+  </small>
+</div>
+
 
                             <section className="mentor-form-section documents-section">
 
@@ -1173,6 +1217,7 @@ function MentorRegister() {
                                             onChange={
                                                 handleChange
                                             }
+                                            minLength={50}
                                             maxLength={500}
                                             rows={4}
                                             placeholder="Briefly describe your core competencies and professional journey..."
@@ -1203,6 +1248,7 @@ function MentorRegister() {
                                             onChange={
                                                 handleChange
                                             }
+                                            minLength={50}
                                             maxLength={500}
                                             rows={4}
                                             placeholder="What is your unique teaching style or industry insight?"

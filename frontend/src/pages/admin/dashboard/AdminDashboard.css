@@ -415,7 +415,7 @@ a {
 
     top: 0;
 
-    left: 256px;
+    left: 0;
     right: 0;
 
     display: flex;
@@ -650,7 +650,7 @@ a {
 ========================================= */
 
 .admin-main {
-    margin-left: 256px;
+    margin-left: 0;
 
     padding-top: 64px;
 
@@ -1525,58 +1525,32 @@ a {
 
 .session-status {
     display: inline-flex;
-
     align-items: center;
-
-    gap: 7px;
-
-    font-size: 13px;
-
-    font-weight: 500;
-
-    white-space: nowrap;
+    gap: 6px;
 }
 
-.session-status > span {
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
+.session-status.scheduled {
+    color: #2563eb;
 }
 
-.session-status.active {
-    color:
-        var(--admin-secondary);
+.session-status.completed {
+    color: #16a34a;
 }
 
-.session-status.active > span {
-    background:
-        var(--admin-secondary);
-
-    animation:
-        pulseSoft 3s
-        ease-in-out
-        infinite;
+.session-status.requested {
+    color: #d97706;
 }
 
-.session-status.finished {
-    color:
-        var(--admin-muted);
+.session-status.cancelled {
+    color: #dc2626;
 }
 
-.session-status.finished > span {
-    background:
-        var(--admin-outline);
+.session-status.rejected {
+    color: #dc2626;
 }
 
-.session-status.upcoming {
-    color:
-        var(--admin-primary);
-}
-
-.session-status.upcoming > span {
-    background:
-        var(--admin-primary);
+.session-status.expired {
+    color: #6b7280;
 }
 
 @keyframes pulseSoft {
@@ -2338,4 +2312,90 @@ a {
     .mentor-status {
         white-space: nowrap;
     }
+
+    .session-volume-chart {
+    width: 100%;
+    padding: 10px 0 0;
+}
+
+.session-volume-svg-wrapper {
+    width: 100%;
+    height: 220px;
+}
+
+.session-volume-svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.chart-grid-line {
+    stroke: #e7e9f2;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+.session-line {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+}
+
+.mentoring-line {
+    stroke: #4338ca;
+}
+
+.workshops-line {
+    stroke: #087f5b;
+}
+
+.session-point {
+    stroke-width: 2;
+    stroke: #ffffff;
+    vector-effect: non-scaling-stroke;
+}
+
+.mentoring-point {
+    fill: #4338ca;
+}
+
+.workshops-point {
+    fill: #087f5b;
+}
+
+.session-chart-labels {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+    padding-left: 6.67%;
+    padding-right: 3.33%;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #7a7f91;
+}
+
+.session-chart-labels span {
+    flex: 1;
+    text-align: center;
+}
+
+.session-volume-empty {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: #8b90a0;
+    gap: 8px;
+}
+
+.session-volume-empty .material-symbols-outlined {
+    font-size: 32px;
+}
+
+.session-volume-empty p {
+    margin: 0;
+}
 }

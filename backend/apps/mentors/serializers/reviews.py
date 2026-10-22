@@ -2,6 +2,10 @@ from rest_framework import serializers
 from apps.accounts.models import UserRating
 
 class MentorReviewSerializer(serializers.ModelSerializer):
+    reviewer_id=serializers.CharField(
+        source='rated_by.id',
+        read_only=True
+    )
     reviewer_name=serializers.SerializerMethodField()
     reviewer_username=serializers.CharField(
         source='rated_by.username',
@@ -12,6 +16,7 @@ class MentorReviewSerializer(serializers.ModelSerializer):
         model=UserRating
         fields=[
             'id',
+            'reviewer_id',
             'reviewer_name',
             'reviewer_username',
             'reviewer_image',
@@ -21,6 +26,7 @@ class MentorReviewSerializer(serializers.ModelSerializer):
         ]
         read_only_fields=[
             'id',
+            'reviewer_id',
             'reviewer_name',
             'reviewer_username',
             'reviewer_image',

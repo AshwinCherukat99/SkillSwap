@@ -32,7 +32,8 @@ urlpatterns = [
     path('api/chat/',include('apps.chat.urls')),
     path('api/payments/',include('apps.payments.urls')),
     path('api/sessions/',include('apps.sessions_mgmt.urls')),
-    path('api/certificates/',include('apps.certificates.urls')),
+    path('api/certificates/',include('apps.certificates.urls')),    
+    path('api/reports/',include('apps.reports.urls')),
 ] 
 if settings.DEBUG:
     urlpatterns+=static(

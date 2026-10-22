@@ -224,10 +224,12 @@ const VerificationList=()=>{
 
                 <VerificationFilters
                     search={search}
-                    onSearchChange={setSearch}
-                    sortBy={sortBy}
-                    onSortChange={setSortBy}
-                    onClear={handleClearFilters}
+                    setSearch={setSearch}
+                    documentStatus='all'
+                    setDocumentStatus={()=>{}}
+                    sort={sortBy}
+                    setSort={setSortBy}
+                    onReset={handleClearFilters}
                 />
 
             </div>

@@ -5,6 +5,7 @@ from ..models import Course,CourseModule,CourseLesson
 class MentorCourseSerializer(serializers.ModelSerializer):
     enrollment_count=serializers.SerializerMethodField()
     lesson_count=serializers.SerializerMethodField()
+    thumbnail=serializers.SerializerMethodField()
     class Meta:
         model=Course
         fields=[
@@ -32,6 +33,15 @@ class MentorCourseSerializer(serializers.ModelSerializer):
             module.lessons.count()
             for module in obj.modules.all()
         )
+    def get_thumbnail(self,obj):
+        if not obj.thumbnail:
+            return None
+        request=self.context.get('request')
+        if request:
+            return request.build_absolute_uri(
+                obj.thumbnail.url
+            )
+        return obj.thumbnail.url
 
 class MentorCourseCreateSerializer(serializers.ModelSerializer):
     class Meta:

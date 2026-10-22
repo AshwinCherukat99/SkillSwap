@@ -3,27 +3,47 @@ from django.db import transaction
 from ..models import Assessment,AssessmentQuestion 
 from openai import OpenAI
 from google import genai
+from google.genai import types
 from django.conf import settings
 from collections import Counter
 import time
 
 client=genai.Client(api_key=settings.GEMINI_API_KEY)
 
+GEMINI_MODELS=[
+    'gemini-3.8-flash',
+    'gemini-3.7-flash',
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite',
+    'gemini-3-flash',
+]
+
+tries=3
+
 def generate_with_retry(prompt):
-    for attempt in range(3):
-        try:
-            response = client.models.generate_content(
-                model="gemini-3.7-flash",
+    last_exception=None
+    for model in GEMINI_MODELS:
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                model=model,
                 contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
             )
+                if response.text:
+                    return response.text
+                raise ValueError(f'{model} returned an empty response')
 
-            return response.text
-
-        except Exception as exc:
-            if attempt == 2:
-                raise exc
-
-            time.sleep(3)
+            except Exception as exc:
+                last_exception=exc
+                if attempt < 2:
+                    time.sleep(3)
+    raise RuntimeError(
+        'all gemini models failed after retries'
+    ) from last_exception
 
 @transaction.atomic
 def generate_assessment_questions(assessment):
@@ -89,10 +109,44 @@ Requirements:
 10. Do not create questions about information that does not appear in the lessons.
 11. Make questions appropriate for the course content.
 12. Return exactly 10 questions.
+Return ONLY valid JSON.
+Do not use Markdown.
+Do not wrap the JSON in ```json or ``` blocks.
+Do not include explanations before or after the JSON.
+
+The response must have exactly this structure:
+
+{{
+  "questions": [
+    {{
+      "lesson_id": 1,
+      "question_type": "MCQ",
+      "question_text": "Example question?",
+      "options": [
+        "Option A",
+        "Option B",
+        "Option C",
+        "Option D"
+      ],
+      "correct_answer": "Option A"
+    }}
+  ]
+}}
 """
     response_text=generate_with_retry(prompt)           
     try:
         data=json.loads(response_text)
+        print("========== AI RESPONSE ==========")
+        print(response_text)
+        print("=================================")
+
+        print("DATA TYPE:", type(data))
+        print("DATA:", data)
+
+        question_data = data.get('questions')
+
+        print("QUESTIONS TYPE:", type(question_data))
+        print("QUESTIONS:", question_data)
     except json.JSONDecodeError as exc:
         raise ValueError(
             'AI returned invalid json'
@@ -248,10 +302,9 @@ def evaluate_objective_answer(question,answer):
     return {
         'is_correct':is_correct,
         'score':1 if is_correct else 0,
-        'feedback':{
+        'feedback':
             'correct_answer' if is_correct
             else f'correct_answer:{question.correct_answer}'
-        }
     }
 
 def generate_assessment_summary(assessment,answers,percentage):

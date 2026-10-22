@@ -40,29 +40,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 self.channel_name,
             )
     async def receive(self,text_data):
+        print('chat message received-',text_data)
         try:
             data=json.loads(text_data)
         except json.JSONDecodeError:
+            print('invalid json')
             await self.send(text_data=json.dumps({
                 'error':'invalid json'
             }))
             return
+        print('parsed chat data:',data)
         if not isinstance(data,dict):
             await self.send(text_data=json.dumps({
                 'error':'message payload must be a json object'
             }))
             return
         message_content=data.get('message','').strip()
+        print('message content:',message_content)
         if not message_content:
             await self.send(text_data=json.dumps({
                 'error':'message cannot be empty'
             })) 
             return
         user=self.scope['user'] 
+        print('sending message as user:',user)
         message=await self.create_message(
             user=user,
             content=message_content
         )
+        print('message created:',message)
+        exists=await self.check_message_exists(
+            message['id']
+        )
+        print('message exists in database:',exists)
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -76,6 +86,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             },
         )
     async def chat_message(self,event):
+        print("CHAT MESSAGE EVENT:", event)
         await self.send(
             text_data=json.dumps({
                 'type':'message',
@@ -140,3 +151,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender':sender,
             'created_at':message.created_at.isoformat(),
         }
+    @database_sync_to_async
+    def check_message_exists(self,message_id):
+        return Message.objects.filter(
+            id=message_id
+        ).exists()

@@ -9,7 +9,7 @@ const ReviewActionMenu=({
 })=>{
     const [open,setOpen]=React.useState(false)
     const menuRef=useRef(null)
-    useEffect=(()=>{
+    useEffect(()=>{
         const handleOutsideClick=(event)=>{
             if (menuRef.current && !menuRef.current.contains(event.target)){
                 setOpen(false)

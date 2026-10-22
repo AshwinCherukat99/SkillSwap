@@ -18,6 +18,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 
 import apps.sessions_mgmt.routing
 import apps.chat.routing
+import apps.notifications.routing
 
 from apps.chat.middleware import JWTAuthMiddleware
 
@@ -28,7 +29,8 @@ application=ProtocolTypeRouter({
     'websocket':JWTAuthMiddleware(
         URLRouter(
             apps.sessions_mgmt.routing.websocket_urlpatterns+
-            apps.chat.routing.websocket_urlpatterns
+            apps.chat.routing.websocket_urlpatterns+
+            apps.notifications.routing.websocket_urlpatterns
         )
     )
 })

@@ -513,6 +513,25 @@ const handleVerify = async (e) => {
                                                             .value
                                                     )
                                                 }
+                                                onPaste={(event) => {
+    event.preventDefault();
+
+    const pastedText = event.clipboardData.getData("text");
+    const digits = pastedText.replace(/\D/g, "").slice(0, 6);
+
+    if (!digits) return;
+
+    const updatedOtp = ["", "", "", "", "", ""];
+
+    digits.split("").forEach((digit, index) => {
+        updatedOtp[index] = digit;
+    });
+
+    setOtp(updatedOtp);
+
+    const nextIndex = Math.min(digits.length, 5);
+    inputRefs.current[nextIndex]?.focus();
+}}
                                                 onKeyDown={(
                                                     event
                                                 ) =>

@@ -4,7 +4,7 @@ from ..models import CourseSession,SkillExchangeSession
 
 class SkillExchangeSessionHistorySerializer(serializers.ModelSerializer):
     title=serializers.SerializerMethodField()
-    person=serializers.SerializerMethodField()
+    person_name=serializers.SerializerMethodField()
     description=serializers.SerializerMethodField()
     skill_wanted=serializers.CharField(source='skill_wanted.name')
     skill_offered=serializers.CharField(source='skill_offered.name')
@@ -93,4 +93,4 @@ class MentorCourseSessionHistorySerializer(serializers.ModelSerializer):
     def get_description(self,obj):
         return obj.message
     def get_requested_by(self,obj):
-        return obj.requested_by
+        return obj.mentor.full_name

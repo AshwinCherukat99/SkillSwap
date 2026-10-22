@@ -34,7 +34,7 @@ const EditBadge=()=>{
                 `/badges/admin/${badgeId}/`,
                 data
             )
-            navigate('/badges/admin/')
+            navigate('/admin/badge-management/')
         }catch(err){
             console.error('failed to update badge:',err)
         }finally{

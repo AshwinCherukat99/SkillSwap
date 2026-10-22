@@ -3,6 +3,16 @@ import {useNavigate} from 'react-router-dom'
 
 import adminApi from '../../../services/adminApi'
 
+import PaymentOverviewCards from '../../../components/admin/payments_dashboard/PaymentOverviewCards'
+import PaymentTabs from '../../../components/admin/payments_dashboard/PaymentTabs'
+import RevenueGrowth from '../../../components/admin/payments_dashboard/RevenueGrowth'
+import RecentTransactions from '../../../components/admin/payments_dashboard/RecentTransactions'
+import PaymentQuickActions from '../../../components/admin/payments_dashboard/PaymentQuickActions'
+import TodaySummary from '../../../components/admin/payments_dashboard/TodaySummary'
+import FinancialHealth from '../../../components/admin/payments_dashboard/FinancialHealth'
+
+import './AdminPaymentsDashboard.css'
+
 function AdminPaymentsDashboard(){
     const navigate=useNavigate()
     const [dashboard,setDashboard]=useState(null)
@@ -14,7 +24,7 @@ function AdminPaymentsDashboard(){
                 setLoading(true)
                 setError('')
                 const response=await adminApi.get(
-
+                    '/payments/admin/dashboard/'
                 )
                 setDashboard(response.data)
             }catch(err){
@@ -159,7 +169,7 @@ function AdminPaymentsDashboard(){
 
                                 onApprovePayouts={() =>
                                     navigate(
-                                        '/admin/payments/payouts'
+                                        '/admin/payments/mentor-payouts'
                                     )
                                 }
 
