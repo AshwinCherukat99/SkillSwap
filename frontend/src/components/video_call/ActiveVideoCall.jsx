@@ -73,6 +73,11 @@ const ActiveVideoCall = ({
     isHandRaised,
     remoteHandRaised,
     toggleHand,
+    screenVideoRef,
+    isScreenSharing,
+    remoteScreenSharing,
+    remoteScreenVideoRef,
+    remoteCameraThumbnailRef
   } = useWebRTC(roomName, conversationId, accessToken);
 
   useEffect(()=>{
@@ -126,6 +131,11 @@ const ActiveVideoCall = ({
             isHandRaised={isHandRaised}
             remoteHandRaised={remoteHandRaised}
             sessionTimeUp={sessionTimeUp}
+            screenVideoRef={screenVideoRef}  
+            isScreenSharing={isScreenSharing}
+            remoteScreenSharing={remoteScreenSharing}
+            remoteScreenVideoRef={remoteScreenVideoRef} 
+            remoteCameraThumbnailRef={remoteCameraThumbnailRef}
           />
           <SessionProgress duration={sessionDetails?.duration_minutes}/>
         </section>

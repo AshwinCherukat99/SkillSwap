@@ -1,3 +1,4 @@
+
 /* =========================================================
    VIDEO CALL PAGE
 ========================================================= */
@@ -6,16 +7,12 @@
     width: 100%;
     height: 100vh;
     min-height: 100vh;
-
     display: flex;
     flex-direction: column;
-
     background: #0f172a;
     color: #f8fafc;
-
     overflow: hidden;
 }
-
 
 /* =========================================================
    HEADER
@@ -24,87 +21,57 @@
 .video-call-header {
     height: 64px;
     min-height: 64px;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 0 24px;
-
     background: #111827;
-
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
-
-
-/* Left side */
 
 .video-call-header-left {
     display: flex;
     align-items: center;
-
     height: 100%;
-
     gap: 18px;
 }
-
-
-/* Logo */
 
 .video-call-logo {
     font-size: 18px;
     font-weight: 700;
-
     color: #ffffff;
-
     white-space: nowrap;
 }
-
-
-/* Divider */
 
 .video-call-divider {
     width: 1px;
     height: 34px;
-
     background: rgba(255, 255, 255, 0.12);
 }
-
-
-/* Title */
 
 .video-call-title {
     display: flex;
     flex-direction: column;
-
     justify-content: center;
 }
 
 .video-call-title h2 {
     margin: 0;
-
     font-size: 20px;
     font-weight: 600;
-
     line-height: 1.2;
 }
 
 .video-call-title span {
     margin-top: 3px;
-
     color: #94a3b8;
-
     font-size: 12px;
 }
-
-
-/* Header right */
 
 .video-call-header-right {
     display: flex;
     align-items: center;
 }
-
 
 /* =========================================================
    CONNECTION STATUS
@@ -114,11 +81,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-
     padding: 7px 14px;
-
     border-radius: 20px;
-
     font-size: 12px;
     font-weight: 600;
 }
@@ -133,52 +97,33 @@
     color: #f87171;
 }
 
-
-/* Your JSX uses status-dot */
-
 .status-dot {
     width: 7px;
     height: 7px;
-
     border-radius: 50%;
-
     background: currentColor;
 }
 
-
 /* =========================================================
-   MAIN
+   MAIN LAYOUT
 ========================================================= */
 
 .video-call-main {
     flex: 1;
-
     min-height: 0;
-
     display: grid;
-
     grid-template-columns: minmax(0, 1fr) 300px;
 }
-
-
-/* =========================================================
-   VIDEO SECTION
-========================================================= */
 
 .video-section {
     min-width: 0;
     min-height: 0;
-
     display: flex;
     flex-direction: column;
-
     gap: 16px;
-
     padding: 20px;
-
     background: #0f172a;
 }
-
 
 /* =========================================================
    VIDEO GRID
@@ -186,124 +131,115 @@
 
 .video-grid {
     position: relative;
-
     flex: 1;
-
     min-height: 0;
-
     background: #020617;
-
     border: 1px solid rgba(255, 255, 255, 0.07);
-
     border-radius: 14px;
-
     overflow: hidden;
 }
 
-
-/* Remote video */
-
 .remote-video-container {
     position: relative;
-
     width: 100%;
     height: 100%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     background: #020617;
 }
 
 .remote-video {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
     background: #020617;
 }
 
-
-/* Remote name */
-
 .video-name {
     position: absolute;
-
     left: 16px;
     bottom: 16px;
-
     padding: 6px 11px;
-
     background: rgba(0, 0, 0, 0.65);
-
     border-radius: 7px;
-
     color: #ffffff;
-
     font-size: 12px;
     font-weight: 500;
 }
 
-
 /* =========================================================
-   LOCAL VIDEO
+   LOCAL CAMERA
 ========================================================= */
 
 .local-video-container {
     position: absolute;
-
     right: 18px;
     bottom: 18px;
-
     width: 220px;
     height: 140px;
-
     background: #111827;
-
     border: 2px solid rgba(255, 255, 255, 0.2);
-
     border-radius: 12px;
-
     overflow: hidden;
-
-    z-index: 5;
-
+    z-index: 8;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
 }
 
 .local-video {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
-
-    /* Mirror user's camera */
     transform: scaleX(-1);
 }
 
-
-/* Local name */
-
 .video-name-small {
     position: absolute;
-
     left: 9px;
     bottom: 8px;
-
     padding: 4px 8px;
-
     background: rgba(0, 0, 0, 0.65);
-
     border-radius: 5px;
-
     color: #ffffff;
-
     font-size: 10px;
     font-weight: 500;
 }
 
+/* =========================================================
+   REMOTE PARTICIPANT CAMERA THUMBNAIL
+========================================================= */
+
+.remote-camera-thumbnail {
+    position: absolute;
+    right: 250px;
+    bottom: 20px;
+    width: 200px;
+    height: 112px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    background: #111827;
+    z-index: 10;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.remote-camera-thumbnail.thumbnail-visible {
+    display: block;
+    visibility: visible;
+    opacity: 1;
+}
+
+.remote-camera-thumbnail.thumbnail-hidden {
+    display: none;
+}
+
+.remote-thumbnail-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: #111827;
+}
 
 /* =========================================================
    SESSION PROGRESS
@@ -311,78 +247,56 @@
 
 .session-progress {
     flex-shrink: 0;
-
     padding: 15px 17px;
-
     background: #111827;
-
     border: 1px solid rgba(255, 255, 255, 0.08);
-
     border-radius: 12px;
 }
-
-
-/* Header */
 
 .session-progress-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 10px;
 }
 
 .session-progress-header > div {
     display: flex;
     align-items: center;
-
     gap: 12px;
 }
 
 .session-label {
     color: #cbd5e1;
-
     font-size: 13px;
     font-weight: 500;
 }
 
 .session-progress-header strong {
     color: #ffffff;
-
     font-size: 14px;
     font-weight: 600;
 }
 
 .session-progress-header > span {
     color: #94a3b8;
-
     font-size: 12px;
 }
-
-
-/* Progress */
 
 .progress-bar-container {
     width: 100%;
     height: 6px;
-
     overflow: hidden;
-
     background: #1e293b;
-
     border-radius: 10px;
 }
 
 .progress-bar {
     height: 100%;
-
     background: #6366f1;
-
     border-radius: 10px;
-
     transition: width 0.5s ease;
 }
-
 
 /* =========================================================
    SIDEBAR
@@ -390,18 +304,11 @@
 
 .call-sidebar {
     min-width: 0;
-
     padding: 22px 20px;
-
     background: #111827;
-
     border-left: 1px solid rgba(255, 255, 255, 0.08);
-
     overflow-y: auto;
 }
-
-
-/* Sidebar section */
 
 .sidebar-section {
     margin-bottom: 28px;
@@ -411,18 +318,12 @@
     margin-bottom: 0;
 }
 
-
-/* Sidebar heading */
-
 .sidebar-section h3 {
     margin: 0 0 14px;
-
     color: #f8fafc;
-
     font-size: 15px;
     font-weight: 600;
 }
-
 
 /* =========================================================
    SESSION DETAILS
@@ -431,11 +332,8 @@
 .session-detail {
     display: flex;
     flex-direction: column;
-
     gap: 3px;
-
     padding: 11px 0;
-
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -445,40 +343,28 @@
 
 .detail-label {
     color: #64748b;
-
     font-size: 11px;
-
     text-transform: uppercase;
-
     letter-spacing: 0.05em;
 }
 
 .detail-value {
     color: #e2e8f0;
-
     font-size: 13px;
     font-weight: 500;
 }
 
 .session-status {
     display: inline-flex;
-
     align-items: center;
-
     width: fit-content;
-
     padding: 3px 8px;
-
     border-radius: 20px;
-
     background: rgba(34, 197, 94, 0.12);
-
     color: #4ade80;
-
     font-size: 11px;
     font-weight: 600;
 }
-
 
 /* =========================================================
    PARTICIPANTS
@@ -487,17 +373,11 @@
 .participant {
     display: flex;
     align-items: center;
-
     gap: 10px;
-
     padding: 10px;
-
     margin-bottom: 8px;
-
     background: #1e293b;
-
     border: 1px solid rgba(255, 255, 255, 0.05);
-
     border-radius: 10px;
 }
 
@@ -505,96 +385,62 @@
     margin-bottom: 0;
 }
 
-
-/* Avatar */
-
 .participant-avatar {
     width: 38px;
     height: 38px;
-
     flex-shrink: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 50%;
-
     background: #334155;
-
     color: #ffffff;
-
     font-size: 14px;
     font-weight: 600;
 }
 
-
-/* Participant info */
-
 .participant-info {
     min-width: 0;
-
     display: flex;
     flex-direction: column;
-
     flex: 1;
 }
 
 .participant-info strong {
     overflow: hidden;
-
     color: #f8fafc;
-
     font-size: 12px;
     font-weight: 600;
-
     white-space: nowrap;
-
     text-overflow: ellipsis;
 }
 
 .participant-info span {
     margin-top: 2px;
-
     color: #94a3b8;
-
     font-size: 10px;
 }
 
-
-/* Online dot */
-
 .participant-status {
     color: #22c55e;
-
     font-size: 9px;
 }
 
-
 /* =========================================================
-   NOTES
+   SESSION NOTES
 ========================================================= */
 
 .session-notes {
     width: 100%;
     min-height: 120px;
-
     padding: 11px 12px;
-
     resize: vertical;
-
     background: #0f172a;
-
     border: 1px solid rgba(255, 255, 255, 0.1);
-
     border-radius: 8px;
-
     outline: none;
-
     color: #f8fafc;
-
     font-size: 12px;
-
     font-family: inherit;
 }
 
@@ -604,10 +450,8 @@
 
 .session-notes:focus {
     border-color: #6366f1;
-
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
 }
-
 
 /* =========================================================
    CALL CONTROLS
@@ -616,42 +460,26 @@
 .call-controls {
     height: 78px;
     min-height: 78px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 10px;
-
     padding: 12px 20px;
-
     background: #111827;
-
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-
-/* All control buttons */
-
 .call-controls button {
     height: 44px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
-
     border: 1px solid rgba(255, 255, 255, 0.1);
-
     background: #1e293b;
-
     color: #e2e8f0;
-
     border-radius: 9px;
-
     font-size: 13px;
-
     cursor: pointer;
-
     transition:
         background 0.2s ease,
         border-color 0.2s ease,
@@ -660,9 +488,7 @@
 
 .call-controls button:hover {
     background: #334155;
-
     border-color: rgba(255, 255, 255, 0.18);
-
     transform: translateY(-1px);
 }
 
@@ -670,71 +496,235 @@
     transform: scale(0.96);
 }
 
-
-/* Icon-only buttons */
-
 .call-controls button:not(.leave-button):not(.share-screen-button) {
     width: 44px;
 }
-
-
-/* Bootstrap icons */
 
 .call-controls button i {
     font-size: 16px;
 }
 
-
-/* Divider */
-
 .control-divider {
     width: 1px;
     height: 30px;
-
     margin: 0 4px;
-
     background: rgba(255, 255, 255, 0.12);
 }
 
-
-/* Share screen */
-
 .call-controls .share-screen-button {
     padding: 0 15px;
-
     gap: 7px;
 }
 
-
-/* Leave */
-
 .call-controls .leave-button {
     padding: 0 16px;
-
     gap: 7px;
-
     background: #dc2626;
-
     border-color: #dc2626;
-
     color: #ffffff;
-
     font-weight: 500;
 }
 
 .call-controls .leave-button:hover {
     background: #b91c1c;
-
     border-color: #b91c1c;
 }
 
+/* =========================================================
+   SCREEN SHARING
+========================================================= */
+
+.screen-sharing-active .remote-video-container {
+    width: 100%;
+    height: 100%;
+    background: #020617;
+}
+
+.shared-screen-video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #020617;
+}
+
+.screen-hidden,
+.camera-hidden {
+    display: none;
+}
+
+.screen-visible {
+    display: block;
+}
+
+.screen-sharing-label {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.9);
+    color: #f8fafc;
+    font-size: 12px;
+}
+
+/* Local camera during screen sharing */
+.screen-sharing-active .local-video-container {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    width: 200px;
+    height: 125px;
+    z-index: 8;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111827;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* =========================================================
+   HAND-RAISE INDICATOR
+========================================================= */
+
+.remote-hand-raised {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px solid #fbbf24;
+    border-radius: 20px;
+    color: #fbbf24;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.remote-hand-raised i {
+    font-size: 56px;
+}
+
+.remote-hand-raised span {
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.local-video-container .remote-hand-raised {
+    top: 8px;
+    right: 8px;
+    width: 76px;
+    height: 76px;
+    gap: 4px;
+    border-radius: 12px;
+}
+
+.local-video-container .remote-hand-raised i {
+    font-size: 32px;
+}
+
+.local-video-container .remote-hand-raised span {
+    font-size: 9px;
+}
+
+/* =========================================================
+   SESSION TIME-UP OVERLAY
+========================================================= */
+
+.session-time-up-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(10, 15, 25, 0.82);
+    backdrop-filter: blur(6px);
+    border-radius: 12px;
+}
+
+.session-time-up-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 32px 24px;
+    text-align: center;
+    color: #fff;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
+.session-time-up-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.session-time-up-card h2 {
+    margin-bottom: 12px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.session-time-up-card p {
+    margin: 0;
+    color: #cbd5e1;
+    line-height: 1.6;
+}
+
+.session-countdown {
+    padding: 8px 14px;
+    margin-bottom: 12px;
+    color: #fff;
+    background: #1e293b;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* =========================================================
+   BUTTON STATES
+========================================================= */
+
+.start-call-button {
+    width: auto !important;
+    padding: 0 16px !important;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: #16a34a !important;
+    border-color: #16a34a !important;
+    color: white !important;
+    font-weight: 500;
+}
+
+.start-call-button:hover {
+    background: #15803d !important;
+    border-color: #15803d !important;
+}
+
+.control-button.active-control {
+    background: #ffc107;
+    color: #212529;
+}
 
 /* =========================================================
    RESPONSIVE
 ========================================================= */
 
 @media (max-width: 1000px) {
-
     .video-call-main {
         grid-template-columns: minmax(0, 1fr) 250px;
     }
@@ -747,11 +737,15 @@
         width: 180px;
         height: 115px;
     }
+
+    .remote-camera-thumbnail {
+        right: 210px;
+        width: 180px;
+        height: 101px;
+    }
 }
 
-
 @media (max-width: 768px) {
-
     .video-call-page {
         height: 100dvh;
     }
@@ -770,15 +764,12 @@
 
     .video-call-main {
         display: block;
-
         overflow-y: auto;
     }
 
     .video-section {
         height: calc(100dvh - 142px);
-
         min-height: 400px;
-
         padding: 12px;
     }
 
@@ -789,17 +780,28 @@
     .local-video-container {
         width: 140px;
         height: 90px;
-
         right: 12px;
         bottom: 12px;
+    }
+
+    .screen-sharing-active .local-video-container {
+        width: 125px;
+        height: 82px;
+        right: 10px;
+        bottom: 10px;
+    }
+
+    .remote-camera-thumbnail {
+        width: 125px;
+        height: 70px;
+        right: 145px;
+        bottom: 10px;
     }
 
     .call-controls {
         height: 78px;
         min-height: 78px;
-
         gap: 7px;
-
         padding: 10px;
     }
 
@@ -810,7 +812,6 @@
     .call-controls button {
         width: 42px !important;
         height: 42px;
-
         padding: 0 !important;
     }
 
@@ -820,24 +821,16 @@
 
     .call-controls .leave-button {
         width: 46px !important;
-    }
-
-    .call-controls .leave-button i {
-        margin: 0;
-    }
-
-    .call-controls .leave-button {
         font-size: 0;
     }
 
     .call-controls .leave-button i {
+        margin: 0;
         font-size: 15px;
     }
 }
 
-
 @media (max-width: 480px) {
-
     .video-call-title h2 {
         font-size: 16px;
     }
@@ -848,7 +841,6 @@
 
     .connection-status {
         padding: 5px 9px;
-
         font-size: 10px;
     }
 
@@ -859,6 +851,12 @@
     .local-video-container {
         width: 115px;
         height: 75px;
+    }
+
+    .remote-camera-thumbnail {
+        width: 105px;
+        height: 59px;
+        right: 125px;
     }
 
     .call-controls {
@@ -873,136 +871,4 @@
     .call-controls button i {
         font-size: 14px;
     }
-    .start-call-button {
-    width: auto !important;
-    padding: 0 16px !important;
-
-    display: flex;
-    align-items: center;
-    gap: 7px;
-
-    background: #16a34a !important;
-    border-color: #16a34a !important;
-
-    color: white !important;
-    font-weight: 500;
-}
-
-.start-call-button:hover {
-    background: #15803d !important;
-    border-color: #15803d !important;
-}
-.control-button.active-control {
-    background: #ffc107;
-    color: #212529;
-}
-}   
-
-
-.video-grid {
-  position: relative;
-}
-
-.session-time-up-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(10, 15, 25, 0.82);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-}
-
-.session-time-up-card {
-  width: 100%;
-  max-width: 380px;
-  padding: 32px 24px;
-  text-align: center;
-  color: #fff;
-  background: #1e293b;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 18px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
-}
-
-.session-time-up-icon {
-  font-size: 42px;
-  margin-bottom: 12px;
-}
-
-.session-time-up-card h2 {
-  margin-bottom: 12px;
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.session-time-up-card p {
-  margin: 0;
-  color: #cbd5e1;
-  line-height: 1.6;
-}
-
-.session-countdown {
-  padding: 8px 14px;
-  margin-bottom: 12px;
-  color: #fff;
-  background: #1e293b;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-}
-
-.remote-hand-raised {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 10;
-
-    width: 120px;
-    height: 120px;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-
-    background: rgba(15, 23, 42, 0.9);
-    border: 2px solid #fbbf24;
-    border-radius: 20px;
-
-    color: #fbbf24;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-}
-
-.remote-hand-raised i {
-    font-size: 56px;
-}
-
-.remote-hand-raised span {
-    color: white;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-/* Smaller indicator in your own video preview */
-.local-video-container .remote-hand-raised {
-    top: 8px;
-    right: 8px;
-    width: 76px;
-    height: 76px;
-    gap: 4px;
-    border-radius: 12px;
-}
-
-.local-video-container .remote-hand-raised i {
-    font-size: 32px;
-}
-
-.local-video-container .remote-hand-raised span {
-    font-size: 9px;
 }
