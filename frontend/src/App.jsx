@@ -83,6 +83,7 @@ import EditBadge from './components/admin/badge_mgmt/EditBadge'
 import AdminMentorProfile from './pages/admin/mentor_profile/AdminMentorProfile'
 import AdminUserProfile from './pages/admin/user_profile/AdminUserProfile'
 import PublicUserProfile from './pages/user/user_profile/PublicUserProfile'
+import ProtectedVideoCallRoute from './ProtectedVideoCallRoute'
 
 function App(){
   return (
@@ -118,6 +119,14 @@ function App(){
         <Route path='/verify-email/' element={
           <VerifyEmail/>
         }/>
+        <Route
+  path="/video-call/:roomName/:conversationId"
+  element={
+    <ProtectedVideoCallRoute>
+      <VideoCallPage />
+    </ProtectedVideoCallRoute>
+  }
+/>
         <Route path='/skills/want/' element={
           <ProtectedRoute>
             <SkillsWant/>
@@ -242,11 +251,6 @@ function App(){
         <Route path='/courses/:courseId/assessment' element={
           <ProtectedRoute>
             <AIAssessment/>
-          </ProtectedRoute>
-        }/>
-        <Route path='/video-call/:roomName/:conversationId' element={
-          <ProtectedRoute>
-            <VideoCallPage/>
           </ProtectedRoute>
         }/>
         <Route path='/courses/:courseId/assessment/:assessmentId/result' element={

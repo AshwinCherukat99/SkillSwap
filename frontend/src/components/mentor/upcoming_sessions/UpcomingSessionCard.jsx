@@ -31,7 +31,7 @@ const UpcomingSessionCard=({session,onCancel})=>{
             )
             return 
         }
-        const roomName=`session-${session.id}`
+        const roomName=`course-session-${session.id}`
         navigate(`/video-call/${roomName}/${session.conversation_id}`)
     }
     const formattedDate = date.toLocaleDateString('en-US', {

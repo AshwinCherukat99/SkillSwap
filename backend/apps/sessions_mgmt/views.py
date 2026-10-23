@@ -387,9 +387,13 @@ class MentorUpcomingSessionsView(APIView):
             CourseSession.objects.filter(
                 mentor=mentor,
                 status=CourseSession.Status.SCHEDULED,
-                scheduled_start__gte=now,
             ).select_related('enrollment','enrollment__user','enrollment__course',)
         )
+        sessions=[
+            session for session in sessions
+            if session.scheduled_start
+            +timedelta(minutes=session.duration_minutes)>now
+        ]
         if search:
             sessions=sessions.filter(
                 Q(
@@ -405,7 +409,7 @@ class MentorUpcomingSessionsView(APIView):
                 )
                 |
                 Q(
-                    enrollment_user__last_name__icontains=search
+                    enrollment__user__last_name__icontains=search
                 )
             )
         if date_filter=='THIS WEEK':
@@ -427,16 +431,17 @@ class MentorUpcomingSessionsView(APIView):
                 scheduled_start__month=today.month
             )
         if sort=='LATEST':
-            sessions=sessions.order_by(
-                '-scheduled_start'
+            sessions.sort(
+                key=lambda session:session.scheduled_start,
+                reverse=True
             )
         elif sort=='TOPIC':
-            sessions=sessions.order_by(
-                'enrollment__course__title'
+            sessions.sort(
+                key=lambda session:session.enrollment.course.title.lower()
             )
         else:
-            sessions=sessions.order_by(
-                'scheduled_start'
+            sessions.sort(
+                key=lambda session:session.scheduled_start
             )
         serializer=MentorUpcomingSessionSerializer(
             sessions,
@@ -446,6 +451,7 @@ class MentorUpcomingSessionsView(APIView):
             mentor=mentor
         )  
         completed_sessions=CourseSession.objects.filter(
+            mentor=mentor,
             status=CourseSession.Status.COMPLETED
         )
         total_minutes=sum(
