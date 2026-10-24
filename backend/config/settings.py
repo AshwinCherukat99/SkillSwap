@@ -35,7 +35,15 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG",cast=bool)
 
-ALLOWED_HOSTS = [".trycloudflare.com","localhost","127.0.0.1",]
+ALLOWED_HOSTS = config(
+    "ALLOWED_HOSTS",
+    default="localhost,127.0.0.1,.trycloudflare.com",
+    cast=lambda value: [
+        host.strip()
+        for host in value.split(",")
+        if host.strip()
+    ],
+)
 
 
 # Application definition
@@ -69,11 +77,18 @@ INSTALLED_APPS = [
 
 ASGI_APPLICATION='config.asgi.application'
 
-CHANNEL_LAYERS={
-    'default':{
-        'BACKEND':
-        'channels.layers.InMemoryChannelLayer'
-    }
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                config(
+                    "REDIS_URL",
+                    default="redis://redis:6379/0",
+                )
+            ],
+        },
+    },
 }
 
 MIDDLEWARE = [
@@ -120,7 +135,7 @@ DATABASES = {
         "NAME": config("DB_NAME"),
         "USER": config("DB_USER"),
         "PASSWORD": config("DB_PASSWORD"),
-        "HOST": 'localhost',
+        "HOST": config('DB_HOST',default='localhost'),
         "PORT": config("DB_PORT"),
     }
 }
@@ -234,9 +249,8 @@ PLATFORM_FEE_PERCENT = Decimal(
 
 X_FRAME_OPTIONS='ALLOWALL'
 
-CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:6379/0"
-
+CELERY_BROKER_URL = config("CELERY_BROKER_URL",default='redis://redis:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND',default="redis://redis:6379/0")
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"

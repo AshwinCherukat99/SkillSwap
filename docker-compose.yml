@@ -17,7 +17,7 @@ services:
     env_file: 
       - ./backend/.env
     container_name: skillswap-backend
-    command: python manage.py runserver 0.0.0.0:8000
+    command: daphne -b 0.0.0.0 -p 8000 config.asgi:application
     volumes:
       - ./backend:/app
     ports:
@@ -51,6 +51,16 @@ services:
     command: 'celery -A config worker --loglevel=info'
     volumes: 
       - './backend:/app'
+    depends_on:
+      - redis
+      - postgres
+  celery-beat:
+    build: ./backend
+    command: celery -A config beat --loglevel=info
+    volumes: 
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
     depends_on:
       - redis
       - postgres
