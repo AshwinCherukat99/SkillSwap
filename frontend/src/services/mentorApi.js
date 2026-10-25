@@ -1,23 +1,25 @@
-import axios from 'axios'
 
-const mentorApi=axios.create({
-    baseURL:"http://127.0.0.1:8000/api",
-    headers:{
-        "Content-Type":"application/json",
-    },
-})
+import axios from "axios";
+import { API_BASE_URL } from "../config";
+
+const mentorApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 mentorApi.interceptors.request.use(
-    (config)=>{
-        const accessToken=localStorage.getItem('mentor_access_token')
-        if (accessToken){
-            config.headers.Authorization=`Bearer ${accessToken}`
-        }
-        return config
-    },
-    (error)=>{
-        return Promise.reject(error)
-    }
-)
+  (config) => {
+    const accessToken = localStorage.getItem("mentor_access_token");
 
-export default mentorApi
+    if (accessToken) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+export default mentorApi;
