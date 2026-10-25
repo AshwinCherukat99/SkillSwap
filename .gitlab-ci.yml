@@ -38,10 +38,10 @@ backend_check:
   stage: test
   image: python:3.13
   services: 
-    -name: postgres:17
-    alias: postgres
-    -name: redis:7
-    alias: redis
+    - name: postgres:17
+      alias: postgres
+    - name: redis:7
+      alias: redis
   variables:
     POSTGRES_DB: skillswap_ci
     POSTGRES_USER: skillswap_ci
