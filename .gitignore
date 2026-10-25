@@ -1,3 +1,5 @@
 .env
 *.dump
 *.sql
+frontend/.env
+backend/.env
