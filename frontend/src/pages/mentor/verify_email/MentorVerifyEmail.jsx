@@ -3,6 +3,8 @@ import { useSearchParams, useNavigate, Link } from "react-router-dom";
 
 import "./MentorVerifyEmail.css";
 
+import { API_BASE_URL } from "../../../config";
+
 function MentorVerifyEmail() {
     const navigate = useNavigate();
 
@@ -171,9 +173,9 @@ function MentorVerifyEmail() {
         let endpoint
 
         if (purpose==='password-reset'){
-            endpoint="http://127.0.0.1:8000/api/mentors/verify-reset-otp/"
+            endpoint=`${API_BASE_URL}/mentors/verify-reset-otp/`
         }else{
-            endpoint="http://127.0.0.1:8000/api/mentors/verify-email/"
+            endpoint=`${API_BASE_URL}/mentors/verify-email/`
         }
 
         const response = await fetch(
@@ -285,7 +287,7 @@ function MentorVerifyEmail() {
         setLoading(true);
 
         const response = await fetch(
-            "http://127.0.0.1:8000/api/mentors/resend-otp/",
+            `${API_BASE_URL}/mentors/resend-otp/`,
             {
                 method: "POST",
                 headers: {

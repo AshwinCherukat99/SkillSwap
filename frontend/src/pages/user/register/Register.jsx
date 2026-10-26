@@ -4,6 +4,8 @@ import { GoogleLogin } from "@react-oauth/google";
 
 import "./Register.css";
 
+import { API_BASE_URL } from "../../../config";
+
 function Register() {
     const navigate = useNavigate();
 
@@ -24,7 +26,7 @@ const [phoneNumber, setPhoneNumber] = useState("");
 const handleGoogleRegister = async (credentialResponse) => {
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/auth/google/",
+            `${API_BASE_URL}/auth/google/`,
             {
                 method: "POST",
                 headers: {
@@ -156,7 +158,7 @@ const handleSubmit = async (e) => {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/auth/register/",
+            `${API_BASE_URL}/auth/register/`,
             {
                 method: "POST",
 

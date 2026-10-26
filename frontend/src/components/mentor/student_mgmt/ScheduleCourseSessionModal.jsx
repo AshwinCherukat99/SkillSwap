@@ -1,6 +1,8 @@
 import React,{useEffect,useState,useMemo, use} from 'react'
 import mentorApi from '../../../services/mentorApi'
 
+import { BACKEND_ORIGIN } from '../../../config'
+
 const DURATION_OPTIONS=[
     {value:15,label:'15 minutes'},
     {value:30,label:'30 minutes'},
@@ -235,7 +237,7 @@ const ScheduleCourseSessionModal=({
                             src={
                               student.profile_image.startsWith("http")
                                 ? student.profile_image
-                                : `http://127.0.0.1:8000${student.profile_image}`
+                                : `${BACKEND_ORIGIN}${student.profile_image}`
                             }
                             alt={student.full_name}
                             className="rounded-circle"

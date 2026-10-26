@@ -1,6 +1,8 @@
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 
+import { WS_BASE_URL } from '../config';
+
 const useWebRTC = (roomName, conversationId, accessToken) => {
   const remoteCameraThumbnailRef = useRef(null);
   const screenSenderRef = useRef(null);
@@ -374,7 +376,7 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
         }
 
         const wsBaseUrl =
-          import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
+          WS_BASE_URL
 
         const wsUrl =
           `${wsBaseUrl}/ws/video/${roomName}/${conversationId}/` +

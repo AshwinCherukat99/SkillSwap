@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import "./MentorForgotPassword.css";
+import "./MentorForgotPassword.css"; 
+
+import { API_BASE_URL } from "../../../config";
 
 function MentorForgotPassword() {
     const navigate = useNavigate();
@@ -25,7 +27,7 @@ function MentorForgotPassword() {
             setLoading(true);
 
             const response = await fetch(
-            "http://127.0.0.1:8000/api/mentors/forgot-password/",
+            `${API_BASE_URL}/mentors/forgot-password/`,
             {
                 method: "POST",
                 headers: {

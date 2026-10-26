@@ -4,6 +4,8 @@ import { GoogleLogin } from "@react-oauth/google";
 
 import "./MentorLogin.css";
 
+import { API_BASE_URL } from "../../../config";
+
 function MentorLogin() {
     const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ function MentorLogin() {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/mentors/login/",
+            `${API_BASE_URL}/mentors/login/`,
             {
                 method: "POST",
                 headers: {
@@ -99,7 +101,7 @@ function MentorLogin() {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/mentors/google-login/",
+            `${API_BASE_URL}/mentors/google-login/`,
             {
                 method: "POST",
                 headers: {

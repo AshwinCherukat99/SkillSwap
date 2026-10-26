@@ -1,3 +1,5 @@
+import { BACKEND_ORIGIN } from "../../../config"
+
 function LeaderBoardTable({users,currentUserId,navigate}){
     return (
         <div className="card border-0 shadow-sm">
@@ -76,7 +78,7 @@ function LeaderBoardTable({users,currentUserId,navigate}){
                                                         user.profile_image
             ? user.profile_image.startsWith("http")
                 ? user.profile_image
-                : `http://127.0.0.1:8000${user.profile_image}`
+                : `${BACKEND_ORIGIN}${user.profile_image}`
             : "/default-avatar.png"
                                                     }
                                                     alt={

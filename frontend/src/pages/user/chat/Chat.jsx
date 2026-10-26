@@ -4,6 +4,8 @@ import api from "../../../services/api";
 
 import './Chat.css'
 
+import { WS_BASE_URL } from "../../../config";
+
 import GroupChatHeader from "../../../components/user/chat/GroupChatHeader";
 import MessageList from "../../../components/user/chat/MessageList";
 import MessageInput from "../../../components/user/chat/MessageInput";
@@ -89,10 +91,7 @@ console.log(
             setConnected(false)
             return
         }
-        const wsProtocol=window.location.protocol==='https:'?'wss':'ws'
-        const wsHost='127.0.0.1:8000'
-        const wsUrl=`${wsProtocol}://${wsHost}` +
-            `/ws/chat/${conversationId}/` +
+        const wsUrl=`${WS_BASE_URL}/ws/chat/${conversationId}/` +
             `?token=${encodeURIComponent(
                 accessToken
             )}`

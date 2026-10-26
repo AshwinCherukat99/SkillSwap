@@ -6,6 +6,8 @@ import ChatWindow from '../../../components/mentor/group_chat/ChatWindow'
 import MembersPanel from '../../../components/mentor/group_chat/MembersPanel'
 import ResourcesPanel from '../../../components/mentor/group_chat/ResourcesPanel'
 
+import { WS_BASE_URL } from '../../../config'
+
 import './MentorGroupChat.css' 
 
 const MentorGroupChat=()=>{
@@ -75,7 +77,7 @@ const MentorGroupChat=()=>{
             console.error('no access token found')
             return
         }
-        const wsUrl=`ws://127.0.0.1:8000/ws/chat/`+`${conversationId}/?token=${accessToken}`
+        const wsUrl=`${WS_BASE_URL}/ws/chat/`+`${conversationId}/?token=${encodeURIComponent(accessToken)}`
         const socket=new WebSocket(wsUrl)
         socketRef.current=socket 
         socket.onopen=()=>{

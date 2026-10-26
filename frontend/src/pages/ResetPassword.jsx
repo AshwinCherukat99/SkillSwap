@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation, useSearchParams } from "react-router-do
 
 import "./ResetPassword.css";
 
+import { API_BASE_URL } from "../config";
+
 function ResetPassword() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -73,7 +75,7 @@ function ResetPassword() {
         }
         setLoading(true)
         try{
-            const response=await fetch("http://127.0.0.1:8000/api/auth/reset-password/",
+            const response=await fetch(`${API_BASE_URL}/auth/reset-password/`,
                 {
                     method:"POST",
                     headers:{

@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import './edit_profile.css'
 
-const API_BASE_URL=import.meta.env.VITE_API_BASE_URL||"http://127.0.0.1:8000"
+import { API_BASE_URL } from '../../../config'
 
 function EditProfile(){
     const navigate=useNavigate()
@@ -48,7 +48,7 @@ function EditProfile(){
         try{
             setLoading(true)
             const response=await fetch(
-                `${API_BASE_URL}/api/auth/profile/`,
+                `${API_BASE_URL}/auth/profile/`,
                 {
                     method:'GET',
                     headers:{
@@ -131,7 +131,7 @@ function EditProfile(){
     }
     const updateProfileDetails=async (accessToken)=>{
         const response=await fetch(
-            `${API_BASE_URL}/api/auth/profile/`,
+            `${API_BASE_URL}/auth/profile/`,
             {
                 method:'PATCH',
                 headers:{
@@ -166,7 +166,7 @@ function EditProfile(){
         const formData=new FormData()
         formData.append('profile_image',selectedImage)
         const response=await fetch(
-            `${API_BASE_URL}/api/auth/profile/image/`,
+            `${API_BASE_URL}/auth/profile/image/`,
             {
                 method:'PUT',
                 headers:{

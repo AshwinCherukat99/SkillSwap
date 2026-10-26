@@ -1,11 +1,13 @@
 import { useCallback, useState, useEffect, useRef } from 'react';
 
+import { WS_BASE_URL } from '../config';
+
 const useChatSocket = (
     conversationId,
     onMessage,
     tokenKey = 'access_token'
 ) => {
-    const wsBaseUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
+    const wsBaseUrl = WS_BASE_URL
     const socketRef = useRef(null);
     const onMessageRef = useRef(onMessage);
     const [connected, setConnected] = useState(false);

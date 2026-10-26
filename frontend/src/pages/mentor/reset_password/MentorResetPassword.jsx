@@ -3,6 +3,8 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 
 import "./MentorResetPassword.css";
 
+import { API_BASE_URL } from "../../../config";
+
 function MentorResetPassword() {
     const navigate = useNavigate();
     const [searchParams]=useSearchParams()
@@ -109,7 +111,7 @@ function MentorResetPassword() {
             setLoading(true);
 
             const response = await fetch(
-            "http://127.0.0.1:8000/api/mentors/reset-password/",
+            `${API_BASE_URL}/mentors/reset-password/`,
             {
                 method: "POST",
                 headers: {

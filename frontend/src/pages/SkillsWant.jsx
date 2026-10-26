@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./SkillsWant.css";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+import { API_BASE_URL } from "../config";
 
 function SkillsWant() {
     const navigate = useNavigate();
@@ -29,7 +29,7 @@ function SkillsWant() {
                 throw new Error('you are not authenticated')
             }
             const response = await fetch(
-                "http://127.0.0.1:8000/api/skills/",
+                `${API_BASE_URL}/skills/`,
                 {
                     method: "GET",
                     headers: {
@@ -129,7 +129,7 @@ const toggleSkill = (skillId) => {
         }
         for (const skillId of selectedSkills) {
             const response = await fetch(
-                `${API_BASE_URL}/api/skills/want/`,
+                `${API_BASE_URL}/skills/want/`,
                 {
                     method: "POST",
                     headers: {

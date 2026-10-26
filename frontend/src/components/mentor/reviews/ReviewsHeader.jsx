@@ -1,5 +1,7 @@
+import { BACKEND_ORIGIN } from "../../../config"
+
 const ReviewsHeader=({mentor})=>{
-    const profileImage=mentor?.profile_image?mentor.profile_image.startsWith('http')?mentor.profile_image:`http://127.0.0.1:8000${mentor.profile_image}`:null
+    const profileImage=mentor?.profile_image?mentor.profile_image.startsWith('http')?mentor.profile_image:`${BACKEND_ORIGIN}${mentor.profile_image}`:null
     const getInitials=()=>{
         const name=mentor?.full_name||'Mentor'
         return name.split(" ").map((word)=>word[0]).join("").slice(0,2).toUpperCase()

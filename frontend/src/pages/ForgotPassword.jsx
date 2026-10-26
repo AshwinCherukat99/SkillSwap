@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import "./ForgotPassword.css";
 
+import { API_BASE_URL } from "../config";
+
 function ForgotPassword() {
     const navigate = useNavigate();
 
@@ -18,7 +20,7 @@ function ForgotPassword() {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/auth/forgot-password/",
+            `${API_BASE_URL}/auth/forgot-password/`,
             {
                 method: "POST",
                 headers: {

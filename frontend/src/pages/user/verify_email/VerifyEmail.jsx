@@ -5,6 +5,8 @@ import {login} from '../../../store/slices/authSlice'
 
 import "./VerifyEmail.css";
 
+import { API_BASE_URL } from "../../../config";
+
 function VerifyEmail() {
     const dispatch=useDispatch()
     const navigate = useNavigate();
@@ -158,9 +160,9 @@ const handleVerify = async (e) => {
         setLoading(true);
         let endpoint
         if (purpose=='password-reset'){
-            endpoint="http://127.0.0.1:8000/api/auth/verify-reset-otp/";
+            endpoint=`${API_BASE_URL}/auth/verify-reset-otp/`;
         }else{
-            endpoint="http://127.0.0.1:8000/api/auth/verify-otp/";
+            endpoint=`${API_BASE_URL}/auth/verify-otp/`;
         }
         const response = await fetch(
             endpoint,
@@ -246,10 +248,10 @@ const handleVerify = async (e) => {
             let endpoint
             if (purpose=='password-reset'){
                 endpoint =
-                "http://127.0.0.1:8000/api/auth/resend-reset-otp/"
+                `${API_BASE_URL}/auth/resend-reset-otp/`
             }else{
                 endpoint =
-                "http://127.0.0.1:8000/api/auth/resend-otp/";
+                `${API_BASE_URL}/auth/resend-otp/`;
             }
             const response=await fetch(
                 endpoint,

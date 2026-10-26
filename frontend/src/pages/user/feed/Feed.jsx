@@ -5,6 +5,8 @@ import { updateUser } from '../../../store/slices/authSlice'
 
 import useRealtimeNotifications from '../../../hooks/useRealTimeNotifications'
 
+import { BACKEND_ORIGIN } from '../../../config'
+
 import {logout} from '../../../store/slices/authSlice'
 import api from '../../../services/api'
 
@@ -28,7 +30,7 @@ function Feed(){
     const profileImage = user?.profile_image
     ? user.profile_image.startsWith("http")
         ? user.profile_image
-        : `http://127.0.0.1:8000${user.profile_image}`
+        : `${BACKEND_ORIGIN}${user.profile_image}`
     : "/default-avatar.png";
     const handlePostEdit=(post)=>{
         setEditingPost(post)

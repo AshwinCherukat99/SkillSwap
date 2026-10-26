@@ -1,6 +1,8 @@
 import {useEffect} from 'react' 
 import {toast} from 'react-toastify'
 
+import { WS_BASE_URL } from '../config'
+
 const useRealtimeNotifications=(tokenKey='access_token')=>{
     console.log('notification hook rendered:',tokenKey)
     useEffect(()=>{
@@ -12,7 +14,7 @@ const useRealtimeNotifications=(tokenKey='access_token')=>{
             console.log('no token found for notifications')
             return
         }
-        const wsBaseUrl=import.meta.env.VITE_WS_URL||'ws://localhost:8000'
+        const wsBaseUrl=WS_BASE_URL
         console.log('connecting to notification websocket:',wsBaseUrl)
         const socket=new WebSocket(
             `${wsBaseUrl}/ws/notifications/?token=${encodeURIComponent(token)}`

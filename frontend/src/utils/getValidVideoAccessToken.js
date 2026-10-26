@@ -1,4 +1,4 @@
-const API_BASE_URL=import.meta.env.VITE_API_URL||'http://localhost:8000'
+import {API_BASE_URL} from '../config'
 
 const getAccountType=(token)=>{
     if (!token) return null
@@ -53,7 +53,7 @@ async function getValidVideoAccessToken(){
     if (!refreshToken){
         throw new Error('your session has expired. please log in again.')
     }
-    const response=await fetch(`${API_BASE_URL}/api/auth/token/refresh/`,{
+    const response=await fetch(`${API_BASE_URL}/auth/token/refresh/`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({refresh:refreshToken})

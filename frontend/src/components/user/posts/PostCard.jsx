@@ -5,6 +5,8 @@ import api from "../../../services/api";
 
 import ReportModal from "../../../pages/report_modal/ReportModal";
 
+import { BACKEND_ORIGIN } from "../../../config";
+
 function PostCard({
     post,
     currentUser,
@@ -31,7 +33,7 @@ function PostCard({
             return image;
         }
 
-        return `http://127.0.0.1:8000${image}`;
+        return `${BACKEND_ORIGIN}${image}`;
     };
 
     const formatDate = (date) => {

@@ -6,7 +6,7 @@ import {login} from '../../../store/slices/authSlice'
 
 import "./Login.css";
 
-const API_BASE_URL = "http://127.0.0.1:8000";
+import {API_BASE_URL} from '../../../config'
 
 function Login() {
     const dispatch=useDispatch()
@@ -94,7 +94,7 @@ function Login() {
 
     try {
         const response = await fetch(
-            `${API_BASE_URL}/api/auth/google/`,
+            `${API_BASE_URL}/auth/google/`,
             {
                 method: "POST",
                 headers: {

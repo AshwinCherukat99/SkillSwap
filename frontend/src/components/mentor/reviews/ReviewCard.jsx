@@ -3,12 +3,14 @@ import {useState,useCallback,useEffect} from 'react'
 import ReportModal from '../../../pages/report_modal/ReportModal'
 import mentorApi from '../../../services/mentorApi'
 
+import { BACKEND_ORIGIN } from '../../../config'
+
 const ReviewCard=({review,onReply,replyLoading})=>{
     const [reportTarget,setReportTarget]=useState(null)
     const [reportToast,setReportToast]=useState('')
     const [message,setMessage]=useState("")
     const [expanded,setExpanded]=useState(false)
-    const profileImage=review?.reviewer_image?review.reviewer_image.startsWith('http')?review.reviewer_image:`http://127.0.0.1:8000${review.reviewer_image}`:null
+    const profileImage=review?.reviewer_image?review.reviewer_image.startsWith('http')?review.reviewer_image:`${BACKEND_ORIGIN}${review.reviewer_image}`:null
     const person=review.reviewer
     const handleCloseReport=useCallback(()=>{
         setReportTarget(null)

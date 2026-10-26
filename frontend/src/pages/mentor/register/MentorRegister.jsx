@@ -3,7 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import "./MentorRegister.css";
 
-const API_BASE_URL="http://127.0.0.1:8000"
+import { API_BASE_URL } from "../../../config";
 
 function MentorRegister() {
     const navigate = useNavigate();
@@ -299,7 +299,7 @@ function MentorRegister() {
 );
 
         const response = await fetch(
-            `${API_BASE_URL}/api/mentors/register/`,
+            `${API_BASE_URL}/mentors/register/`,
             {
                 method: "POST",
                 body: formDataToSend,

@@ -1,6 +1,8 @@
 
 import React from "react";
 
+import { BACKEND_ORIGIN } from "../../../config";
+
 const MessageBubble = ({ message, currentUserId }) => {
     const sender = message.sender;
     const senderId = sender?.id;
@@ -67,7 +69,7 @@ const MessageBubble = ({ message, currentUserId }) => {
                                     <a
                                         href={fileUrl.startsWith("http")
                                             ? fileUrl
-                                            : `http://127.0.0.1:8000${fileUrl}`}
+                                            : `${BACKEND_ORIGIN}${fileUrl}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                     >

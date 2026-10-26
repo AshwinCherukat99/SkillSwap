@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import './Skills_Offer.css'
 
-const API_BASE_URL="http://127.0.0.1:8000"
+import { API_BASE_URL } from '../../../config'
 
 function Skills_Offer(){
     const navigate=useNavigate()

@@ -1,3 +1,5 @@
+import { BACKEND_ORIGIN } from "../../../config"
+
 function LeaderBoardPodium({users}){
     if (!users.length){
         return null
@@ -27,7 +29,7 @@ function LeaderBoardPodium({users}){
                                     second.profile_image
             ? second.profile_image.startsWith("http")
                 ? second.profile_image
-                : `http://127.0.0.1:8000${second.profile_image}`
+                : `${BACKEND_ORIGIN}${second.profile_image}`
             : "/default-avatar.png"
                                 }
                                 alt={second.full_name}
@@ -67,7 +69,7 @@ function LeaderBoardPodium({users}){
                                     first.profile_image
             ? first.profile_image.startsWith("http")
                 ? first.profile_image
-                : `http://127.0.0.1:8000${first.profile_image}`
+                : `${BACKEND_ORIGIN}${first.profile_image}`
             : "/default-avatar.png"
                                 }
                                 alt={first.full_name}
@@ -111,7 +113,7 @@ function LeaderBoardPodium({users}){
                                     third.profile_image
             ? third.profile_image.startsWith("http")
                 ? third.profile_image
-                : `http://127.0.0.1:8000${third.profile_image}`
+                : `${BACKEND_ORIGIN}${third.profile_image}`
             : "/default-avatar.png"
                                 }
                                 alt={third.full_name}

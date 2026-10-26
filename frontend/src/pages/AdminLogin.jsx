@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import "./AdminLogin.css";
 
+import { API_BASE_URL } from "../config";
+
 function AdminLogin() {
     const navigate = useNavigate();
 
@@ -23,7 +25,7 @@ function AdminLogin() {
 
     try {
         const response = await fetch(
-            "http://127.0.0.1:8000/api/admin/login/",
+            `${API_BASE_URL}/admin/login/`,
             {
                 method: "POST",
                 headers: {

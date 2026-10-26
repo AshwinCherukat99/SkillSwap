@@ -2,6 +2,8 @@ import React,{useState,useRef} from 'react'
 
 import {ZoomIn,ZoomOut,RotateCw,Maximize,FileText} from 'lucide-react'
 
+import { BACKEND_ORIGIN } from '../../../config'
+
 const DocumentViewer=({document:documentData})=>{
     const [zoom,setZoom]=useState(100)
     const [rotation,setRotate]=useState(0)
@@ -23,7 +25,7 @@ const DocumentViewer=({document:documentData})=>{
             </section>
         )
     }
-    const documentUrl=documentData.document?documentData.document.startsWith('http')?documentData.document:`http://127.0.0.1:8000${documentData.document}`:documentData.external_url
+    const documentUrl=documentData.document?documentData.document.startsWith('http')?documentData.document:`${BACKEND_ORIGIN}${documentData.document}`:documentData.external_url
     console.log('document url:',documentUrl)
     const handleZoomIn=()=>{
         setZoom((current)=>

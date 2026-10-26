@@ -1,3 +1,5 @@
+import { BACKEND_ORIGIN } from "../../../config"
+
 function MentorProfileHeader({
     mentor,
     onRequestSession
@@ -9,7 +11,7 @@ function MentorProfileHeader({
         if (image.startsWith('http')){
             return image
         }
-        return `http://127.0.0.1:8000${image}`
+        return `${BACKEND_ORIGIN}${image}`
     }
     return (
         <section className="container">
