@@ -248,13 +248,6 @@ EMAIL_USE_TLS=config('EMAIL_USE_TLS',cast=bool)
 
 DEFAULT_FROM_EMAIL=config('DEFAULT_FROM_EMAIL')
 
-CACHES={
-    "default":{
-        "BACKEND":"django.core.cache.backends.locmem.LocMemCache",
-        "Location":"skillswap-registration-cache"
-    }
-}
-
 GOOGLE_CLIENT_ID=config('GOOGLE_CLIENT_ID')
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID")
