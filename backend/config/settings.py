@@ -162,7 +162,10 @@ DATABASES = {
 CACHES={
     "default":{
         "BACKEND":"django_redis.cache.RedisCache",
-        "LOCATION":"redis://redis:6379/1",
+        "LOCATION":config(
+            "CACHE_REDIS_URL",
+            default="redis://redis:6379/1",
+        ),
         "OPTIONS":{
             "CLIENT_CLASS":"django_redis.client.DefaultClient"
         }
@@ -229,7 +232,7 @@ SIMPLE_JWT={
 
 MEDIA_URL='/media/'
 
-MEDIA_ROOT=os.path.join('BASE_DIR','media')
+MEDIA_ROOT=BASE_DIR/'media'
 
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
 
