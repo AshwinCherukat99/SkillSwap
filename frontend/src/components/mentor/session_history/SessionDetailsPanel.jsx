@@ -44,7 +44,7 @@ const SessionDetailsPanel=({
             : '-'
 
     const studentName=session.person_name||'student'
-    const initails=studentName.split(' ').map(word=>word.charAt(0)).slice(0,2).join('').toUpperCase()
+    const initials=studentName.split(' ').map(word=>word.charAt(0)).slice(0,2).join('').toUpperCase()
     return (
         <div
             className="session-details-overlay"

@@ -3,6 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import './edit_profile.css'
 
+import { API_BASE_URL } from '../../../config'
 import { BACKEND_ORIGIN } from '../../../config'
 
 function EditProfile(){
@@ -31,8 +32,8 @@ function EditProfile(){
         if (!image){
             return null
         }
-        if (/^https?:\/\//i.test(url)) {
-        return url;
+        if (/^https?:\/\//i.test(image)) {
+        return image;
     }
         return `${BACKEND_ORIGIN}${image.startsWith("/")?"":"/"}${image}`
     }

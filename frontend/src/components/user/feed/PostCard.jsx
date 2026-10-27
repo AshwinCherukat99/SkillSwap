@@ -16,10 +16,11 @@ function PostCard({post,currentUser,onPostDeleted}){
         console.log("LIKE CLICKED");
     console.log("POST ID:", post.id);
     console.log("CURRENT LIKED:", liked);
+        let response
         try{
             if (liked){
                 console.log("SENDING DELETE");
-                const response=await api.delete(
+                response=await api.delete(
                     `/posts/${post.id}/like/`
                 )
                 setLiked(false)
@@ -28,7 +29,7 @@ function PostCard({post,currentUser,onPostDeleted}){
                 )
             }else{
                 console.log("SENDING POST");
-                const response=await api.post(
+                response=await api.post(
                     `/posts/${post.id}/like/`
                 )
                 setLiked(true)

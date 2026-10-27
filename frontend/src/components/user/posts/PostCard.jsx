@@ -75,9 +75,10 @@ const handleLike=async ()=>{
     console.log("POST ID:", post.id);
     console.log("CURRENT LIKED:", liked);
         try{
+            let response
             if (liked){
                 console.log("SENDING DELETE");
-                const response=await api.delete(
+                response=await api.delete(
                     `/posts/${post.id}/like/`
                 )
                 setLiked(false)
@@ -86,7 +87,7 @@ const handleLike=async ()=>{
                 )
             }else{
                 console.log("SENDING POST");
-                const response=await api.post(
+                response=await api.post(
                     `/posts/${post.id}/like/`
                 )
                 setLiked(true)

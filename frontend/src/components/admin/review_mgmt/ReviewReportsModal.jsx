@@ -24,7 +24,7 @@ const ReviewReportsModal=({review,onClose})=>{
     useEffect(()=>{
         fetchReports()
     },[review.id])
-    const UpdateReport=async (
+    const updateReport=async (
         reportId,
         newStatus
     )=>{

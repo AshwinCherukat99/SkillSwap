@@ -3,7 +3,7 @@ import {useNavigate,Link} from 'react-router-dom'
 import {useDispatch,useSelector} from 'react-redux'
 import { updateUser } from '../../../store/slices/authSlice'
 
-import useRealtimeNotifications from '../../../hooks/useRealTimeNotifications'
+import useRealtimeNotifications from '../../../hooks/useRealtimeNotifications'
 
 import { BACKEND_ORIGIN } from '../../../config'
 

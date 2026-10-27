@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import api from '../../../services/api'
 
-function CertificateCard({certificate,isSelected=False}){
+function CertificateCard({certificate,isSelected=false}){
     const navigate=useNavigate()
     const [downloading,setDownloading]=useState(false)
     const cardRef=useRef(null)

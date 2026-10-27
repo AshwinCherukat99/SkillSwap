@@ -3,7 +3,7 @@ import React,{useEffect,useRef} from "react";
 const ReviewActionMenu=({
     review,
     onHide,
-    onReveal,
+    onRestore,
     onDelete,
     onViewReports
 })=>{

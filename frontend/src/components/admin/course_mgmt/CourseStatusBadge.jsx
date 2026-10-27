@@ -10,10 +10,6 @@ const CourseStatusBadge=({status})=>{
             label:'Pending Review',
             className:'bg-subtle-warning text-warning',
         },
-        DRAFT:{
-            label:'Draft',
-            className:'bg-secondary-subtle text-secondary'
-        },
         PUBLISHED:{
             label:'Published',
             className:'bg-success-subtle text-success'

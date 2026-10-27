@@ -63,8 +63,14 @@ const handleGoogleRegister = async (credentialResponse) => {
                 data.refresh
             );
         }
-
-        navigate("/feed/");
+        if (data.has_skills){
+            console.log('navigating to feed')
+            navigate("/feed/");
+        }
+        else{
+            console.log('navigating to skill selection')
+            navigate('/skills/want/')
+        }
     } catch (error) {
         console.error(error);
         alert(

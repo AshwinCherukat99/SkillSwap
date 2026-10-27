@@ -12,9 +12,6 @@ const EditBadge=()=>{
     const [badge,setBadge]=useState(null)
     const [loading,setLoading]=useState(true)
     const [submitting,setSubmitting]=useState(false)
-    useEffect(()=>{
-        loadBadge()
-    },[badgeId])
     const loadBadge=async ()=>{
         try{
             const response=await adminApi.get(
@@ -27,6 +24,9 @@ const EditBadge=()=>{
             setLoading(false)
         }
     }
+    useEffect(()=>{
+        loadBadge()
+    },[badgeId])
     const handleSubmit=async (data)=>{
         try{
             setSubmitting(true)

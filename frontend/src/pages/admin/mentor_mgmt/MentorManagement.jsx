@@ -230,7 +230,7 @@ console.log(
                 onClose={()=>setEditingMentor(null)}
                 onUpdated={async ()=>{
                     setEditingMentor(null)
-                    await fetchUsers()
+                    await fetchMentors()
                 }}
                 />
             )}
