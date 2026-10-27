@@ -1,6 +1,7 @@
 stages:
   - test
   - build
+  - deploy
 
 frontend-lint:
   stage: test
@@ -89,3 +90,21 @@ backend_check:
     - python -m pip install -r backend/requirements.txt
     - cd backend
     - python manage.py check
+
+frontend-deploy:
+  stage: deploy
+  image: node:22
+  needs:
+    - job: frontend-build
+      artifacts: true
+  before_script:
+    - apt-get update
+    - apt-get install -y awscli
+  script:
+    - aws sts get-caller-identity
+    - aws s3 sync frontend/dist/ "s3://${S3_BUCKET_NAME}/" --delete
+    - aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" --paths "/*"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: never
