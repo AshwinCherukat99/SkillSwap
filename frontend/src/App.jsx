@@ -128,14 +128,14 @@ function App(){
   }
 />
         <Route path='/skills/want/' element={
-          <ProtectedRoute>
+          <PublicRoute>
             <SkillsWant/>
-          </ProtectedRoute>
+          </PublicRoute>
         }/>
         <Route path='/skills/offer/' element={
-          <ProtectedRoute>
+          <PublicRoute>
             <SkillsOffer/>
-          </ProtectedRoute>
+          </PublicRoute>
         }/>
       <Route element={<MainLayout/>}>
         <Route path='/feed/' element={
