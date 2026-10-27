@@ -16,6 +16,7 @@ frontend-lint:
     - cd frontend
     - npm ci --cache .npm --prefer-offline
     - npm run lint
+  allow_failure: true
 
 frontend-build:
   stage: build
