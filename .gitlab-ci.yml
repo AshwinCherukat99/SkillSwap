@@ -54,7 +54,6 @@ backend_check:
     DB_PASSWORD: ci_only_password
     DB_HOST: postgres
     DB_PORT: "5432"
-  allow_failure: true
 
     # Dummy application settings for CI
     SECRET_KEY: "ci-only-dummy-secret-key-not-for-production"
@@ -92,6 +91,7 @@ backend_check:
     - python -m pip install -r backend/requirements.txt
     - cd backend
     - python manage.py check
+  allow_failure: true
 
 frontend-deploy:
   stage: deploy
