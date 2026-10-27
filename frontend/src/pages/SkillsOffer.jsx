@@ -34,7 +34,7 @@ function SkillsOffer() {
                 localStorage.getItem("access_token")
 
             const response = await fetch(
-                `${API_BASE_URL}/api/skills/`,
+                `${API_BASE_URL}/skills/`,
                 {
                     method: "GET",
                     headers: {
@@ -164,7 +164,7 @@ function SkillsOffer() {
 
             for (const skillId of selectedSkills) {
             const response = await fetch(
-                `${API_BASE_URL}/api/skills/offer/`,
+                `${API_BASE_URL}/skills/offer/`,
                 {
                     method: "POST",
                     headers: {

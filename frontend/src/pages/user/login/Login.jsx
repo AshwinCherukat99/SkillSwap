@@ -28,7 +28,7 @@ function Login() {
 
         try {
             const response = await fetch(
-                `${API_BASE_URL}/api/auth/login/`,
+                `${API_BASE_URL}/auth/login/`,
                 {
                     method: "POST",
                     headers: {
@@ -165,21 +165,6 @@ function Login() {
             {/* ==========================================
                 DARK MODE
             =========================================== */}
-
-            <button
-                className="theme-toggle"
-                onClick={() =>
-                    document.documentElement.classList.toggle(
-                        "dark"
-                    )
-                }
-                type="button"
-                aria-label="Toggle dark mode"
-            >
-                <span className="material-symbols-outlined">
-                    dark_mode
-                </span>
-            </button>
 
             <main className="login-main">
 

@@ -47,7 +47,7 @@ function Recommendations(){
             setLoading(true)
             setError("")
             const response=await fetch(
-                `${API_BASE_URL}/api/auth/recommendations/`,
+                `${API_BASE_URL}/auth/recommendations/`,
                 {
                     method:'GET',
                     headers:getHeaders(),

@@ -70,14 +70,14 @@ function Skills_Offer(){
             setError("")
             const [offerResponse,allSkillsResponse]=await Promise.all([
                 fetch(
-                    `${API_BASE_URL}/api/skills/offer/`,
+                    `${API_BASE_URL}/skills/offer/`,
                     {
                         method:'GET',
                         headers:getHeaders(),
                     }
                 ),
                 fetch(
-                    `${API_BASE_URL}/api/skills/`,
+                    `${API_BASE_URL}/skills/`,
                     {
                         method:'GET',
                         headers:getHeaders(),
@@ -142,7 +142,7 @@ function Skills_Offer(){
         setError("")
         setSuccess("")
         const response=await fetch(
-            `${API_BASE_URL}/api/skills/offer/`,
+            `${API_BASE_URL}/skills/offer/`,
             {
                 method:'POST',
                 headers:getHeaders(),

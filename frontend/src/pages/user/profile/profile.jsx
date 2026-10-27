@@ -4,7 +4,7 @@ import {useSelector} from 'react-redux'
 
 import './profile.css'
 
-import { API_BASE_URL } from '../../../config'
+import { BACKEND_ORIGIN } from '../../../config'
 
 function Profile(){
     const navigate=useNavigate() 
@@ -20,13 +20,10 @@ function Profile(){
         if (!url){
             return ""
         }
-        if (
-            url.startsWith('http://')||
-            url.startsWith('https://')
-        ){
-            return url
-        }
-        return `${API_BASE_URL}${url}`
+        if (/^https?:\/\//i.test(url)) {
+        return url;
+    }
+        return `${BACKEND_ORIGIN}${url.startsWith("/")?"":"/"}${url}`
     }
     const fetchProfile=async ()=>{
         if (!accessToken){
@@ -36,7 +33,7 @@ function Profile(){
         try{ 
             console.log('access token:',accessToken)
             const response=await fetch(
-                `${API_BASE_URL}/api/auth/profile/`,
+                `${API_BASE_URL}/auth/profile/`,
                 {
                     method:'GET',
                     headers:{
@@ -82,14 +79,14 @@ function Profile(){
             }  
             const [offerResponse,wantResponse,]=await Promise.all([
                 fetch(
-                    `${API_BASE_URL}/api/skills/offer/`,
+                    `${API_BASE_URL}/skills/offer/`,
                     {
                         method:'GET',
                         headers,
                     }
                 ),
                 fetch(
-                    `${API_BASE_URL}/api/skills/want/`,
+                    `${API_BASE_URL}/skills/want/`,
                     {
                         method:'GET',
                         headers,

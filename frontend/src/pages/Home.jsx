@@ -180,20 +180,6 @@ function Home() {
 
                         <button
                             type="button"
-                            className="home-icon-button"
-                            onClick={() => {
-                                document.documentElement.classList.toggle(
-                                    "dark-mode"
-                                );
-                            }}
-                        >
-                            <span className="material-symbols-outlined">
-                                dark_mode
-                            </span>
-                        </button>
-
-                        <button
-                            type="button"
                             className="home-login-button"
                             onClick={() =>
                                 navigate("/login/")
@@ -559,7 +545,7 @@ function Home() {
 
                                 <div className="why-image">
                                     <img
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuB5kQmN0s3IL6DEskeOH5i8PEFdwVXZC0WBRIqRaSm2FYwKeffgG-wDfa82kmKey2RYpXP1xo23TESHeU3igywX6-4JYZzw_XvRypcFT-65fSLc3PTr3n2LY2IZ-5skdebW5i-ttwi27BOKsQ_P76KMx3lJF-TZuLA54bFA-_VjtzzQtZrYQZPX8k0wHvj0755EOz7ccFwwbrlos43KO3CG_weIK8P-450zW2Ke6e7rQPFgZ_7cYOKzQ"
+                                        src="/images/vitaly-gariev-PSksbOVDhWk-unsplash.jpg"
                                         alt="SkillSwap collaboration"
                                     />
                                 </div>
@@ -893,7 +879,7 @@ function Home() {
                                     className="home-glass-button"
                                     onClick={() =>
                                         navigate(
-                                            "/mentor/apply/"
+                                            "/mentor/register/"
                                         )
                                     }
                                 >

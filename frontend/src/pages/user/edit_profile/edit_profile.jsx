@@ -3,7 +3,7 @@ import {useNavigate} from 'react-router-dom'
 
 import './edit_profile.css'
 
-import { API_BASE_URL } from '../../../config'
+import { BACKEND_ORIGIN } from '../../../config'
 
 function EditProfile(){
     const navigate=useNavigate()
@@ -31,13 +31,10 @@ function EditProfile(){
         if (!image){
             return null
         }
-        if (
-            image.startsWith('http://')||
-            image.startsWith('https://')
-        ){
-            return image
-        }
-        return `${API_BASE_URL}${image}`
+        if (/^https?:\/\//i.test(url)) {
+        return url;
+    }
+        return `${BACKEND_ORIGIN}${image.startsWith("/")?"":"/"}${image}`
     }
     const fetchProfile=async ()=>{
         const accessToken=getAccessToken()

@@ -5,11 +5,11 @@ const BACKEND_URL = (
 
 export const API_BASE_URL = `${BACKEND_URL}/api`;
 
+export const BACKEND_ORIGIN = BACKEND_URL;
+
 export const WS_BASE_URL = (
   import.meta.env.VITE_WS_URL ||
   (BACKEND_ORIGIN.startsWith("https://")
     ? BACKEND_ORIGIN.replace(/^https:/, "wss:")
     : BACKEND_ORIGIN.replace(/^http:/, "ws:"))
 ).replace(/\/+$/, "");
-
-export const BACKEND_ORIGIN = BACKEND_URL;

@@ -32,14 +32,14 @@ function MySkills(){
             }
             const [wantResponse,offerResponse]=await Promise.all([
                 fetch(
-                    `${API_BASE_URL}/api/skills/want/`,
+                    `${API_BASE_URL}/skills/want/`,
                     {
                         method:'GET',
                         headers,
                     }
                 ),
                 fetch(
-                    `${API_BASE_URL}/api/skills/offer/`,
+                    `${API_BASE_URL}/skills/offer/`,
                     {
                         method:'GET',
                         headers,
