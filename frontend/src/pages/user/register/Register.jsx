@@ -63,6 +63,11 @@ dispatch(
         refreshToken: data.tokens.refresh,
     })
 );
+console.log(
+    "Token saved:",
+    localStorage.getItem("access_token")
+);
+
         if (data.has_skills){
             console.log('navigating to feed')
             navigate("/feed/");
