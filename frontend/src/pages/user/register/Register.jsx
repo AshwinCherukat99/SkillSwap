@@ -1,3 +1,5 @@
+import { useDispatch } from "react-redux";
+import { login } from "../../../store/slices/authSlice";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
@@ -8,7 +10,7 @@ import { API_BASE_URL } from "../../../config";
 
 function Register() {
     const navigate = useNavigate();
-
+    const dispatch=useDispatch()
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] =
         useState(false);
@@ -50,19 +52,17 @@ const handleGoogleRegister = async (credentialResponse) => {
 
         console.log("Google registration successful:", data);
 
-        if (data.access) {
-            localStorage.setItem(
-                "access_token",
-                data.access
-            );
-        }
+        if (!data.tokens?.access) {
+    throw new Error("Access token was not received.");
+}
 
-        if (data.refresh) {
-            localStorage.setItem(
-                "refresh_token",
-                data.refresh
-            );
-        }
+dispatch(
+    login({
+        user: data.user,
+        accessToken: data.tokens.access,
+        refreshToken: data.tokens.refresh,
+    })
+);
         if (data.has_skills){
             console.log('navigating to feed')
             navigate("/feed/");
