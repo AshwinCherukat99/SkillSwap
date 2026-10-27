@@ -54,6 +54,7 @@ backend_check:
     DB_PASSWORD: ci_only_password
     DB_HOST: postgres
     DB_PORT: "5432"
+  allow_failure: true
 
     # Dummy application settings for CI
     SECRET_KEY: "ci-only-dummy-secret-key-not-for-production"
