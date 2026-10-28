@@ -55,7 +55,7 @@ const handleGoogleRegister = async (credentialResponse) => {
         if (!data.tokens?.access) {
     throw new Error("Access token was not received.");
 }
-
+console.log('before login dispatch')
 dispatch(
     login({
         user: data.user,
@@ -63,6 +63,7 @@ dispatch(
         refreshToken: data.tokens.refresh,
     })
 );
+console.log('after login dispatch')
 console.log(
     "Token saved:",
     localStorage.getItem("access_token")
