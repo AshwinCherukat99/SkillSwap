@@ -1,690 +1,347 @@
-import {useState,useEffect} from 'react'
-import {Link,useNavigate} from 'react-router-dom' 
-import {useSelector} from 'react-redux'
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import "./profile.css";
+import { BACKEND_ORIGIN, API_BASE_URL } from "../../../config";
 
-import './profile.css'
+function Profile() {
+  const navigate = useNavigate();
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [skillsOffer, setSkillsOffer] = useState([]);
+  const [skillsWant, setSkillsWant] = useState([]);
 
-import { BACKEND_ORIGIN } from '../../../config'
-import { API_BASE_URL } from '../../../config'
+  const getMediaUrl = (url) => {
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    return `${BACKEND_ORIGIN}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
 
-function Profile(){
-    const navigate=useNavigate() 
-    const accessToken=useSelector(
-        (state)=>state.auth.accessToken
-    )
-    const [profile,setProfile]=useState(null)
-    const [loading,setLoading]=useState(true) 
-    const [error,setError]=useState("")
-    const [skillsOffer, setSkillsOffer] = useState([]);
-    const [skillsWant, setSkillsWant] = useState([]);
-    const getMediaUrl=(url)=>{
-        if (!url){
-            return ""
-        }
-        if (/^https?:\/\//i.test(url)) {
-        return url;
+  const fetchProfile = async () => {
+    if (!accessToken) {
+      navigate("/login/");
+      return;
     }
-        return `${BACKEND_ORIGIN}${url.startsWith("/")?"":"/"}${url}`
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || data.error || "Unable to load profile");
+      }
+      setProfile(data);
+    } catch (err) {
+      setError(err.message || "Unable to load your profile");
     }
-    const fetchProfile=async ()=>{
-        if (!accessToken){
-            navigate('/login/')
-            return
-        }
-        try{ 
-            console.log('access token:',accessToken)
-            const response=await fetch(
-                `${API_BASE_URL}/auth/profile/`,
-                {
-                    method:'GET',
-                    headers:{
-                        Authorization: 
-                        `Bearer ${accessToken}`,
-                        "Content-Type":"application/json",
-                    }
-                }
-            )
-            const data=await response.json() 
-            console.log(
-                'Profile response:',
-                response.status,
-                data
-            )
-            if (!response.ok){
-                throw new Error(
-                    data.detail||
-                    data.error||
-                    'unable to load profile'
-                )
-            }
-            setProfile(data)
-        }catch(err){
-            console.error(
-                'profile fetch error:',
-                err
-            )
-            setError(
-                err.message||
-                'unable to load your profile'
-            )
-        }
-    }
-    const fetchSkills=async ()=>{
-        if (!accessToken){
-            return 
-        }
-        try{
-            const headers={
-                Authorization:`Bearer ${accessToken}`,
-                'Content-Type':'application/json',
-            }  
-            const [offerResponse,wantResponse,]=await Promise.all([
-                fetch(
-                    `${API_BASE_URL}/skills/offer/`,
-                    {
-                        method:'GET',
-                        headers,
-                    }
-                ),
-                fetch(
-                    `${API_BASE_URL}/skills/want/`,
-                    {
-                        method:'GET',
-                        headers,
-                    }
-                ),
-            ])
-            const offerData=await offerResponse.json()
-            const wantData=await wantResponse.json() 
-            console.log(
-                'offer skills:',
-                offerResponse.status,
-                offerData
-            )
-            console.log(
-                'want skills:',
-                wantResponse.status,
-                wantData
-            )
-            if (!offerResponse.ok){
-                throw new Error(
-                    offerData.detail||
-                    offerData.error||
-                    'unable to load teaching skills'
-                )
-            }
-            if (!wantResponse.ok){
-                throw new Error(
-                    wantData.detail||
-                    wantData.error||
-                    'unable to load learning skills'
-                )
-            }
-            setSkillsOffer(
-                Array.isArray(offerData)?offerData:offerData.results||[]
-            )
-            setSkillsWant(
-                Array.isArray(wantData)?wantData:wantData.results||[]
-            )
-        }catch(err){
-            console.error('skills fetch error:',err)
-            setError((current)=>current||err.message||'unable to load skills')
-        }
-    }
-    useEffect(()=>{
-        if (!accessToken){
-            navigate('/login/')
-            return
-        }
-        const loadProfile=async ()=>{
-            setLoading(true)
-            setError("")
-            await Promise.all([
-                fetchProfile(),
-                fetchSkills(),
-            ])
-            setLoading(false)
-        }
-        loadProfile()
-    },[])
-    const formatJoinedDate=(date)=>{
-        if (!date){
-            return 'recently joined'
-        }
-        return `joined ${new Date(
-            date
-        ).toLocaleDateString(
-            'en-US',
-            {
-                month:"long",
-                year:"numeric",
-            }
-        )}`
-    }
-    const profileImage=getMediaUrl(
-        profile?.profile_image
-    )
-    const displayName=profile?.full_name||profile?.username||'SkillSwap User'
-    if (loading){
-        return (
-            <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+  };
 
-                    <p className="text-on-surface-variant">
-                        Loading your profile...
-                    </p>
-                </div>
-            </div>
-        )
+  const fetchSkills = async () => {
+    if (!accessToken) return;
+    try {
+      const headers = {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      };
+      const [offerResponse, wantResponse] = await Promise.all([
+        fetch(`${API_BASE_URL}/skills/offer/`, { method: "GET", headers }),
+        fetch(`${API_BASE_URL}/skills/want/`, { method: "GET", headers }),
+      ]);
+      const offerData = await offerResponse.json();
+      const wantData = await wantResponse.json();
+
+      if (offerResponse.ok) {
+        setSkillsOffer(
+          Array.isArray(offerData) ? offerData : offerData.results || []
+        );
+      }
+      if (wantResponse.ok) {
+        setSkillsWant(
+          Array.isArray(wantData) ? wantData : wantData.results || []
+        );
+      }
+    } catch (err) {
+      setError((current) => current || err.message || "Unable to load skills");
     }
+  };
+
+  useEffect(() => {
+    if (!accessToken) {
+      navigate("/login/");
+      return;
+    }
+    const loadProfile = async () => {
+      setLoading(true);
+      setError("");
+      await Promise.all([fetchProfile(), fetchSkills()]);
+      setLoading(false);
+    };
+    loadProfile();
+  }, []);
+
+  const formatJoinedDate = (date) => {
+    if (!date) return "Recently joined";
+    return `Joined ${new Date(date).toLocaleDateString("en-US", {
+      month: "long",
+      year: "numeric",
+    })}`;
+  };
+
+  const profileImage = getMediaUrl(profile?.profile_image);
+  const displayName =
+    profile?.full_name || profile?.username || "SkillSwap User";
+
+  if (loading) {
     return (
-    <div className="profile-page">
+      <div className="profile-loading-screen">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <p className="text-muted mt-2 small">Loading your profile...</p>
+      </div>
+    );
+  }
 
-        {/* ==========================================
-            MAIN CONTENT
-        =========================================== */}
+  return (
+    <div className="profile-page py-4">
+      <main className="container profile-container">
+        {error && (
+          <div className="alert alert-danger mb-4 shadow-sm">{error}</div>
+        )}
 
-        <main className="profile-main container-fluid">
+        {/* HERO CARD */}
+        <div className="profile-header-card shadow-sm mb-4">
+          <div className="profile-cover"></div>
 
-            {error && (
-                <div className="alert alert-danger profile-error mb-4">
-                    {error}
-                </div>
-            )}
-
-
-            {/* ==========================================
-                HERO
-            =========================================== */}
-
-            <header className="profile-hero mb-5">
-
-                <div className="profile-cover glass-panel">
-
-                    <div className="profile-cover-glow profile-cover-glow-one" />
-                    <div className="profile-cover-glow profile-cover-glow-two" />
-
-                </div>
-
-
-                <div className="profile-hero-content row align-items-end g-4">
-
-                    {/* PROFILE IMAGE */}
-
-                    <div className="col-auto">
-
-                        <div className="profile-avatar">
-
-                            {profileImage ? (
-                                <img
-                                    src={profileImage}
-                                    alt={displayName}
-                                />
-                            ) : (
-                                <div className="profile-avatar-fallback">
-                                    {displayName
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                </div>
-                            )}
-
-                        </div>
-
+          <div className="profile-header-body px-4 pb-4">
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center align-items-md-end gap-3">
+              {/* Avatar & User Details */}
+              <div className="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-3 text-center text-md-start">
+                <div className="profile-avatar-wrap">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt={displayName}
+                      className="profile-avatar"
+                    />
+                  ) : (
+                    <div className="profile-avatar profile-avatar-fallback">
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
-
-
-                    {/* PROFILE DETAILS */}
-
-                    <div className="col">
-
-                        <div className="d-flex flex-column flex-lg-row align-items-center align-items-lg-center gap-2 mb-2">
-
-                            <h1 className="profile-name mb-0">
-                                {displayName}
-                            </h1>
-
-                            <span className="profile-username">
-                                @{profile?.username || "username"}
-                            </span>
-
-                            {profile?.role && (
-                                <span className="profile-role-badge">
-                                    <span className="material-symbols-outlined">
-                                        person
-                                    </span>
-
-                                    {profile.role === "USER"
-                                        ? "SKILLSWAP USER"
-                                        : profile.role}
-                                </span>
-                            )}
-
-                        </div>
-
-
-                        <div className="profile-meta mb-3 justify-content-center justify-content-lg-start">
-
-                            {profile?.location && (
-                                <div className="profile-meta-item">
-
-                                    <span className="material-symbols-outlined">
-                                        location_on
-                                    </span>
-
-                                    <span>
-                                        {profile.location}
-                                    </span>
-
-                                </div>
-                            )}
-
-                            <div className="profile-meta-item">
-
-                                <span className="material-symbols-outlined">
-                                    calendar_today
-                                </span>
-
-                                <span>
-                                    {formatJoinedDate(
-                                        profile?.date_joined
-                                    )}
-                                </span>
-
-                            </div>
-
-                        </div>
-
-
-                        <p className="profile-bio mb-0 text-center text-lg-start">
-                            {profile?.bio ||
-                                "This user has not added a bio yet."}
-                        </p>
-
-                    </div>
-
-
-                    
-
+                  )}
                 </div>
-
-            </header>
-
-
-            {/* ==========================================
-                CONTENT GRID
-            =========================================== */}
-
-            <div className="row g-4">
-
-                {/* ======================================
-                    MAIN COLUMN
-                ======================================= */}
-
-                <div className="col-12 col-lg-8">
-
-                    <div className="d-flex flex-column gap-4">
-
-
-                        {/* ==================================
-                            STATISTICS
-                        =================================== */}
-
-                        <div className="row g-3">
-
-                            <div className="col-6 col-md-3">
-
-                                <div className="profile-stat-card h-100">
-
-                                    <p className="profile-stat-label">
-                                        Skills Teaching
-                                    </p>
-
-                                    <p className="profile-stat-value mb-0">
-                                        {profile?.skills_teaching??0}
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div className="col-6 col-md-3">
-
-                                <div className="profile-stat-card h-100">
-
-                                    <p className="profile-stat-label">
-                                        Skills Learning
-                                    </p>
-
-                                    <p className="profile-stat-value mb-0 text-success">
-                                        {profile?.skills_learning??0}
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div className="col-6 col-md-3">
-
-                                <div className="profile-stat-card h-100">
-
-                                    <p className="profile-stat-label">
-                                        Average Rating
-                                    </p>
-
-                                    <p className="profile-stat-value mb-0">
-
-                                        {profile?.average_rating !==
-                                        null &&
-                                        profile?.average_rating !==
-                                        undefined
-                                            ? Number(
-                                                  profile.average_rating
-                                              ).toFixed(1)
-                                            : "—"}
-
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-
-                            <div className="col-6 col-md-3">
-
-                                <div className="profile-stat-card h-100">
-
-                                    <p className="profile-stat-label">
-                                        Sessions
-                                    </p>
-
-                                    <p className="profile-stat-value mb-0 text-success">
-                                        {profile?.session_count ??
-                                            "—"}
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* ==================================
-                            ABOUT ME
-                        =================================== */}
-
-                        <section className="profile-info-card p-4 p-md-5">
-
-                            <div className="profile-section-header">
-
-                                <h2 className="profile-section-title mb-0">
-
-                                    <span className="material-symbols-outlined">
-                                        account_circle
-                                    </span>
-
-                                    About Me
-
-                                </h2>
-
-                                <button
-                                    type="button"
-                                    className="profile-section-edit"
-                                    onClick={() =>
-                                        navigate(
-                                            "/profile/edit/"
-                                        )
-                                    }
-                                >
-                                    Edit
-                                </button>
-
-                            </div>
-
-
-                            <div className="profile-info-grid">
-
-                                <div className="profile-info-item">
-
-                                    <p className="profile-info-label">
-                                        Full Name
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        {profile?.full_name ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-
-                                <div className="profile-info-item">
-
-                                    <p className="profile-info-label">
-                                        Username
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        @{profile?.username ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-
-                                <div className="profile-info-item">
-
-                                    <p className="profile-info-label">
-                                        Email
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        {profile?.email ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-
-                                <div className="profile-info-item">
-
-                                    <p className="profile-info-label">
-                                        Phone Number
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        {profile?.phone_number ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-
-                                <div className="profile-info-item full-width">
-
-                                    <p className="profile-info-label">
-                                        Location
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        {profile?.location ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-
-                                <div className="profile-info-item full-width">
-
-                                    <p className="profile-info-label">
-                                        Bio
-                                    </p>
-
-                                    <p className="profile-info-value">
-                                        {profile?.bio ||
-                                            "Not provided"}
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </section>
-
-
-                    </div>
-
+                <div>
+                  <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-2 mb-1">
+                    <h2 className="profile-name mb-0">{displayName}</h2>
+                    <span className="text-muted small">
+                      @{profile?.username}
+                    </span>
+                    {profile?.role && (
+                      <span className="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                        {profile.role === "USER"
+                          ? "MEMBER"
+                          : profile.role}
+                      </span>
+                    )}
+                  </div>
+                  <div className="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start gap-3 text-muted small">
+                    {profile?.location && (
+                      <span className="d-flex align-items-center gap-1">
+                        <span className="material-symbols-outlined fs-6">
+                          location_on
+                        </span>
+                        {profile.location}
+                      </span>
+                    )}
+                    <span className="d-flex align-items-center gap-1">
+                      <span className="material-symbols-outlined fs-6">
+                        calendar_today
+                      </span>
+                      {formatJoinedDate(profile?.date_joined)}
+                    </span>
+                  </div>
                 </div>
+              </div>
 
-
-                {/* ======================================
-                    SIDEBAR COLUMN
-                ======================================= */}
-
-                <div className="col-12 col-lg-4">
-
-                    <div className="d-flex flex-column gap-4">
-
-
-                        {/* ==================================
-                            PROFILE OVERVIEW
-                        =================================== */}
-
-                        <div className="profile-sidebar-card p-4 p-md-5 text-center">
-
-                            <div className="profile-overview-icon">
-
-                                <span className="material-symbols-outlined">
-                                    person
-                                </span>
-
-                            </div>
-
-                            <h4 className="profile-sidebar-title">
-                                Profile Overview
-                            </h4>
-
-                            <p className="profile-sidebar-text mb-4">
-                                Keep your profile updated so the community can learn more about you.
-                            </p>
-
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    navigate(
-                                        "/profile/edit/"
-                                    )
-                                }
-                                className="btn btn-primary w-100 fw-bold"
-                            >
-                                Edit Profile
-                            </button>
-
-                        </div>
-
-
-                        {/* ==================================
-                            CONTACT INFORMATION
-                        =================================== */}
-
-                        <div className="profile-sidebar-card p-4">
-
-                            <h4 className="profile-sidebar-title d-flex align-items-center gap-2 mb-4">
-
-                                <span className="material-symbols-outlined text-primary">
-                                    contact_page
-                                </span>
-
-                                Contact Information
-
-                            </h4>
-
-
-                            <div className="profile-contact-list">
-
-                                <div className="profile-contact-item">
-
-                                    <span className="material-symbols-outlined profile-contact-icon">
-                                        mail
-                                    </span>
-
-                                    <div>
-
-                                        <p className="profile-contact-label">
-                                            Email
-                                        </p>
-
-                                        <p className="profile-contact-value">
-                                            {profile?.email ||
-                                                "Not provided"}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div className="profile-contact-item">
-
-                                    <span className="material-symbols-outlined profile-contact-icon">
-                                        phone
-                                    </span>
-
-                                    <div>
-
-                                        <p className="profile-contact-label">
-                                            Phone
-                                        </p>
-
-                                        <p className="profile-contact-value">
-                                            {profile?.phone_number ||
-                                                "Not provided"}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-
-                                <div className="profile-contact-item">
-
-                                    <span className="material-symbols-outlined profile-contact-icon">
-                                        location_on
-                                    </span>
-
-                                    <div>
-
-                                        <p className="profile-contact-label">
-                                            Location
-                                        </p>
-
-                                        <p className="profile-contact-value">
-                                            {profile?.location ||
-                                                "Not provided"}
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                    </div>
-
-                </div>
-
+              {/* Action Button */}
+              <button
+                type="button"
+                className="btn btn-primary px-4 fw-semibold rounded-pill shadow-sm"
+                onClick={() => navigate("/profile/edit/")}
+              >
+                Edit Profile
+              </button>
             </div>
+          </div>
+        </div>
 
-        </main>
+        {/* STATS STRIP */}
+        <div className="row g-3 mb-4">
+          <div className="col-6 col-md-3">
+            <div className="stat-card">
+              <span className="stat-label">Skills Teaching</span>
+              <span className="stat-value text-primary">
+                {profile?.skills_teaching ?? skillsOffer.length ?? 0}
+              </span>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="stat-card">
+              <span className="stat-label">Skills Learning</span>
+              <span className="stat-value text-success">
+                {profile?.skills_learning ?? skillsWant.length ?? 0}
+              </span>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="stat-card">
+              <span className="stat-label">Average Rating</span>
+              <span className="stat-value text-warning">
+                ⭐ {profile?.average_rating != null ? Number(profile.average_rating).toFixed(1) : "0.0"}
+              </span>
+            </div>
+          </div>
+          <div className="col-6 col-md-3">
+            <div className="stat-card">
+              <span className="stat-label">Sessions Held</span>
+              <span className="stat-value text-indigo">
+                {profile?.session_count ?? 0}
+              </span>
+            </div>
+          </div>
+        </div>
 
+        {/* CONTENT GRID */}
+        <div className="row g-4">
+          {/* LEFT: Skills & Bio */}
+          <div className="col-12 col-lg-8">
+            <div className="d-flex flex-column gap-4">
+              {/* Bio */}
+              <div className="card surface-card shadow-sm border-0 p-4">
+                <h5 className="section-title mb-3">About</h5>
+                <p className="bio-text mb-0">
+                  {profile?.bio ||
+                    "No bio provided yet. Add a short bio to let others know what you are passionate about!"}
+                </p>
+              </div>
+
+              {/* Teaching Skills */}
+              <div className="card surface-card shadow-sm border-0 p-4">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="section-title mb-0">Skills I Teach</h5>
+                  <Link
+                    to="/my-skills"
+                    className="small text-primary text-decoration-none fw-semibold"
+                  >
+                    Manage Skills
+                  </Link>
+                </div>
+                {skillsOffer.length > 0 ? (
+                  <div className="d-flex flex-wrap gap-2">
+                    {skillsOffer.map((item, idx) => (
+                      <span key={item.id || idx} className="skill-pill teach">
+                        {item.skill?.name || item.name || item}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted small mb-0">
+                    You haven&apos;t added any teaching skills yet.
+                  </p>
+                )}
+              </div>
+
+              {/* Learning Skills */}
+              <div className="card surface-card shadow-sm border-0 p-4">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h5 className="section-title mb-0">Skills I Want to Learn</h5>
+                  <Link
+                    to="/my-skills"
+                    className="small text-success text-decoration-none fw-semibold"
+                  >
+                    Explore Skills
+                  </Link>
+                </div>
+                {skillsWant.length > 0 ? (
+                  <div className="d-flex flex-wrap gap-2">
+                    {skillsWant.map((item, idx) => (
+                      <span key={item.id || idx} className="skill-pill learn">
+                        {item.skill?.name || item.name || item}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted small mb-0">
+                    You haven&apos;t added any learning goals yet.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT: Contact & Details */}
+          <div className="col-12 col-lg-4">
+            <div className="card surface-card shadow-sm border-0 p-4">
+              <h5 className="section-title mb-4">Contact & Information</h5>
+              <div className="d-flex flex-column gap-3">
+                <div className="info-row">
+                  <span className="material-symbols-outlined text-primary">
+                    mail
+                  </span>
+                  <div>
+                    <span className="info-label">Email</span>
+                    <p className="info-value mb-0">
+                      {profile?.email || "Not provided"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="material-symbols-outlined text-primary">
+                    call
+                  </span>
+                  <div>
+                    <span className="info-label">Phone</span>
+                    <p className="info-value mb-0">
+                      {profile?.phone_number || "Not provided"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="material-symbols-outlined text-primary">
+                    location_on
+                  </span>
+                  <div>
+                    <span className="info-label">Location</span>
+                    <p className="info-value mb-0">
+                      {profile?.location || "Not provided"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="info-row">
+                  <span className="material-symbols-outlined text-primary">
+                    badge
+                  </span>
+                  <div>
+                    <span className="info-label">Username</span>
+                    <p className="info-value mb-0">@{profile?.username}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-);
-    }
+  );
+}
 
-export default Profile
+export default Profile;
