@@ -67,27 +67,6 @@ const ConversationList = ({
                 </div>
 
 
-                <div className="conversation-filter-pills">
-
-                    <button className="active">
-                        All
-                    </button>
-
-                    <button>
-                        Unread
-                    </button>
-
-                    <button>
-                        Online
-                    </button>
-
-                    <button>
-                        Mentors
-                    </button>
-
-                </div>
-
-
                 <div className="conversation-list">
 
                     {filteredConversations.length ===

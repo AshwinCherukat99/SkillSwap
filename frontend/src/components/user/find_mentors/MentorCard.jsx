@@ -2,111 +2,96 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function MentorCard({ mentor }) {
-
     const navigate = useNavigate();
 
-    const image =
-        mentor.profile_image ||
-        "/default-mentor.png";
+    const image = mentor.profile_image || "/default-mentor.png";
 
     return (
         <div className="card mentor-card border-0 shadow-sm h-100">
+            <div className="card-body p-4 d-flex flex-column">
 
-            <div className="card-body p-4">
+                {/* TOP ROW: AVATAR & INFO */}
+                <div className="d-flex align-items-start gap-3 mb-3">
+                    <div className="mentor-image-container flex-shrink-0">
+                        <img
+                            src={image}
+                            alt={mentor.full_name || mentor.username}
+                            className="mentor-image"
+                            onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = "/default-mentor.png";
+                            }}
+                        />
+                        {mentor.is_verified && (
+                            <span className="verified-icon" title="Verified mentor">
+                                <i className="bi bi-patch-check-fill"></i>
+                            </span>
+                        )}
+                    </div>
 
-                <div className="d-flex align-items-start gap-3">
-
-                    <img
-                        src={image}
-                        alt={mentor.full_name}
-                        className="mentor-image"
-                    />
-
-                    <div className="flex-grow-1">
-
+                    <div className="flex-grow-1 min-w-0">
                         <div className="d-flex align-items-center gap-2">
-
-                            <h5 className="mb-1">
+                            <h5 className="mb-0 text-truncate fw-bold text-dark">
                                 {mentor.username}
                             </h5>
-
-                            {mentor.is_verified && (
-                                <i
-                                    className="bi bi-patch-check-fill text-success"
-                                    title="Verified mentor"
-                                ></i>
-                            )}
-
                         </div>
 
-                        <p className="text-muted small mb-1">
-                            {mentor.current_profession ||
-                                "Professional Mentor"}
+                        <p className="mentor-role text-muted small mb-0 text-truncate">
+                            {mentor.current_profession || "Professional Mentor"}
                         </p>
 
                         {mentor.organization && (
-                            <p className="text-muted small mb-0">
+                            <p className="text-muted small mb-0 text-truncate">
                                 {mentor.organization}
                             </p>
                         )}
-
                     </div>
-
                 </div>
 
-                <div className="d-flex gap-4 mt-4">
-
-                    <div>
+                {/* STATS GRID */}
+                <div className="mentor-stats-grid mb-3">
+                    <div className="mentor-stat text-center">
                         <strong>
+                            <i className="bi bi-star-fill text-warning me-1"></i>
                             {Number(mentor.rating || 0).toFixed(1)}
                         </strong>
-
-                        <div className="small text-muted">
-                            <i className="bi bi-star-fill text-warning"></i>{" "}
-                            Rating
-                        </div>
+                        <small>Rating</small>
                     </div>
 
-                    <div>
-                        <strong>
-                            {mentor.total_reviews || 0}
-                        </strong>
-
-                        <div className="small text-muted">
-                            Reviews
-                        </div>
+                    <div className="mentor-stat text-center">
+                        <strong>{mentor.total_reviews || 0}</strong>
+                        <small>Reviews</small>
                     </div>
 
-                    <div>
-                        <strong>
-                            {mentor.experience_years || 0}
-                        </strong>
-
-                        <div className="small text-muted">
-                            Years
-                        </div>
+                    <div className="mentor-stat text-center">
+                        <strong>{mentor.experience_years || 0}</strong>
+                        <small>Years</small>
                     </div>
-
                 </div>
 
+                {/* TEACHING NICHE (WRAPS PROPERLY & NEVER OVERFLOWS) */}
                 {mentor.teaching_niche && (
-                    <p className="text-muted small mt-3 mb-3">
-                        {mentor.teaching_niche}
-                    </p>
+                    <div className="mentor-niche-box mb-3">
+                        <p className="mentor-niche-text text-muted small mb-0">
+                            {mentor.teaching_niche}
+                        </p>
+                    </div>
                 )}
 
-                <button
-                    type="button"
-                    className="btn btn-primary w-100"
-                    onClick={() =>
-                        navigate(`/mentors/mentor-profile/${mentor.id}/`)
-                    }
-                >
-                    View Profile
-                </button>
+                {/* ACTION BUTTON (LOCKED TO BOTTOM) */}
+                <div className="mt-auto pt-2">
+                    <button
+                        type="button"
+                        className="btn btn-primary w-100 py-2 fw-semibold"
+                        onClick={() =>
+                            navigate(`/mentors/mentor-profile/${mentor.id}/`)
+                        }
+                    >
+                        View Profile
+                    </button>
+                </div>
 
             </div>
-
         </div>
     );
 }
