@@ -159,7 +159,7 @@ function Recommendations(){
 const handleAddFriend = async (user) => {
     try {
         const response = await fetch(
-            `${API_BASE_URL}/api/auth/friends/add/`,
+            `${API_BASE_URL}/auth/friends/add/`,
             {
                 method: 'POST',
                 headers: getHeaders(),
