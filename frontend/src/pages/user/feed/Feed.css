@@ -505,3 +505,63 @@ h6 {
 .post-card .dropdown-item i {
     font-size: 16px;
 }
+
+/* Container Width Cap */
+.feed-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/* Profile banner & avatar adjustment */
+.profile-banner {
+  height: 52px;
+  background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+}
+
+.profile-avatar-wrapper {
+  margin-top: -36px;
+}
+
+.profile-avatar {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #ffffff;
+  background: #ffffff;
+}
+
+/* Sticky layout rules */
+.sticky-sidebar {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 96px;
+}
+
+/* Mini utilities */
+.fs-xs {
+  font-size: 0.75rem;
+}
+
+.fs-sm {
+  font-size: 0.875rem;
+}
+
+/* Sidebar quick links */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.15s ease-in-out;
+}
+
+.sidebar-link:hover {
+  background-color: var(--surface-low);
+  color: var(--primary);
+}
