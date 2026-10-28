@@ -323,7 +323,7 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
       return;
     }
 
-    if (data.type === 'peer-left') {
+    if (data.type === 'peer_left') {
       if (peerConnectionRef.current) {
         peerConnectionRef.current.close();
         peerConnectionRef.current = null;
@@ -393,7 +393,9 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
 
         socket.onmessage = async (event) => {
           try {
-            await handleSignal(JSON.parse(event.data));
+            const data=JSON.parse(event.data);
+            console.log('recieved video signalling message:', data);
+            await handleSignal(data);
           } catch (error) {
             console.error('Failed to process video signal:', error);
           }
