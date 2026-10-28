@@ -5,6 +5,7 @@ import {useSelector} from 'react-redux'
 import './profile.css'
 
 import { BACKEND_ORIGIN } from '../../../config'
+import { API_BASE_URL } from '../../../config'
 
 function Profile(){
     const navigate=useNavigate() 
