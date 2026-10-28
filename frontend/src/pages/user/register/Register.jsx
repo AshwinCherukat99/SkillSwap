@@ -25,7 +25,11 @@ const [phoneNumber, setPhoneNumber] = useState("");
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
+
 const handleGoogleRegister = async (credentialResponse) => {
+    setLoading(true);
+    setError("");
+
     try {
         const response = await fetch(
             `${API_BASE_URL}/auth/google/`,
@@ -50,39 +54,32 @@ const handleGoogleRegister = async (credentialResponse) => {
             );
         }
 
-        console.log("Google registration successful:", data);
-
         if (!data.tokens?.access) {
-    throw new Error("Access token was not received.");
-}
-console.log('before login dispatch')
-dispatch(
-    login({
-        user: data.user,
-        accessToken: data.tokens.access,
-        refreshToken: data.tokens.refresh,
-    })
-);
-console.log('after login dispatch')
-console.log(
-    "Token saved:",
-    localStorage.getItem("access_token")
-);
-
-        if (data.has_skills){
-            console.log('navigating to feed')
-            navigate("/feed/");
+            throw new Error("Access token was not received.");
         }
-        else{
-            console.log('navigating to skill selection')
-            navigate('/skills/want/')
+
+        dispatch(
+            login({
+                user: data.user,
+                accessToken: data.tokens.access,
+                refreshToken: data.tokens.refresh,
+            })
+        );
+
+        if (!localStorage.getItem("access_token")) {
+            throw new Error("Login state was not saved.");
+        }
+
+        if (data.has_skills) {
+            navigate("/feed/");
+        } else {
+            navigate("/skills/want/");
         }
     } catch (error) {
-        console.error(error);
-        alert(
-            error.message ||
-            "Unable to register with Google."
-        );
+        console.error("Google registration error:", error);
+        setError(error.message || "Unable to register with Google.");
+    } finally {
+        setLoading(false);
     }
 };
 
