@@ -1,388 +1,216 @@
-import {useEffect,useState} from 'react'
-import {Link,useNavigate} from 'react-router-dom'
-
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './my_skills.css'
-
 import { API_BASE_URL } from '../../../config'
 
-function MySkills(){
-    const navigate=useNavigate()
-    const [skillsWantCount,setSkillsWantCount]=useState(0)
-    const [skillsOfferCount,setSkillsOfferCount]=useState(0)
-    const [loading,setLoading]=useState(true)
-    const [error,setError]=useState("")
-    const getAccessToken=()=>{
+function MySkills() {
+    const navigate = useNavigate()
+    const [skillsWantCount, setSkillsWantCount] = useState(0)
+    const [skillsOfferCount, setSkillsOfferCount] = useState(0)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState("")
+
+    const getAccessToken = () => {
         return (
-            localStorage.getItem('access_token')||
+            localStorage.getItem('access_token') ||
             sessionStorage.getItem('access_token')
         )
     }
-    const fetchSkills=async ()=>{
-        const accessToken=getAccessToken()
-        if (!accessToken){
+
+    const fetchSkills = async () => {
+        const accessToken = getAccessToken()
+        if (!accessToken) {
             navigate('/login/')
             return 
         }
-        try{
+
+        try {
             setLoading(true)
             setError("")
-            const headers={
-                Authorization:`Bearer ${accessToken}`,
-                "Content-Type":"application/json",
+            const headers = {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
             }
-            const [wantResponse,offerResponse]=await Promise.all([
-                fetch(
-                    `${API_BASE_URL}/skills/want/`,
-                    {
-                        method:'GET',
-                        headers,
-                    }
-                ),
-                fetch(
-                    `${API_BASE_URL}/skills/offer/`,
-                    {
-                        method:'GET',
-                        headers,
-                    }
-                ),
+
+            const [wantResponse, offerResponse] = await Promise.all([
+                fetch(`${API_BASE_URL}/skills/want/`, { method: 'GET', headers }),
+                fetch(`${API_BASE_URL}/skills/offer/`, { method: 'GET', headers }),
             ])
-            const wantData=await wantResponse.json()
-            const offerData=await offerResponse.json()
-            console.log('wanted skills response:',wantResponse.status,wantData)
-            console.log('offered skills response:',offerResponse.status,offerData)
-            if (!wantResponse.ok){
-                throw new Error(
-                    wantData.detail||
-                    wantData.error||
-                    'unable to load wanted skills'
-                )
+
+            const wantData = await wantResponse.json()
+            const offerData = await offerResponse.json()
+
+            if (!wantResponse.ok) {
+                throw new Error(wantData.detail || wantData.error || 'Unable to load wanted skills')
             }
             if (!offerResponse.ok) {
-                throw new Error(
-                    offerData.detail ||
-                    offerData.error ||
-                    "Unable to load offered skills."
-                );
+                throw new Error(offerData.detail || offerData.error || 'Unable to load offered skills.')
             }
-            const wantedSkills=Array.isArray(wantData)?wantData:wantData.results||[]
-            const offeredSkills=Array.isArray(offerData)?offerData:offerData.results||[]
+
+            const wantedSkills = Array.isArray(wantData) ? wantData : wantData.results || []
+            const offeredSkills = Array.isArray(offerData) ? offerData : offerData.results || []
+
             setSkillsWantCount(wantedSkills.length)
             setSkillsOfferCount(offeredSkills.length)
-        }catch(err){
-            console.error(
-                'My skills error:',
-                err
-            )
-            setError(
-                err.message||
-                'unable to load your skills'
-            )
-        }finally{
+        } catch (err) {
+            console.error('My skills error:', err)
+            setError(err.message || 'Unable to load your skills')
+        } finally {
             setLoading(false)
         }
     }
-    useEffect(()=>{
+
+    useEffect(() => {
         fetchSkills()
-    },[])
-    if (loading){
+    }, [])
+
+    if (loading) {
         return (
             <div className="myskills-loading">
-                <div className="text-center">
-                    <div className="myskills-spinner mx-auto mb-3" />
-
-                    <p className="text-secondary mb-0">
-                        Loading your skills...
-                    </p>
-                </div>
+                <div className="myskills-spinner mb-3" />
+                <p className="text-secondary fw-medium mb-0">Loading your skills...</p>
             </div>
         )
     }
+
     return (
         <div className="myskills-page">
-
-            
-            {/* ==========================================
-                MAIN CONTENT
-            =========================================== */}
-
             <main className="myskills-main container-fluid">
-
                 <div className="myskills-content">
 
-                    {/* ERROR */}
-
+                    {/* ERROR BANNER */}
                     {error && (
-                        <div className="alert alert-danger myskills-alert">
-                            {error}
+                        <div className="alert alert-danger myskills-alert d-flex align-items-center gap-2 mb-3">
+                            <span className="material-symbols-outlined">error</span>
+                            <span>{error}</span>
                         </div>
                     )}
 
-
-                    {/* ======================================
-                        PAGE HEADER
-                    ======================================= */}
-
-                    <header className="mb-5">
-
-                        <h1 className="myskills-page-title">
-                            My Skills
-                        </h1>
-
-                        <p className="myskills-page-subtitle">
-                            Manage the skills you want to master
-                            and the knowledge you share with others.
-                        </p>
-
+                    {/* COMPACT UNIFIED HEADER */}
+                    <header className="myskills-header">
+                        <div>
+                            <h1 className="myskills-page-title">My Skills</h1>
+                            <p className="myskills-page-subtitle">
+                                Track the abilities you're learning and the knowledge you share.
+                            </p>
+                        </div>
+                        <div className="myskills-overview-badge">
+                            <div className="myskills-overview-pill">
+                                <span className="pill-dot blue" />
+                                <span><strong>{skillsWantCount}</strong> Learning</span>
+                            </div>
+                            <div className="myskills-overview-pill">
+                                <span className="pill-dot green" />
+                                <span><strong>{skillsOfferCount}</strong> Teaching</span>
+                            </div>
+                        </div>
                     </header>
 
+                    {/* HERO CARDS SECTION */}
+                    <div className="row g-3 g-lg-4">
+                        {/* WANTED SKILLS CARD */}
+                        <div className="col-12 col-md-6">
+                            <div className="myskills-hero-card myskills-wanted-card">
+                                <span className="myskills-hero-background-icon material-symbols-outlined">
+                                    school
+                                </span>
 
-                    {/* ======================================
-                        SKILL JOURNEY
-                    ======================================= */}
-
-                    <section className="mb-5">
-
-                        <div className="d-flex align-items-center justify-content-between mb-4">
-
-                            <div>
-                                <h2 className="myskills-section-title mb-1">
-                                    Your Skill Journey
-                                </h2>
-
-                                <p className="text-secondary mb-0">
-                                    Choose what you want to learn
-                                    or what you want to share.
-                                </p>
-                            </div>
-
-                        </div>
-
-
-                        <div className="row g-4">
-
-
-                            {/* ==============================
-                                WANTED SKILLS
-                            =============================== */}
-
-                            <div className="col-12 col-xl-6">
-
-                                <div className="myskills-hero-card myskills-wanted-card">
-
-                                    <span className="myskills-hero-background-icon material-symbols-outlined">
-                                        school
-                                    </span>
-
-                                    <div className="position-relative">
-
-                                        <div className="d-flex align-items-center gap-3 mb-4">
-
+                                <div className="myskills-card-top">
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <div className="d-flex align-items-center gap-2">
                                             <div className="myskills-hero-icon">
-
-                                                <span className="material-symbols-outlined">
-                                                    school
-                                                </span>
-
+                                                <span className="material-symbols-outlined">school</span>
                                             </div>
-
-                                            <h3 className="myskills-hero-title mb-0">
-                                                Wanted Skills
-                                            </h3>
-
+                                            <h2 className="myskills-hero-title mb-0">Wanted Skills</h2>
                                         </div>
-
-
-                                        <div className="row g-3 mb-4">
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    {skillsWantCount}
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Skills Learning
-                                                </p>
-
-                                            </div>
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    —
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Courses Completed
-                                                </p>
-
-                                            </div>
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    —
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Learning Goals
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-
+                                        <span className="myskills-pill-status">Learner Track</span>
                                     </div>
-
-
-                                    <div className="d-flex flex-wrap gap-2 position-relative">
-
-                                        <button
-                                            type="button"
-                                            className="btn myskills-light-button"
-                                            onClick={() =>
-                                                navigate(
-                                                    "/my_skills/want/"
-                                                )
-                                            }
-                                        >
-                                            Explore Skills
-                                        </button>
-
-
-                                    </div>
-
+                                    <p className="myskills-card-desc">
+                                        Skills and topics you want to acquire or improve through mentorship.
+                                    </p>
                                 </div>
 
-                            </div>
-
-
-                            {/* ==============================
-                                OFFERED SKILLS
-                            =============================== */}
-
-                            <div className="col-12 col-xl-6">
-
-                                <div className="myskills-hero-card myskills-offered-card">
-
-                                    <span className="myskills-hero-background-icon material-symbols-outlined">
-                                        record_voice_over
-                                    </span>
-
-                                    <div className="position-relative">
-
-                                        <div className="d-flex align-items-center gap-3 mb-4">
-
-                                            <div className="myskills-hero-icon">
-
-                                                <span className="material-symbols-outlined">
-                                                    record_voice_over
-                                                </span>
-
-                                            </div>
-
-                                            <h3 className="myskills-hero-title mb-0">
-                                                Offered Skills
-                                            </h3>
-
-                                        </div>
-
-
-                                        <div className="row g-3 mb-4">
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    —
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Students
-                                                </p>
-
-                                            </div>
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    {skillsOfferCount}
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Skills Teaching
-                                                </p>
-
-                                            </div>
-
-                                            <div className="col-4">
-
-                                                <p className="myskills-hero-number mb-1">
-                                                    —
-                                                </p>
-
-                                                <p className="myskills-hero-label">
-                                                    Average Rating
-                                                </p>
-
-                                            </div>
-
-                                        </div>
-
+                                <div className="myskills-card-middle">
+                                    <div className="myskills-stat-box">
+                                        <span className="myskills-hero-number">{skillsWantCount}</span>
+                                        <span className="myskills-hero-label">Skills In Progress</span>
                                     </div>
-
-
-                                    <div className="d-flex flex-wrap gap-2 position-relative">
-
-                                        <button
-                                            type="button"
-                                            className="btn myskills-light-button myskills-light-button-green"
-                                            onClick={() =>
-                                                navigate(
-                                                    "/my_skills/offer/"
-                                                )
-                                            }
-                                        >
-                                            Manage Skills
-                                        </button>
-
-
+                                    <div className="myskills-stat-meta">
+                                        <span className="meta-info">
+                                            {skillsWantCount === 0 ? "No skills added yet" : "Active goals"}
+                                        </span>
                                     </div>
-
                                 </div>
 
+                                <div className="myskills-card-bottom">
+                                    <button
+                                        type="button"
+                                        className="btn myskills-btn myskills-btn-light"
+                                        onClick={() => navigate("/my_skills/want/")}
+                                    >
+                                        <span>Explore Skills</span>
+                                        <span className="material-symbols-outlined icon-slide">arrow_forward</span>
+                                    </button>
+                                </div>
                             </div>
-
                         </div>
 
-                    </section>
+                        {/* OFFERED SKILLS CARD */}
+                        <div className="col-12 col-md-6">
+                            <div className="myskills-hero-card myskills-offered-card">
+                                <span className="myskills-hero-background-icon material-symbols-outlined">
+                                    record_voice_over
+                                </span>
 
+                                <div className="myskills-card-top">
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <div className="d-flex align-items-center gap-2">
+                                            <div className="myskills-hero-icon">
+                                                <span className="material-symbols-outlined">record_voice_over</span>
+                                            </div>
+                                            <h2 className="myskills-hero-title mb-0">Offered Skills</h2>
+                                        </div>
+                                        <span className="myskills-pill-status">Mentor Track</span>
+                                    </div>
+                                    <p className="myskills-card-desc">
+                                        Expertise you teach and sessions you share with the community.
+                                    </p>
+                                </div>
 
+                                <div className="myskills-card-middle">
+                                    <div className="myskills-stat-box">
+                                        <span className="myskills-hero-number">{skillsOfferCount}</span>
+                                        <span className="myskills-hero-label">Skills Teaching</span>
+                                    </div>
+                                    <div className="myskills-stat-meta">
+                                        <span className="meta-info">
+                                            {skillsOfferCount === 0 ? "Ready to share knowledge" : "Available to mentor"}
+                                        </span>
+                                    </div>
+                                </div>
 
-                    {/* ======================================
-                        RECENT ACTIVITY + ACHIEVEMENTS
-                    ======================================= */}
-
-                
-
+                                <div className="myskills-card-bottom">
+                                    <button
+                                        type="button"
+                                        className="btn myskills-btn myskills-btn-green"
+                                        onClick={() => navigate("/my_skills/offer/")}
+                                    >
+                                        <span>Manage Skills</span>
+                                        <span className="material-symbols-outlined icon-slide">arrow_forward</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
-
             </main>
 
-
-            {/* ==========================================
-                FOOTER
-            =========================================== */}
-
             <footer className="myskills-footer">
-
                 <p className="mb-0">
-                    © 2024 SkillSwap. Empowering the
-                    next generation of experts.
+                    © 2024 <strong>SkillSwap</strong>. Empowering the next generation of experts.
                 </p>
-
             </footer>
-
         </div>
     )
 }

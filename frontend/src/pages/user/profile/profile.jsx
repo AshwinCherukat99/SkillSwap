@@ -230,58 +230,6 @@ function Profile() {
                     "No bio provided yet. Add a short bio to let others know what you are passionate about!"}
                 </p>
               </div>
-
-              {/* Teaching Skills */}
-              <div className="card surface-card shadow-sm border-0 p-4">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="section-title mb-0">Skills I Teach</h5>
-                  <Link
-                    to="/my-skills"
-                    className="small text-primary text-decoration-none fw-semibold"
-                  >
-                    Manage Skills
-                  </Link>
-                </div>
-                {skillsOffer.length > 0 ? (
-                  <div className="d-flex flex-wrap gap-2">
-                    {skillsOffer.map((item, idx) => (
-                      <span key={item.id || idx} className="skill-pill teach">
-                        {item.skill?.name || item.name || item}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted small mb-0">
-                    You haven&apos;t added any teaching skills yet.
-                  </p>
-                )}
-              </div>
-
-              {/* Learning Skills */}
-              <div className="card surface-card shadow-sm border-0 p-4">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h5 className="section-title mb-0">Skills I Want to Learn</h5>
-                  <Link
-                    to="/my-skills"
-                    className="small text-success text-decoration-none fw-semibold"
-                  >
-                    Explore Skills
-                  </Link>
-                </div>
-                {skillsWant.length > 0 ? (
-                  <div className="d-flex flex-wrap gap-2">
-                    {skillsWant.map((item, idx) => (
-                      <span key={item.id || idx} className="skill-pill learn">
-                        {item.skill?.name || item.name || item}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-muted small mb-0">
-                    You haven&apos;t added any learning goals yet.
-                  </p>
-                )}
-              </div>
             </div>
           </div>
 
