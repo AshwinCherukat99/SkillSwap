@@ -57,7 +57,7 @@ const Navbar=()=>{
     return (
         <nav className="navbar skillswap-navbar">
             <div className="container-fluid skillswap-navbar-inner">
-                <NavLink to="/" className="navbar-brand skillswap-logo">
+                <NavLink to="/feed" className="navbar-brand skillswap-logo">
                     SkillSwap
                 </NavLink>
 
