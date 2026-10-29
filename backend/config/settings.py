@@ -82,11 +82,13 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                config(
-                    "REDIS_URL",
-                    default="redis://redis:6379/0",
-                ),
-                "socket_timeout":None,
+                {
+                    'address':config(
+                                        "REDIS_URL",
+                                        default="redis://redis:6379/0",
+                                    ),
+                                    "socket_timeout":None,
+                }
             ],
         },
     },
