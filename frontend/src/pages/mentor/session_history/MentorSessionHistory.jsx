@@ -36,7 +36,6 @@ const MentorSessionHistory=()=>{
     const [statusFilter,setStatusFilter]=useState('ALL')
     const [dateFilter,setDateFilter]=useState('THIS_MONTH')
     const [selectedSession,setSelectedSession]=useState(null)
-    const [showExportMenu,setShowExportMenu]=useState(false)
     useEffect(()=>{
         fetchSessions()
     },[])
@@ -178,13 +177,7 @@ const MentorSessionHistory=()=>{
 
             <main className="container-fluid px-4 py-4">
 
-                <SessionHistoryHeader
-                    showExportMenu={showExportMenu}
-                    setShowExportMenu={setShowExportMenu}
-                    onSchedule={() =>
-                        navigate('/mentor/sessions/create')
-                    }
-                />
+                <SessionHistoryHeader/>
 
 
                 <SessionStats
@@ -284,13 +277,13 @@ const MentorSessionHistory=()=>{
 
                 {!loading &&
                     !error &&
-                    sessions.length > 0 && (
+                    filteredSessions.length > 0 && (
 
                         <>
 
                             <SessionTable
                                 sessions={
-                                    sessions
+                                    filteredSessions
                                 }
                                 onViewDetails={
                                     setSelectedSession

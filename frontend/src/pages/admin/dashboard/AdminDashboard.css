@@ -661,24 +661,17 @@ a {
 }
 
 .admin-dashboard-grid {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 1fr) 320px;
-
-    gap: 24px;
-
-    padding: 24px;
+    display: block;
+    width: 100%;
+    padding: 16px 20px;
 }
 
 .admin-main-content {
     min-width: 0;
-
     display: flex;
-
     flex-direction: column;
-
-    gap: 32px;
+    gap: 20px;
+    width: 100%;
 }
 
 /* =========================================
@@ -690,9 +683,9 @@ a {
 
     overflow: hidden;
 
-    min-height: 170px;
+    min-height: 140px;
 
-    padding: 32px;
+    padding: 24px 28px;
 
     display: flex;
 
@@ -748,7 +741,7 @@ a {
 }
 
 .admin-hero h2 {
-    margin: 0 0 8px;
+    margin: 0 0 6px;
 
     font-family:
         "Manrope",
@@ -771,7 +764,7 @@ a {
 
     font-size: 18px;
 
-    line-height: 1.6;
+    line-height: 1.4;
 }
 
 .admin-local-time {
@@ -813,48 +806,31 @@ a {
 
 .admin-kpi-grid {
     display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    align-items: stretch;
+}
 
-    grid-template-columns:
-        repeat(4, minmax(0, 1fr));
-
-    gap: 24px;
+.admin-analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 16px;
 }
 
 .kpi-card {
-    padding: 24px;
-
-    min-height: 190px;
-
+    min-width: 0;
+    min-height: 140px;
+    padding: 18px;
     display: flex;
-
     flex-direction: column;
-
-    justify-content: space-between;
-
-    gap: 16px;
-
+    justify-content: flex-start;
+    gap: 14px;
     border-radius: 16px;
-
-    background:
-        rgba(255, 255, 255, 0.7);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.4);
-
-    box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.03);
-
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(199, 196, 216, 0.35);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 .kpi-card:hover {
@@ -868,12 +844,11 @@ a {
 
 .kpi-top {
     display: flex;
-
     align-items: flex-start;
-
     justify-content: space-between;
-
-    gap: 12px;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
 }
 
 .kpi-icon {
@@ -982,22 +957,6 @@ a {
     font-weight: 700;
 }
 
-.kpi-mini-chart {
-    width: 100%;
-
-    height: 32px;
-
-    border-radius: 6px;
-
-    background:
-        linear-gradient(
-            to right,
-            rgba(53, 37, 205, 0.04),
-            rgba(53, 37, 205, 0.18),
-            rgba(53, 37, 205, 0.04)
-        );
-}
-
 .kpi-mini-chart.secondary {
     background:
         linear-gradient(
@@ -1043,38 +1002,11 @@ a {
 ========================================= */
 
 .admin-panel {
-    padding: 24px;
-
-    border-radius: 16px;
-
-    background:
-        rgba(255, 255, 255, 0.7);
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
-
-    border:
-        1px solid
-        rgba(255, 255, 255, 0.25);
-
-    box-shadow:
-        0 4px 15px
-        rgba(0, 0, 0, 0.03);
+    padding: 18px;
 }
 
 .admin-panel-header {
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    gap: 16px;
-
-    margin-bottom: 24px;
+    margin-bottom: 14px;
 }
 
 .admin-panel-header h3 {
@@ -1134,15 +1066,6 @@ a {
 /* =========================================
    ANALYTICS
 ========================================= */
-
-.admin-analytics-grid {
-    display: grid;
-
-    grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-    gap: 24px;
-}
 
 .user-growth-chart {
     height: 256px;
@@ -1339,13 +1262,7 @@ a {
 ========================================= */
 
 .admin-lower-grid {
-    display: grid;
-
-    grid-template-columns:
-        minmax(0, 2fr)
-        minmax(280px, 1fr);
-
-    gap: 24px;
+    gap: 16px;
 }
 
 .admin-health-column {
@@ -2398,4 +2315,261 @@ a {
 .session-volume-empty p {
     margin: 0;
 }
+}
+
+
+/* Compact dashboard spacing */
+.admin-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 16px;
+    padding: 16px 20px;
+    align-items: start;
+}
+
+.admin-main-content {
+    gap: 20px;
+}
+
+.admin-kpi-grid,
+.admin-analytics-grid {
+    gap: 16px;
+}
+
+.admin-hero {
+    min-height: 145px;
+    padding: 24px 28px;
+}
+
+.kpi-card {
+    min-height: 145px;
+    padding: 18px;
+    gap: 14px;
+    justify-content: flex-start;
+}
+
+.kpi-value p {
+    margin:0 0 4px;
+}
+
+.kpi-value h3 {
+    margin: 0;
+    line-height: 1.25;
+}
+
+.admin-panel {
+    padding: 20px;
+}
+
+.admin-panel-header {
+    margin-bottom: 16px;
+}
+
+/* Remove decorative bands below KPI values */
+.kpi-mini-chart {
+    display: none !important;
+}
+
+/* Session Volume grouped bar chart */
+.session-volume-chart {
+    width: 100%;
+}
+
+.session-volume-plot {
+    display: flex;
+    gap: 10px;
+    height: 220px;
+}
+
+.session-volume-y-labels {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding-bottom: 26px;
+    color: var(--admin-muted);
+    font-size: 10px;
+    text-align: right;
+}
+
+.session-volume-bars-area {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.session-volume-grid-lines {
+    position: absolute;
+    inset: 0 0 26px;
+    pointer-events: none;
+}
+
+.session-volume-grid-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px dashed #e5e7f0;
+}
+
+.session-volume-bars {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    gap: 8px;
+    height: 100%;
+}
+
+.session-volume-day {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 7px;
+}
+
+.session-volume-bar-pair {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 5px;
+    width: 100%;
+    height: calc(100% - 26px);
+}
+
+.session-volume-bar {
+    position: relative;
+    width: min(30%, 20px);
+    min-height: 2px;
+    border-radius: 5px 5px 0 0;
+    transition: filter 0.2s ease;
+}
+
+.mentoring-bar {
+    background: var(--admin-primary);
+}
+
+.networking-bar {
+    background: var(--admin-secondary);
+}
+
+.session-volume-bar:hover {
+    filter: brightness(1.15);
+}
+
+.session-volume-tooltip {
+    position: absolute;
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 6px;
+    border-radius: 5px;
+    background: #27313f;
+    color: #fff;
+    font-size: 10px;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.session-volume-bar:hover .session-volume-tooltip {
+    opacity: 1;
+}
+
+.session-volume-day-label {
+    height: 19px;
+    color: var(--admin-muted);
+    font-size: 10px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.session-volume-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.session-summary-card {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 10px;
+    min-width: 0;
+    border-radius: 9px;
+    background: var(--admin-surface-low);
+}
+
+.session-summary-card span {
+    color: var(--admin-muted);
+    font-size: 10px;
+}
+
+.session-summary-card strong {
+    font-size: 20px;
+}
+
+.mentoring-summary strong {
+    color: var(--admin-primary);
+}
+
+.networking-summary strong {
+    color: var(--admin-secondary);
+}
+
+.session-volume-empty {
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    color: var(--admin-muted);
+}
+
+.session-volume-empty p {
+    margin: 0;
+}
+
+@media (max-width: 1100px) {
+    .admin-dashboard-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 700px) {
+    .admin-dashboard-grid {
+        padding: 12px;
+    }
+
+    .admin-analytics-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .admin-hero {
+        padding: 20px;
+    }
+
+    .admin-hero h2 {
+        font-size: 27px;
+    }
+
+    .session-volume-summary {
+        gap: 6px;
+    }
+
+    .session-summary-card {
+        padding: 8px;
+    }
+}
+
+.admin-platform-status {
+    width: 100%;
+    margin: 0;
 }

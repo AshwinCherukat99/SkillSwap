@@ -7,11 +7,7 @@ import {
     ChevronDown,
 } from 'lucide-react'
 
-const SessionHistoryHeader=({
-    showExportMenu,
-    setShowExportMenu,
-    onSchedule,
-})=>{
+const SessionHistoryHeader=()=>{
     return (
         <div className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-4 mb-4">
 
@@ -39,45 +35,6 @@ const SessionHistoryHeader=({
                     View and manage your completed,
                     cancelled and expired past mentoring exchanges.
                 </p>
-
-            </div>
-
-
-            <div className="d-flex gap-2">
-
-                <div className="dropdown">
-
-                    <button
-                        className="btn btn-light session-export-btn dropdown-toggle"
-                        onClick={() =>
-                            setShowExportMenu(
-                                !showExportMenu
-                            )
-                        }
-                    >
-                        <Download
-                            size={17}
-                            className="me-2"
-                        />
-
-                        Export History
-                    </button>
-
-
-                </div>
-
-
-                <button
-                    className="btn btn-primary session-schedule-btn"
-                    onClick={onSchedule}
-                >
-                    <Plus
-                        size={19}
-                        className="me-2"
-                    />
-
-                    Schedule Session
-                </button>
 
             </div>
 

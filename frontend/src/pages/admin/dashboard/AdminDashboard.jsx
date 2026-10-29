@@ -311,7 +311,7 @@ function AdminDashboard(){
 
                     {/* RIGHT SIDEBAR */}
 
-                    <aside className="admin-right-sidebar">
+                    <aside className="admin-platform-status">
 
                         <PlatformStatus
                             status={

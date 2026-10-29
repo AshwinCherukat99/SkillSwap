@@ -1,4 +1,4 @@
-import React,{useRef,useState,useEffect} from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import mentorApi from '../../../services/mentorApi'
 
 import GroupList from '../../../components/mentor/group_chat/GroupList'
@@ -10,114 +10,109 @@ import { WS_BASE_URL } from '../../../config'
 
 import './MentorGroupChat.css' 
 
-const MentorGroupChat=()=>{
-    const [groups,setGroups]=useState([])
-    const [selectedGroup,setSelectedGroup]=useState(null)
-    const [messages,setMessages]=useState([])
-    const [members,setMembers]=useState([])
-    const [resources,setResources]=useState([])
-    const [loadingGroups,setLoadingGroups]=useState(true)
-    const [loadingMessages,setLoadingMessages]=useState(false)
-    const [connected,setConnected]=useState(false)
-    const socketRef=useRef(null)
-    const accessToken=localStorage.getItem('mentor_access_token')||sessionStorage.getItem('mentor_access_token')
-    const currentUserId=getMentorIdFromToken(accessToken)
-    useEffect(()=>{
+const MentorGroupChat = () => {
+    const [groups, setGroups] = useState([])
+    const [selectedGroup, setSelectedGroup] = useState(null)
+    const [messages, setMessages] = useState([])
+    const [members, setMembers] = useState([])
+    const [resources, setResources] = useState([])
+    const [loadingGroups, setLoadingGroups] = useState(true)
+    const [loadingMessages, setLoadingMessages] = useState(false)
+    const [connected, setConnected] = useState(false)
+    const socketRef = useRef(null)
+    const accessToken = localStorage.getItem('mentor_access_token') || sessionStorage.getItem('mentor_access_token')
+    const currentUserId = getMentorIdFromToken(accessToken)
+
+    useEffect(() => {
         fetchGroups()
-    },[])
-    const fetchGroups=async ()=>{
-        try{
+    }, [])
+
+    const fetchGroups = async () => {
+        try {
             setLoadingGroups(true)
-            const response=await mentorApi.get(
-                '/chat/mentor/groups/'
-            )
+            const response = await mentorApi.get('/chat/mentor/groups/')
             setGroups(response.data)
-            if (response.data.length>0){
+            if (response.data.length > 0) {
                 setSelectedGroup(response.data[0])
             }
-        }catch(error){
-            console.error('failed to load study groups:',error)
-        }finally{
+        } catch (error) {
+            console.error('failed to load study groups:', error)
+        } finally {
             setLoadingGroups(false)
         }
     }
-    useEffect(()=>{
+
+    useEffect(() => {
         if (!selectedGroup) return
         fetchGroupData(selectedGroup.id)
         connectWebSocket(selectedGroup.id) 
-        return ()=>{
+        return () => {
             disconnectWebSocket()
         }
-    },[selectedGroup])
-    const fetchGroupData=async (conversationId)=>{
-        try{
+    }, [selectedGroup])
+
+    const fetchGroupData = async (conversationId) => {
+        try {
             setLoadingMessages(true)
-            const [messagesResponse,membersResponse]=await Promise.all([
-                mentorApi.get(
-                    `/chat/mentor/conversations/${conversationId}/messages/`
-                ),
-                mentorApi.get(
-                    `/chat/mentor/conversations/${conversationId}/members/`
-                )
+            const [messagesResponse, membersResponse] = await Promise.all([
+                mentorApi.get(`/chat/mentor/conversations/${conversationId}/messages/`),
+                mentorApi.get(`/chat/mentor/conversations/${conversationId}/members/`)
             ])
             setMessages(messagesResponse.data)
             setMembers(membersResponse.data)
             setResources([])
-        }catch(error){
-            console.error(
-                'failed to load group data:',
-                error
-            )
-        }finally{
+        } catch (error) {
+            console.error('failed to load group data:', error)
+        } finally {
             setLoadingMessages(false)
         }
     }
-    const connectWebSocket=(conversationId)=>{
-        if (!accessToken){
+
+    const connectWebSocket = (conversationId) => {
+        if (!accessToken) {
             console.error('no access token found')
             return
         }
-        const wsUrl=`${WS_BASE_URL}/ws/chat/`+`${conversationId}/?token=${encodeURIComponent(accessToken)}`
-        const socket=new WebSocket(wsUrl)
-        socketRef.current=socket 
-        socket.onopen=()=>{
+        const wsUrl = `${WS_BASE_URL}/ws/chat/${conversationId}/?token=${encodeURIComponent(accessToken)}`
+        const socket = new WebSocket(wsUrl)
+        socketRef.current = socket 
+        socket.onopen = () => {
             console.log('websocket connected')
             setConnected(true)
         } 
-        socket.onmessage=(event)=>{
-            try{
-                const data=JSON.parse(event.data)
-                if (data.type==='message'){
-                    setMessages((previous)=>[
+        socket.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data)
+                if (data.type === 'message') {
+                    setMessages((previous) => [
                         ...previous,
                         data.message,
                     ])
                 }
-            }catch(error){
-                console.error(
-                    'invalid websocket message:',
-                    error
-                )
+            } catch (error) {
+                console.error('invalid websocket message:', error)
             }
         }
-        socket.onclose=()=>{
+        socket.onclose = () => {
             console.log('websocket disconnected')
             setConnected(false)
         }
-        socket.onerror=(error)=>{
-            console.log('websocket error:',error)
+        socket.onerror = (error) => {
+            console.log('websocket error:', error)
             setConnected(false)
         }
     }
-    const disconnectWebSocket=()=>{
-        if (socketRef.current){
+
+    const disconnectWebSocket = () => {
+        if (socketRef.current) {
             socketRef.current.close()
-            socketRef.current=null
+            socketRef.current = null
         }
         setConnected(false)
     }
-    const sendMessage=(message)=>{
-        if (socketRef.current && socketRef.current.readyState===WebSocket.OPEN){
+
+    const sendMessage = (message) => {
+        if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
             socketRef.current.send(
                 JSON.stringify({
                     message,
@@ -125,102 +120,96 @@ const MentorGroupChat=()=>{
             )
         }
     }
+
     return (
         <div className="mentor-chat-page">
-      {/* Page Header */}
+            {/* Page Header */}
+            <div className="container-fluid px-4 py-3">
+                <div className="d-flex justify-content-between align-items-center mb-3 chat-top-header">
+                    <div>
+                        <h2 className="fw-bold text-primary mb-1 chat-page-title">
+                            Study Groups
+                        </h2>
+                        <p className="text-muted mb-0 chat-page-subtitle">
+                            Build collaborative learning communities
+                        </p>
+                    </div>
 
-      <div className="container-fluid px-4 py-3">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <div>
-            <h2 className="fw-bold text-primary mb-1">
-              Study Groups
-            </h2>
+                    <div className="d-flex align-items-center gap-2">
+                        <div className="input-group search-box">
+                            <span className="input-group-text bg-white border-end-0">
+                                <i className="bi bi-search"></i>
+                            </span>
+                            <input
+                                type="text"
+                                className="form-control border-start-0"
+                                placeholder="Search groups..."
+                            />
+                        </div>
 
-            <p className="text-muted mb-0">
-              Build collaborative learning communities
-            </p>
-          </div>
+                        <button className="btn btn-light rounded-circle chat-icon-btn" title="Notifications">
+                            <i className="bi bi-bell"></i>
+                        </button>
+                    </div>
+                </div>
 
-          <div className="d-flex align-items-center gap-3">
-            <div className="input-group search-box">
-              <span className="input-group-text bg-white border-end-0">
-                <i className="bi bi-search"></i>
-              </span>
+                {/* Dashboard */}
+                <div className="row g-3 chat-dashboard">
 
-              <input
-                type="text"
-                className="form-control border-start-0"
-                placeholder="Search groups..."
-              />
+                    {/* Groups (Left Panel) */}
+                    <div className="col-lg-3 col-xl-3 chat-col">
+                        <GroupList
+                            groups={groups}
+                            selectedGroup={selectedGroup}
+                            onSelectGroup={setSelectedGroup}
+                            loading={loadingGroups}
+                        />
+                    </div>
+
+                    {/* Chat (Center Window) */}
+                    <div className="col-lg-6 col-xl-6 chat-col">
+                        <ChatWindow
+                            group={selectedGroup}
+                            messages={messages}
+                            currentUserId={currentUserId}
+                            currentUserType="MENTOR"
+                            loadingMessages={loadingMessages}
+                            onSend={sendMessage}
+                            connected={connected}
+                        />
+                    </div>
+
+                    {/* Right Panel (Resources & Members) */}
+                    <div className="col-lg-3 col-xl-3 chat-col">
+                        <div className="d-flex flex-column gap-3 h-100 right-panels-stack">
+                            <ResourcesPanel
+                                resources={resources}
+                            />
+
+                            <div className="flex-grow-1 members-wrapper">
+                                <MembersPanel
+                                    members={members}
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-
-            <button className="btn btn-light rounded-circle">
-              <i className="bi bi-bell"></i>
-            </button>
-          </div>
         </div>
-
-        {/* Dashboard */}
-
-        <div className="row g-3 chat-dashboard">
-
-          {/* Groups */}
-
-          <div className="col-lg-3 col-xl-3">
-            <GroupList
-              groups={groups}
-              selectedGroup={selectedGroup}
-              onSelectGroup={setSelectedGroup}
-              loading={loadingGroups}
-            />
-          </div>
-
-          {/* Chat */}
-
-          <div className="col-lg-6 col-xl-6">
-            <ChatWindow
-              group={selectedGroup}
-              messages={messages}
-              currentUserId={currentUserId}
-              currentUserType='MENTOR'
-              loadingMessages={loadingMessages}
-              onSend={sendMessage}
-              connected={connected}
-            />
-          </div>
-
-          {/* Right Panel */}
-
-          <div className="col-lg-3 col-xl-3">
-            <div className="d-flex flex-column gap-3 h-100">
-
-              <ResourcesPanel
-                resources={resources}
-              />
-
-              <div className="flex-grow-1">
-                <MembersPanel
-                  members={members}
-                />
-              </div>
-
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
     )
 } 
-const getMentorIdFromToken=(token)=>{
-        if (!token) return null
-        try{
-            const payload=JSON.parse(
-                atob(token.split('.')[1])
-            )
-            return payload.mentor_id
-        }catch{
-            return null
-        }
+
+const getMentorIdFromToken = (token) => {
+    if (!token) return null
+    try {
+        const payload = JSON.parse(
+            atob(token.split('.')[1])
+        )
+        return payload.mentor_id
+    } catch {
+        return null
     }
+}
+
 export default MentorGroupChat

@@ -1,45 +1,88 @@
-/* AdminCourseManagement.css */
-
+/* ==========================================
+   PAGE BASE & SPACING (RESOLVES TOP/LEFT ISSUE)
+========================================== */
 .admin-course-management {
+    min-height: 100vh;
+    background-color: #f8faff;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+    padding: 32px 32px 60px; /* Natural breathing room below top navbar */
     width: 100%;
 }
 
+/* Centered container with max-width to eliminate the far-left cramp */
+.admin-course-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+.admin-course-header {
+    padding-bottom: 8px;
+}
+
+.admin-page-title {
+    font-family: "Manrope", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.admin-page-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ==========================================
+   TABLE CARD
+========================================== */
+.admin-table-card {
+    border-radius: 18px !important;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05) !important;
+    overflow: hidden;
+}
+
+.admin-table-card .card-header {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    padding: 16px 24px;
+}
+
+/* ==========================================
+   ORIGINAL STATS & TABLE STYLES PRESERVED
+========================================== */
 .course-stat-icon {
     width: 45px;
     height: 45px;
-
     border-radius: 12px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     font-size: 1.25rem;
-
     background: #f8f9fa;
 }
 
 .admin-course-thumbnail {
     width: 52px;
     height: 52px;
-
     border-radius: 10px;
-
     background: #f1f3f5;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     overflow: hidden;
-
     flex-shrink: 0;
 }
 
 .admin-course-thumbnail img {
     width: 100%;
     height: 100%;
-
     object-fit: cover;
 }
 
@@ -50,21 +93,16 @@
 
 .admin-course-management .table th {
     font-size: 0.75rem;
-
     text-transform: uppercase;
-
     letter-spacing: 0.04em;
-
     color: #6c757d;
-
     font-weight: 600;
-
     white-space: nowrap;
+    padding: 1rem 1.25rem;
 }
 
 .admin-course-management .table td {
-    padding: 1rem;
-
+    padding: 1.1rem 1.25rem;
     vertical-align: middle;
 }
 
@@ -73,7 +111,7 @@
 }
 
 .admin-course-management .table tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: #f8faff;
 }
 
 .course-stat-icon.text-primary {
@@ -94,4 +132,17 @@
 
 .course-stat-icon.text-secondary {
     background: #f1f3f5;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+@media (max-width: 768px) {
+    .admin-course-management {
+        padding: 20px 16px 40px;
+    }
+
+    .admin-page-title {
+        font-size: 24px;
+    }
 }

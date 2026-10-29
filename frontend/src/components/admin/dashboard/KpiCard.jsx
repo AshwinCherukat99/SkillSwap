@@ -33,11 +33,7 @@ function KpiCard({title,value,change,changeType,icon,iconClass,filledIcon=false}
                 <h3>{value}</h3>
             </div>
 
-            <div
-                className={`kpi-mini-chart ${iconClass}`}
-            />
-
-        </div>
+            </div>
     )
 }
 

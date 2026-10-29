@@ -1,58 +1,122 @@
+/* ==========================================
+   PAGE BASE & SPACING (RESOLVES TOP/LEFT ISSUE)
+========================================== */
 .admin-user-management {
-    background: #f7f9fb;
     min-height: 100vh;
+    background-color: #f8faff;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+    padding: 32px 32px 60px; /* Generous separation from top navbar */
+    width: 100%;
 }
 
+/* Centered container with max-width */
+.admin-user-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
+}
 
+/* ==========================================
+   HEADER
+========================================== */
+.admin-user-header {
+    padding-bottom: 8px;
+}
+
+.admin-page-title {
+    font-family: "Manrope", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.admin-page-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ==========================================
+   CARDS & TABLE ENCLOSURE
+========================================== */
 .admin-user-management .card {
-    border-radius: 16px;
+    border-radius: 18px !important;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05) !important;
+    overflow: hidden;
 }
 
+.admin-table-wrapper {
+    width: 100%;
+}
 
 .admin-user-management .table > :not(caption) > * > * {
-    padding: 1rem;
+    padding: 1.1rem 1.25rem;
+    vertical-align: middle;
 }
 
+.admin-user-management .table thead th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    font-weight: 600;
+}
 
 .admin-user-management .table tbody tr {
     transition: background-color 0.15s ease;
 }
 
-
 .admin-user-management .table tbody tr:hover {
-    background-color: rgba(79, 70, 229, 0.025);
+    background-color: #f8faff;
 }
 
-
+/* ==========================================
+   BUTTONS, DROPDOWNS & BADGES
+========================================== */
 .admin-user-management .btn-primary {
     background: #4f46e5;
     border-color: #4f46e5;
 }
-
 
 .admin-user-management .btn-primary:hover {
     background: #4338ca;
     border-color: #4338ca;
 }
 
-
 .admin-user-management .dropdown-menu {
     border-radius: 12px;
     padding: 0.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.9);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
 }
-
 
 .admin-user-management .dropdown-item {
     border-radius: 8px;
     padding: 0.55rem 0.75rem;
+    font-size: 13.5px;
 }
-
 
 .admin-user-management .dropdown-item:hover {
-    background-color: #f1f3f5;
+    background-color: #f1f5f9;
 }
-
 
 .admin-user-management .badge {
     font-weight: 600;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+@media (max-width: 768px) {
+    .admin-user-management {
+        padding: 20px 16px 40px;
+    }
+
+    .admin-page-title {
+        font-size: 24px;
+    }
 }

@@ -4,6 +4,24 @@
     color: #121c2a;
 }
 
+/* ==========================================
+   SPACING: FILTERS & STATS SEPARATION
+========================================== */
+.mentor-filters-section {
+    margin-bottom: 24px;
+}
+
+.mentor-stats-section {
+    margin-bottom: 28px;
+}
+
+/* In case MentorStudentsHeader rows need direct margin */
+.mentor-filters-section .row,
+.mentor-filters-section form,
+.mentor-filters-section .d-flex {
+    margin-bottom: 0;
+}
+
 .mentor-students-page .form-control,
 .mentor-students-page .form-select {
     border-color: #d9deea;
@@ -15,6 +33,9 @@
     box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.12);
 }
 
+/* ==========================================
+   STAT CARDS
+========================================== */
 .mentor-student-stat {
     background: rgba(255, 255, 255, 0.78);
     border: 1px solid rgba(255, 255, 255, 0.8);
@@ -22,6 +43,12 @@
     padding: 20px;
     text-align: center;
     box-shadow: 0 4px 18px rgba(30, 40, 80, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mentor-student-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(30, 40, 80, 0.09);
 }
 
 .mentor-stat-icon {
@@ -47,7 +74,6 @@
     color: #6c757d;
     font-size: 0.78rem;
 }
-
 
 /* Compact student cards */
 .mentor-student-card {

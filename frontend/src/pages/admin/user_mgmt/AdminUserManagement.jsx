@@ -1,4 +1,4 @@
-import React,{useEffect,useState,useCallback} from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import UserStats from "../../../components/admin/user_mgmt/UserStats";
@@ -11,286 +11,263 @@ import './AdminUserManagement.css'
 
 import adminApi from '../../../services/adminApi'
 
-const AdminUserManagement=()=>{
-    const navigate=useNavigate()
-    const [users,setUsers]=useState([])
-    const [stats,setStats]=useState({
-        total_users:0,
-        active_users:0,
-        suspended_users:0,
-        blocked_users:0,
+const AdminUserManagement = () => {
+    const navigate = useNavigate()
+    const [users, setUsers] = useState([])
+    const [stats, setStats] = useState({
+        total_users: 0,
+        active_users: 0,
+        suspended_users: 0,
+        blocked_users: 0,
     })
-    const [search,setSearch]=useState('')
-    const [selectedStatus,setSelectedStatus]=useState('ALL')
-    const [loading,setLoading]=useState(true)
-    const [error,setError]=useState('')
-    const [actionModal,setActionModal]=useState({
-        show:false,
-        type:null,
-        user:null,
+    const [search, setSearch] = useState('')
+    const [selectedStatus, setSelectedStatus] = useState('ALL')
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
+    const [actionModal, setActionModal] = useState({
+        show: false,
+        type: null,
+        user: null,
     })
-    const [actionLoading,setActionLoading]=useState(false)
-    const [editingUser,setEditingUser]=useState(null)
-    const fetchUsers=useCallback(
-        async ()=>{
-            try{
+    const [actionLoading, setActionLoading] = useState(false)
+    const [editingUser, setEditingUser] = useState(null)
+
+    const fetchUsers = useCallback(
+        async () => {
+            try {
                 setLoading(true)
                 setError('')
-                const response=await adminApi.get(
+                const response = await adminApi.get(
                     '/admin/users/',
                     {
-                        params:{
+                        params: {
                             search,
-                            status:selectedStatus,
+                            status: selectedStatus,
                         }
                     }
                 )
-                setUsers(response.data.users||[])
-                setStats(response.data.stats||{
-                    total_users:0,
-                    active_users:0,
-                    blocked_users:0,
-                    suspended_users:0,
+                setUsers(response.data.users || [])
+                setStats(response.data.stats || {
+                    total_users: 0,
+                    active_users: 0,
+                    blocked_users: 0,
+                    suspended_users: 0,
                 })
-            }catch(error){
-                console.error('failed to fetch users:',error)
-                setError(error.response?.data?.detail||'failed to load users')
-            }finally{
+            } catch (error) {
+                console.error('failed to fetch users:', error)
+                setError(error.response?.data?.detail || 'failed to load users')
+            } finally {
                 setLoading(false)
             }
         },
-    [search,selectedStatus])
-    useEffect(()=>{
+        [search, selectedStatus]
+    )
+
+    useEffect(() => {
         fetchUsers()
-    },[fetchUsers])
-    const handleSearchChange=(value)=>{
+    }, [fetchUsers])
+
+    const handleSearchChange = (value) => {
         setSearch(value)
     }
-    const handleStatusChange=(value)=>{
+
+    const handleStatusChange = (value) => {
         setSelectedStatus(value)
     }
-    const handleView=(user)=>{
-        console.log('view user:',user.id)
+
+    const handleView = (user) => {
+        console.log('view user:', user.id)
         navigate(`/admin/user-management/${user.id}/`)
     }
-    const handleEdit=(user)=>{
+
+    const handleEdit = (user) => {
         setEditingUser(user)
     }
-    const openActionModal=(type,user)=>{
+
+    const openActionModal = (type, user) => {
         setActionModal({
-            show:true,
+            show: true,
             type,
             user,
         })
     }
-    const executeAction=async ()=>{
-        const {type,user}=actionModal
-        if (!user){
+
+    const executeAction = async () => {
+        const { type, user } = actionModal
+        if (!user) {
             return
         }
-        try{
+        try {
             setActionLoading(true)
             let response
-            if (type==='block'){
-                response=await adminApi.post(
+            if (type === 'block') {
+                response = await adminApi.post(
                     `/admin/users/${user.id}/block/`
                 )
             }
-            if (type==='suspend'){
-                response=await adminApi.post(
+            if (type === 'suspend') {
+                response = await adminApi.post(
                     `/admin/users/${user.id}/suspend/`
                 )
             }
-            if (type==='activate'){
-                response=await adminApi.post(
+            if (type === 'activate') {
+                response = await adminApi.post(
                     `/admin/users/${user.id}/activate/`
                 )
             }
             console.log(response?.data)
             setActionModal({
-                show:false,
-                type:null,
-                user:null,
+                show: false,
+                type: null,
+                user: null,
             })
             await fetchUsers()
-        }catch(error){
-            console.error('user action failed:',error)
-            setError(error.response?.data?.detail||error.response?.data?.error||'user action failed')
-        }finally{
+        } catch (error) {
+            console.error('user action failed:', error)
+            setError(error.response?.data?.detail || error.response?.data?.error || 'user action failed')
+        } finally {
             setActionLoading(false)
         }
     }
-    const getModalContent=()=>{
-        const {type,user}=actionModal
-        if (!user){
+
+    const getModalContent = () => {
+        const { type, user } = actionModal
+        if (!user) {
             return {}
         }
-        const name=user.full_name||user.username||'this user'
-        const content={
-            block:{
-                title:'Block User',
-                message:`Are you sure you want to block ${name}? They will no longer be able to access the platform`,
-                confirmText:'Block User',
-                confirmClass:'btn-danger',
+        const name = user.full_name || user.username || 'this user'
+        const content = {
+            block: {
+                title: 'Block User',
+                message: `Are you sure you want to block ${name}? They will no longer be able to access the platform`,
+                confirmText: 'Block User',
+                confirmClass: 'btn-danger',
             },
-            suspend:{
-                title:'Suspend User',
-                message:`Are you sure you want to suspend ${name}? They will still be able to login but restricted actions will be unavailable`,
-                confirmText:'Suspend User',
-                confirmClass:'btn-warning',
+            suspend: {
+                title: 'Suspend User',
+                message: `Are you sure you want to suspend ${name}? They will still be able to login but restricted actions will be unavailable`,
+                confirmText: 'Suspend User',
+                confirmClass: 'btn-warning',
             },
-            activate:{
-                title:'Activate User',
-                message:`Are you sure you want to activate ${name}?`,
-                confirmText:'Activate User',
-                confirmClass:'btn-primary'
+            activate: {
+                title: 'Activate User',
+                message: `Are you sure you want to activate ${name}?`,
+                confirmText: 'Activate User',
+                confirmClass: 'btn-primary'
             }
         }
-        return content[type]||{}
+        return content[type] || {}
     }
-    const modalContent=getModalContent()
-    return(
+
+    const modalContent = getModalContent()
+
+    return (
         <div className="admin-user-management">
+            <div className="admin-user-container">
 
-            {/* Header */}
-
-            <div className="mb-4">
-
-                <h2 className="fw-bold mb-1">
-                    User Management
-                </h2>
-
-                <p className="text-muted mb-0">
-                    Monitor, verify, and moderate
-                    the SkillSwap community.
-                </p>
-
-            </div>
-
-
-            {/* Error */}
-
-            {error && (
-
-                <div
-                    className="alert alert-danger d-flex justify-content-between align-items-center"
-                    role="alert"
-                >
-
-                    <span>
-                        {error}
-                    </span>
-
-                    <button
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={fetchUsers}
-                    >
-                        Retry
-                    </button>
-
+                {/* Header */}
+                <div className="admin-user-header mb-4">
+                    <h2 className="fw-bold mb-1 admin-page-title">
+                        User Management
+                    </h2>
+                    <p className="text-muted mb-0 admin-page-subtitle">
+                        Monitor, verify, and moderate
+                        the SkillSwap community.
+                    </p>
                 </div>
 
-            )}
+                {/* Error */}
+                {error && (
+                    <div
+                        className="alert alert-danger d-flex justify-content-between align-items-center mb-4"
+                        role="alert"
+                    >
+                        <span>{error}</span>
+                        <button
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={fetchUsers}
+                        >
+                            Retry
+                        </button>
+                    </div>
+                )}
 
+                {/* Statistics */}
+                <div className="mb-4">
+                    <UserStats
+                        stats={stats}
+                    />
+                </div>
 
-            {/* Statistics */}
+                {/* Filters */}
+                <div className="mb-4">
+                    <UserFilters
+                        search={search}
+                        setSearch={handleSearchChange}
+                        selectedStatus={selectedStatus}
+                        setSelectedStatus={handleStatusChange}
+                    />
+                </div>
 
-            <UserStats
-                stats={stats}
-            />
+                {/* Table */}
+                <div className="admin-table-wrapper mb-4">
+                    <UserTable
+                        users={users}
+                        loading={loading}
+                        onView={handleView}
+                        onEdit={handleEdit}
+                        onBlock={(user) =>
+                            openActionModal(
+                                'block',
+                                user
+                            )
+                        }
+                        onSuspend={(user) =>
+                            openActionModal(
+                                'suspend',
+                                user
+                            )
+                        }
+                        onActivate={(user) =>
+                            openActionModal(
+                                'activate',
+                                user
+                            )
+                        }
+                    />
+                </div>
 
+                {/* Confirmation Modal */}
+                <ConfirmUserActionModal
+                    show={actionModal.show}
+                    title={modalContent.title}
+                    message={modalContent.message}
+                    confirmText={modalContent.confirmText}
+                    confirmClass={modalContent.confirmClass}
+                    loading={actionLoading}
+                    onConfirm={executeAction}
+                    onCancel={() =>
+                        setActionModal({
+                            show: false,
+                            type: null,
+                            user: null,
+                        })
+                    }
+                />
 
-            {/* Filters */}
+                {/* Edit Modal */}
+                {editingUser && (
+                    <EditUserModal
+                        user={editingUser}
+                        onClose={() => setEditingUser(null)}
+                        onUpdated={async () => {
+                            setEditingUser(null)
+                            await fetchUsers()
+                        }}
+                    />
+                )}
 
-            <UserFilters
-                search={search}
-                setSearch={
-                    handleSearchChange
-                }
-                selectedStatus={
-                    selectedStatus
-                }
-                setSelectedStatus={
-                    handleStatusChange
-                }
-            />
-
-
-            {/* Table */}
-
-            <UserTable
-                users={users}
-                loading={loading}
-                onView={handleView}
-                onEdit={handleEdit}
-
-                onBlock={(user) =>
-                    openActionModal(
-                        'block',
-                        user
-                    )
-                }
-
-                onSuspend={(user) =>
-                    openActionModal(
-                        'suspend',
-                        user
-                    )
-                }
-
-                onActivate={(user) =>
-                    openActionModal(
-                        'activate',
-                        user
-                    )
-                }
-
-            />
-
-
-            {/* Confirmation */}
-
-            <ConfirmUserActionModal
-                show={
-                    actionModal.show
-                }
-                title={
-                    modalContent.title
-                }
-                message={
-                    modalContent.message
-                }
-                confirmText={
-                    modalContent.confirmText
-                }
-                confirmClass={
-                    modalContent.confirmClass
-                }
-                loading={
-                    actionLoading
-                }
-                onConfirm={
-                    executeAction
-                }
-                onCancel={() =>
-                    setActionModal({
-                        show: false,
-                        type: null,
-                        user: null,
-                    })
-                }
-            />
-
-            {editingUser&&(
-                <EditUserModal
-                user={editingUser}
-                onClose={()=>setEditingUser(null)}
-                onUpdated={async ()=>{
-                    setEditingUser(null)
-                    await fetchUsers()
-                }}/>
-            )}
-
+            </div>
         </div>
     )
 }

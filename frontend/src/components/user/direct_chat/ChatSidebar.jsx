@@ -3,7 +3,6 @@ import React from "react";
 const ChatSidebar = ({
     activeFilter,
     setActiveFilter,
-    onNewMessage
 }) => {
 
     const filters = [
@@ -77,21 +76,7 @@ const ChatSidebar = ({
             </div>
 
 
-            <div className="chat-sidebar-bottom">
-
-                <button
-                    className="new-message-btn"
-                    onClick={onNewMessage}
-                >
-                    ✎
-                    <span>
-                        New Message
-                    </span>
-                </button>
-
-            </div>
-
-        </aside>
+            </aside>
     );
 };
 

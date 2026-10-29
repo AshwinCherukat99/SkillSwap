@@ -140,11 +140,6 @@ const ConversationsPage = ({
                     setActiveFilter={
                         setActiveFilter
                     }
-                    onNewMessage={() => {
-                        console.log(
-                            "New message"
-                        );
-                    }}
                 />
 
 

@@ -1,21 +1,71 @@
+/* ==========================================
+   PAGE BASE & SPACING (FIXES MARGINS)
+========================================== */
 .friends-page {
-    min-height: 100%;
+    min-height: 100vh;
+    background-color: #f8faff;
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.05) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%);
+    padding: 32px 24px 56px; /* Generous top & side breathing room from navbar */
 }
 
+/* Centers content and prevents it from sticking to the far left margin */
+.friends-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* ==========================================
+   PAGE HEADER
+========================================== */
+.friends-header {
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    padding-bottom: 18px;
+}
+
+.friends-page-title {
+    font-family: "Manrope", sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.friends-page-subtitle {
+    font-size: 14px;
+    color: #64748b;
+}
+
+/* ==========================================
+   SECTIONS
+========================================== */
+.friends-section {
+    width: 100%;
+}
+
+/* ==========================================
+   CARDS & AVATARS
+========================================== */
 .friend-card {
     border-radius: 18px;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.85);
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .friend-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08) !important;
 }
 
 .friend-avatar {
     width: 96px;
     height: 96px;
     object-fit: cover;
+    border-radius: 16px;
 }
 
 .friend-avatar-placeholder {
@@ -26,6 +76,7 @@
     color: white;
     font-size: 28px;
     font-weight: 600;
+    border-radius: 16px;
 }
 
 .bg-purple-subtle {
@@ -34,4 +85,17 @@
 
 .text-purple {
     color: #9333ea;
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+@media (max-width: 768px) {
+    .friends-page {
+        padding: 20px 16px 40px;
+    }
+
+    .friends-page-title {
+        font-size: 24px;
+    }
 }

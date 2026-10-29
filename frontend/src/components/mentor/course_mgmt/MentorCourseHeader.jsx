@@ -6,9 +6,6 @@ const MentorCourseHeader=({searchTerm,setSearchTerm})=>{
     const handleCreateCourse=()=>{
         navigate('/mentor/courses/create_course/')
     }
-    const handleReport=()=>{
-        alert('course report functionality will be added soon')
-    }
     return (
         <>
             {/* Search bar */}
@@ -45,17 +42,6 @@ const MentorCourseHeader=({searchTerm,setSearchTerm})=>{
                 </div>
 
                 <div className="d-flex gap-2">
-
-                    <button
-                        className="btn mentor-report-btn"
-                        onClick={handleReport}
-                    >
-                        <span className="material-symbols-outlined">
-                            file_download
-                        </span>
-
-                        Report
-                    </button>
 
                     <button
                         className="btn mentor-create-btn"
