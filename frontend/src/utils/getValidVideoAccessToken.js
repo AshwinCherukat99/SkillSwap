@@ -62,7 +62,7 @@ async function getValidVideoAccessToken(){
         throw new Error('could not refresh your session. please log in again')
     }
     const data=await response.json()
-    accessToken=response.access
+    accessToken=data.access
     if (!accessToken){
         throw new Error('token refresh response did not contain an access token')
     }
