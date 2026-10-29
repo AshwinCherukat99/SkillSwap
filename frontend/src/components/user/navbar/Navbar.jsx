@@ -96,7 +96,7 @@ const Navbar=()=>{
                         <MessageSquare size={20} />
                     </NavLink>
 
-                    <div className="profile-dropdown" ref={dropdownRef}>
+                    <div className="profile-dropdown" ref={dropDownRef}>
                         <button
                             type="button"
                             className={`profile-trigger ${
