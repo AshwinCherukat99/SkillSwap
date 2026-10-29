@@ -85,7 +85,8 @@ CHANNEL_LAYERS = {
                 config(
                     "REDIS_URL",
                     default="redis://redis:6379/0",
-                )
+                ),
+                "socket_timeout":None,
             ],
         },
     },
