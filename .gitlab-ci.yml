@@ -91,7 +91,6 @@ backend_check:
     - python -m pip install -r backend/requirements.txt
     - cd backend
     - python manage.py check
-  allow_failure: true
 
 frontend-deploy:
   stage: deploy
@@ -136,3 +135,32 @@ backend-build:
       fi
   rules:
     - if: '$CI_COMMIT_BRANCH'
+
+
+backend-deploy:
+  stage: deploy
+  image: alpine:3.20
+  needs:
+    - job: backend-build
+    - job: backend_check
+  before_script:
+    - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - printf '%s\n' "$EC2_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 600 ~/.ssh/known_hosts
+    - chmod 600 "$EC2_SSH_PRIVATE_KEY"
+  script:
+    - |
+      IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHA}"
+
+      ssh -i "$EC2_SSH_PRIVATE_KEY" \
+        -o StrictHostKeyChecking=yes \
+        "$EC2_USER@$EC2_HOST" \
+        "cd /home/ubuntu/skillswap &&
+         BACKEND_IMAGE='$IMAGE' docker compose --env-file .env.production -f docker-compose.prod.yml pull backend celery celery-beat &&
+         BACKEND_IMAGE='$IMAGE' docker compose --env-file .env.production -f docker-compose.prod.yml up -d --no-build backend celery celery-beat"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: never
