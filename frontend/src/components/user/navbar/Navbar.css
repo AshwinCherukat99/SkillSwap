@@ -1,123 +1,271 @@
 
+
 .skillswap-navbar {
-  min-height: 64px;
-  background-color: #e5e5e5;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+
+    min-height: 64px;
+    padding: 0 20px;
+    background-color: #e5e5e5;
+
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #d6d6d6;
 }
 
-.skillswap-navbar > .container-fluid {
-  display: flex;
-  align-items: center;
-  flex-wrap: nowrap;
-  gap: 6px;
-  min-width: 0;
-  padding: 0;
+.skillswap-navbar-inner {
+    display: flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 16px;
+    width: 100%;
+    min-width: 0;
+    padding: 0;
 }
 
-/* Logo */
 .skillswap-logo {
-  color: #3730d9 !important;
-  font-size: 20px;
-  font-weight: 700;
-  margin: 0 0 0 0;
-  padding: 0;
-  line-height: 1;
-  flex-shrink: 0;
-  text-decoration: none;
+    flex-shrink: 0;
+    margin: 0;
+    padding: 0;
+    color: #3730d9 !important;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
 }
 
-
-/* Navigation links */
 .skillswap-nav {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center;
-  gap: 0;
-  flex: 1 1 0;
-  min-width: 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  white-space: nowrap;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    flex: 1 1 auto;
+    gap: 2px;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    white-space: nowrap;
 }
 
 .skillswap-nav::-webkit-scrollbar {
-  display: none;
+    display: none;
 }
 
 .skillswap-link {
-  color: #444 !important;
-  font-size: 12px;
-  padding: 12px 7px !important;
-  white-space: nowrap;
-  flex: 0 0 auto;
-  line-height: 1.4;
-  text-decoration: none;
-  border-bottom: 2px solid transparent;
+    flex: 0 0 auto;
+    padding: 12px 8px !important;
+    border-bottom: 2px solid transparent;
+    color: #444 !important;
+    font-size: 12px;
+    line-height: 1.4;
+    text-decoration: none;
+    white-space: nowrap;
 }
 
-.skillswap-link:hover {
-  color: #3730d9 !important;
+.skillswap-link:hover,
+.skillswap-link.active {
+    color: #3730d9 !important;
 }
 
 .skillswap-link.active {
-  color: #3730d9 !important;
-  border-bottom-color: #3730d9;
-}
-
-/* Keep logo and action icons visible */
-.skillswap-logo,
-.skillswap-actions {
-  flex-shrink: 0;
+    border-bottom-color: #3730d9;
 }
 
 .skillswap-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
-
 
 .icon-btn {
-  width: 28px;
-  height: 32px;
-  padding: 0;
-  border: none;
-  background: transparent;
-  color: #333;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  cursor: pointer;
-  flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 34px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #333;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .icon-btn:hover {
-  color: #3730d9;
+    background: rgba(55, 48, 217, 0.08);
+    color: #3730d9;
 }
 
-/* Smaller screens */
-@media (max-width: 992px) {
-  .skillswap-navbar {
-    padding: 8px 16px;
-  }
+/* Profile dropdown */
+.profile-dropdown {
+    position: relative;
+    flex-shrink: 0;
+}
 
-  .skillswap-navbar > .container-fluid {
-    flex-wrap: wrap;
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 38px;
+    padding: 3px 7px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+}
+
+.profile-trigger:hover,
+.profile-trigger.open {
+    background: rgba(55, 48, 217, 0.08);
+    border-color: rgba(55, 48, 217, 0.12);
+}
+
+.profile-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #dcd9ff;
+    color: #3730d9;
+}
+
+.profile-chevron {
+    color: #555;
+    transition: transform 0.2s ease;
+}
+
+.profile-trigger.open .profile-chevron {
+    transform: rotate(180deg);
+}
+
+.profile-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 1200;
+
+    width: 230px;
+    max-height: min(70vh, 440px);
+    overflow-y: auto;
+    padding: 8px;
+
+    background: #fff;
+    border: 1px solid #e6e6ef;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(20, 20, 50, 0.16);
+}
+
+.profile-menu-heading {
+    display: flex;
+    align-items: center;
     gap: 10px;
-  }
+    padding: 10px 8px;
+}
 
-  .skillswap-nav {
-    order: 3;
-    flex-basis: 100%;
+.profile-menu-heading strong,
+.profile-menu-heading span {
+    display: block;
+}
+
+.profile-menu-heading strong {
+    color: #202033;
+    font-size: 13px;
+}
+
+.profile-menu-heading div > span {
+    margin-top: 3px;
+    color: #777;
+    font-size: 11px;
+}
+
+.profile-menu-divider {
+    height: 1px;
+    margin: 6px 0;
+    background: #ededf3;
+}
+
+.profile-menu-link {
+    display: flex;
+    align-items: center;
     width: 100%;
-  }
+    gap: 9px;
+    padding: 10px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: #424253;
+    font-size: 13px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
 
-  .skillswap-actions {
-    margin-left: auto;
-  }
+.profile-menu-link:hover,
+.profile-menu-link.active {
+    background: #f0efff;
+    color: #3730d9;
+}
+
+.logout-link {
+    color: #bd3030;
+}
+
+.logout-link:hover {
+    background: #fff0f0;
+    color: #a51f1f;
+}
+
+/* Reserve space so page content isn't hidden behind fixed navbar */
+body {
+    padding-top: 64px;
+}
+
+/* Responsive navbar */
+@media (max-width: 992px) {
+    .skillswap-navbar {
+        padding: 8px 12px;
+    }
+
+    .skillswap-navbar-inner {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .skillswap-logo {
+        font-size: 19px;
+    }
+
+    .skillswap-actions {
+        margin-left: auto;
+    }
+
+    .skillswap-nav {
+        order: 3;
+        flex: 0 0 100%;
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .skillswap-navbar-inner {
+        gap: 6px;
+    }
+
+    .skillswap-actions {
+        gap: 3px;
+    }
+
+    .skillswap-link {
+        padding: 10px 7px !important;
+    }
 }
