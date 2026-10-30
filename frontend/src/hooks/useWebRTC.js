@@ -113,11 +113,14 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
         event.streams[0] || new MediaStream([event.track]);
 
       console.log('Incoming video mapping:', {
-        incomingMid: transceiver.mid,
-        screenMid: screenMidRef.current,
-        screenSenderMid: screenSenderRef.current?.mid ?? null,
-        isScreenTrack,
-      });
+    incomingMid: transceiver.mid,
+    screenMid: screenMidRef.current,
+    direction: transceiver.direction,
+    currentDirection: transceiver.currentDirection,
+    isScreenTrack,
+    trackId: event.track.id,
+    trackState: event.track.readyState,
+});
 
       if (isScreenTrack) {
         attachStream(
@@ -226,24 +229,27 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
 
       // Reuse the transceiver corresponding to the screen m-line.
       // Do not create another transceiver on the answering peer.
-      if (screenMidRef.current != null) {
-        screenSenderRef.current =
-          peerConnection.getTransceivers().find(
+      // Reuse the screen-sharing transceiver from the remote offer.
+if (screenMidRef.current != null) {
+    screenSenderRef.current =
+        peerConnection.getTransceivers().find(
             (t) => t.mid === screenMidRef.current
-          ) ?? null;
-      }
+        ) ?? null;
+}
 
-      console.log(
-        'Transceivers after remote offer:',
-        peerConnection.getTransceivers().map((t) => ({
-          mid: t.mid,
-          direction: t.direction,
-          currentDirection: t.currentDirection,
-          senderTrack: t.sender.track?.kind ?? null,
-          receiverTrack: t.receiver.track?.kind ?? null,
-          isScreenSender: t === screenSenderRef.current,
-        }))
-      );
+// Allow both participants to send and receive screen video.
+if (screenSenderRef.current) {
+    screenSenderRef.current.direction = 'sendrecv';
+
+    console.log('Screen transceiver configured on answering peer:', {
+        mid: screenSenderRef.current.mid,
+        direction: screenSenderRef.current.direction,
+        currentDirection: screenSenderRef.current.currentDirection,
+        senderTrack: screenSenderRef.current.sender.track,
+    });
+} else {
+    console.error('Could not find screen-sharing transceiver.');
+}
 
       for (const candidate of pendingCandidatesRef.current) {
         await peerConnection.addIceCandidate(
