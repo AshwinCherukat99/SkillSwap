@@ -96,23 +96,22 @@ function Feed(){
   <div className="container feed-container py-4">
     <div className="row g-4">
       {/* LEFT SIDEBAR */}
-      <div className="col-12 col-md-4 col-lg-3">
+      <div className="col-12 col-md-5 col-lg-3">
         <div className="sticky-sidebar">
           {/* Profile Card */}
           <div className="card surface-card shadow-sm border-0 mb-3 overflow-hidden text-center">
-            <div className="profile-banner"></div>
-            <div className="card-body pt-0 px-3 pb-3">
-              <div className="profile-avatar-wrapper mb-2">
-                <img
-                  src={profileImage}
-                  alt=""
-                  className="profile-avatar shadow-sm"
-                />
-              </div>
-              <h6 className="fw-bold mb-0">
-                {user?.full_name || user?.username || "User"}
-              </h6>
-              <p className="text-muted small mb-3">@{user?.username}</p>
+  <div className="profile-banner">
+    <img
+      src={profileImage}
+      alt=""
+      className="profile-banner-img"
+    />
+  </div>
+  <div className="card-body px-3 pb-3 pt-3">
+    <h6 className="fw-bold mb-0">
+      {user?.full_name || user?.username || "User"}
+    </h6>
+    <p className="text-muted small mb-3">@{user?.username}</p>
 
               {/* Stats Box */}
               <div className="stats-box d-flex py-2 mb-3">

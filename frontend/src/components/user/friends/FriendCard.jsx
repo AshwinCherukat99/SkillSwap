@@ -1,6 +1,8 @@
-import React from 'react'
+import React,{useState,useCallback,useEffect} from 'react'
 
+import api from '../../../services/api'
 import {MessageCircle,CalendarPlus,User,Users} from 'lucide-react'
+import ReportModal from '../../../pages/report_modal/ReportModal'
 
 const FriendCard=({
     friend,
@@ -8,11 +10,69 @@ const FriendCard=({
     onChat,
     onRequestSession
 })=>{
+    const [reportTarget,setReportTarget]=useState(null)
+    const [reportToast,setReportToast]=useState('')
     const initials=friend.name?.split(' ').map(word=>word[0]).join('').slice(0,2).toUpperCase()
+    const person=friend
+    const handleCloseReport=useCallback(()=>{
+        setReportTarget(null)
+    })
+    const handleReportSuccess=(message)=>{
+        setReportToast(message)
+    }
+    const onReportUser=()=>{
+        const reportedUserId=person?.id
+        if (reportedUserId===null){
+            console.error('friend data:',friend)
+            alert('unable to identify the user. check the api response')
+            return
+        }
+        setReportTarget({
+            type:"USER",
+            id:reportedUserId,
+            reportedUserId,
+        })
+    }
+    useEffect(()=>{
+        if (!reportToast) return
+        const timeout=setTimeout(()=>{
+            setReportToast('')
+        },4000)
+        return ()=>clearTimeout(timeout)
+    },[reportToast])
     return (
         <div className="card border-0 shadow-sm h-100 friend-card">
 
             <div className="card-body p-4 d-flex flex-column">
+
+                <div className="d-flex flex-column align-items-end gap-3">
+
+    <div className="dropdown">
+      <button
+        type="button"
+        className="btn btn-light btn-sm rounded-pill d-flex align-items-center gap-1"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        <i className="bi bi-exclamation-circle"></i>
+        <span>Report</span>
+      </button>
+
+      <ul className="dropdown-menu dropdown-menu-end shadow-sm border-0">
+        <li>
+          <button
+            type="button"
+            className="dropdown-item d-flex align-items-center gap-2"
+            onClick={onReportUser}
+          >
+            <i className="bi bi-person-exclamation text-danger"></i>
+            Report User
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+
 
                 {/* Profile image */}
                 <div className="text-center">
@@ -137,6 +197,35 @@ const FriendCard=({
                 </div>
 
             </div>
+
+            {reportTarget&&(
+                <ReportModal
+                target={reportTarget}
+                apiClient={api}
+                onClose={handleCloseReport}
+                onSuccess={handleReportSuccess}/>
+            )}
+
+            {reportToast&&(
+                <div
+        className="report-toast"
+        role="status"
+        aria-live="polite"
+    >
+        <i className="bi bi-check-circle-fill" />
+
+        <span>{reportToast}</span>
+
+        <button
+            type="button"
+            onClick={() => setReportToast("")}
+            aria-label="Dismiss notification"
+        >
+            &times;
+        </button>
+    </div>
+            )}
+
 
         </div>
     )
