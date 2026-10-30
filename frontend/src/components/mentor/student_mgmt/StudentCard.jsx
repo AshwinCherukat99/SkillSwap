@@ -5,7 +5,12 @@ const StudentCard=({student,onScheduleSession,onMessage})=>{
     const navigate=useNavigate()
     const initials=(student.full_name||student.username||'?').split(' ').map((name)=>name[0]).join('').slice(0,2).toUpperCase()
     const handleViewProfile=()=>{
-        navigate(`/mentor/students/${student.student_id}/`)
+        const enrollmentId=student.enrollments?.[0]?.id
+        if (!enrollmentId){
+            console.error('no enrollment found for this student')
+            return
+        }
+        navigate(`/mentor/students/${enrollmentId}/`)
     }
     return (
         <div className="col-12 col-md-6">
