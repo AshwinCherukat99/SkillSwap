@@ -95,34 +95,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
     @database_sync_to_async
     def check_membership(self,user):
-        if ConversationMember.objects.filter(
+        account_type=self.scope.get('account_type')
+        if account_type=='MENTOR':
+            return ConversationMember.objects.filter(
+                conversation_id=self.conversation_id,
+                mentor=user,
+                is_active=True,
+            ).exists()
+        return ConversationMember.objects.filter(
             conversation_id=self.conversation_id,
             user=user,
             is_active=True,
-        ).exists():
-            return True
-        try:
-            mentor=user.mentor_profile
-        except Exception:
-            mentor=None
-        if mentor:
-            return ConversationMember.objects.filter(
-                conversation_id=self.conversation_id,
-                mentor=mentor,
-                is_active=True,
-            ).exists()
-        return False
-
+        ).exists()
+        
     @database_sync_to_async
     def create_message(self,user,content):
         conversation=Conversation.objects.get(
             id=self.conversation_id
         ) 
-        try:
-            mentor=user.mentor_profile
-        except Exception:
-            mentor=None
-        if mentor:
+        account_type=self.scope.get('account_type')
+        if account_type=='MENTOR':
+            mentor=user
             message=Message.objects.create(
                 conversation=conversation,
                 sender_mentor=mentor,
@@ -135,14 +128,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         else:
             message=Message.objects.create(
-            conversation=conversation,
-            sender_user=user,
-            content=content,
-        )
+                conversation=conversation,
+                sender_user=user,
+                content=content,
+            )
             sender={
                 'id':user.id,
                 'username':user.username,
-                'type':'USER'
+                'type':'USER',
             }
         conversation.save(update_fields=['updated_at'])
         return {
@@ -151,6 +144,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'sender':sender,
             'created_at':message.created_at.isoformat(),
         }
+        
     @database_sync_to_async
     def check_message_exists(self,message_id):
         return Message.objects.filter(
