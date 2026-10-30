@@ -63,6 +63,21 @@ class StartAssessmentView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        total_lessons=CourseLesson.objects.filter(
+            module__course=course
+        ).count()
+        unlocked_lessons=LessonProgress.objects.filter(
+            enrollment=enrollment,
+            lesson__module__course=course,
+            is_unlocked=True,
+        ).count()
+        if total_lessons==0 or unlocked_lessons!=total_lessons:
+            return Response(
+                {
+                    'error':'you must unlock all lessons before starting the assessment'
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
         passed_assessment=Assessment.objects.filter(
             enrollment=enrollment,
             status=Assessment.Status.COMPLETED,
@@ -603,6 +618,34 @@ class UserCourseDetailView(APIView):
             course=course,
         ).first()
         is_enrolled=enrollment is not None
+        all_lessons=CourseLesson.objects.filter(
+            module__course=course
+        )
+        total_lessons=all_lessons.count()
+        unlocked_lessons=0
+        if (is_enrolled and total_lessons>0):
+            unlocked_lessons=LessonProgress.objects.filter(
+                enrollment=enrollment,
+                lesson__module__course=course,
+                is_unlocked=True,
+            ).count()          
+            first_module=course.modules.order_by('order').first()
+            first_lesson=(
+                first_module.lessons.order_by('order').first() if first_module else None
+            )
+            if first_lesson:
+                first_lesson_progress=LessonProgress.objects.filter(
+                    enrollment=enrollment,
+                    lesson=first_lesson,
+                    is_unlocked=True,
+                ).exists()       
+                if not first_lesson_progress:
+                    unlocked_lessons+=1
+        all_lessons_unlocked=(
+            is_enrolled 
+            and total_lessons>0
+            and total_lessons==unlocked_lessons
+        )
         modules=list(
             course.modules.all().order_by('order')
         )
@@ -656,7 +699,8 @@ class UserCourseDetailView(APIView):
                 )
         return Response(
                 {
-                    'is_enrolled':is_enrolled,
+                    'is_enrolled':is_enrolled, 
+                    'all_lessons_unlocked':all_lessons_unlocked,
                     'enrollment':(
                         {
                             'id':enrollment.id,

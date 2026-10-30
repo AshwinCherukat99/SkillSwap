@@ -16,6 +16,7 @@ function CourseDetail(){
     const [isEnrolled,setIsEnrolled]=useState(false)
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
+    const [allLessonsUnlocked,setAllLessonsUnlocked]=useState(false)
     useEffect(()=>{
         const fetchCourse=async ()=>{
             try{
@@ -27,6 +28,7 @@ function CourseDetail(){
                 const data=response.data
                 setCourse(data.course||data)
                 setIsEnrolled(data.is_enrolled===true)
+                setAllLessonsUnlocked(data.all_lessons_unlocked===true)
             }catch(error){
                 console.error('failed to load course:',error)
                 if (error.response?.status===404){
@@ -156,6 +158,30 @@ function CourseDetail(){
                             course={course}
                             isEnrolled={isEnrolled}
                         />
+                        {isEnrolled && allLessonsUnlocked && (
+    <div className="card shadow-sm mt-4">
+        <div className="card-body">
+            <h5 className="card-title">
+                Course Assessment
+            </h5>
+
+            <p className="text-muted">
+                All lessons are unlocked. You can now start
+                your course assessment.
+            </p>
+
+            <button
+                type="button"
+                className="btn btn-primary w-100"
+                onClick={() =>
+                    navigate(`/courses/${courseId}/assessment`)
+                }
+            >
+                Start Assessment
+            </button>
+        </div>
+    </div>
+)}
 
                     </div>
 

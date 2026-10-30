@@ -647,16 +647,6 @@ function Home() {
                                             )}
                                         </div>
 
-                                        <button
-                                            type="button"
-                                            className={
-                                                mentor.featured
-                                                    ? "mentor-view-button filled"
-                                                    : "mentor-view-button"
-                                            }
-                                        >
-                                            View Profile
-                                        </button>
                                     </div>
                                 )
                             )}
