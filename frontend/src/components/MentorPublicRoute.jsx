@@ -10,7 +10,7 @@ function MentorPublicRoute({children}){
             />
         )
     }
-    return children
+    return <div className='public-page-wrapper'>{children}</div>
 }
 
 export default MentorPublicRoute

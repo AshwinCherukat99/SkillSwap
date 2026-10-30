@@ -5,13 +5,15 @@ const MessageList=({messages,currentUserId,currentUserType,loading})=>{
     const messagesEndRef=useRef(null)
     useEffect(()=>{
         messagesEndRef.current?.scrollIntoView({
-            behaviour:'smooth',
+            behavior:'smooth',
         })
     },[messages])
     if (loading){
+      return (
         <div className="flex-grow-1 d-flex align-items-center justify-content-center">
         <div className="spinner-border text-primary" />
       </div>
+      )
     }
     return (
         <div className="chat-messages flex-grow-1 overflow-auto p-4">

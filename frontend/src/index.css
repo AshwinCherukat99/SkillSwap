@@ -1,3 +1,15 @@
+/* Automatically removes the 64px body padding on all public routes */
+body:has(.public-page-wrapper),
+body:has(.admin-login-page){
+    padding-top: 0 !important;
+    margin: 0 !important;
+}
+
+.public-page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+}
+
 * {
     box-sizing: border-box;
 }
