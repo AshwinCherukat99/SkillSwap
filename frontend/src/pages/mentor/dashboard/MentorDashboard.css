@@ -655,3 +655,27 @@ body {
     font-size: 16px;
     font-variation-settings: 'FILL' 1;
 }
+
+.dashboard-upcoming-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.dashboard-upcoming-list .session-card {
+    padding: 10px;
+    min-width: 0;
+}
+
+.dashboard-upcoming-list .session-title {
+    font-size: 12px;
+}
+
+.dashboard-upcoming-list .session-meta {
+    font-size: 10px;
+}
+
+.dashboard-upcoming-list .join-btn {
+    padding: 6px 10px;
+    flex-shrink: 0;
+}

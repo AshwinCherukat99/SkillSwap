@@ -7,9 +7,11 @@ function MentorDashboard() {
     const navigate = useNavigate();
     const [mentor, setMentor] = useState(null);
     const [dashboard, setDashboard] = useState(null);
+    const [period,setPeriod]=useState('6')
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const upcomingSessions=dashboard?.upcoming_sessions||[]
 
     const handleLogout = () => {
         localStorage.removeItem("mentor_access_token");
@@ -21,7 +23,7 @@ function MentorDashboard() {
     useEffect(() => {
         const fetchDashboard = async () => {
             try {
-                const response = await mentorApi.get("/mentors/dashboard/");
+                const response = await mentorApi.get(`/mentors/dashboard/?period=${period}`);
                 setMentor(response.data.mentor);
                 setDashboard(response.data);
                 setCourses(response.data.courses || []);
@@ -37,7 +39,7 @@ function MentorDashboard() {
             }
         };
         fetchDashboard();
-    }, []);
+    }, [period]);
 
     if (loading) {
         return (
@@ -75,14 +77,11 @@ function MentorDashboard() {
         },
     ];
 
-    const chartBars = [
-        { label: "May", height: "60%", value: 120 },
-        { label: "Jun", height: "75%", value: 145 },
-        { label: "Jul", height: "65%", value: 132 },
-        { label: "Aug", height: "85%", value: 168 },
-        { label: "Sep", height: "95%", value: 190 },
-        { label: "Oct", height: "80%", value: 178 },
-    ];
+    const chartBars = dashboard?.student_growth||[]
+    const maxStudents=Math.max(
+        ...chartBars.map(bar=>bar.students),
+        1
+    )
 
     const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(
         mentor?.full_name || "Mentor"
@@ -160,7 +159,7 @@ function MentorDashboard() {
                                     <span className="kpi-change">+12%</span>
                                 </div>
                                 <p className="kpi-label">Total Students</p>
-                                <h3 className="kpi-value">524</h3>
+                                <h3 className="kpi-value">{dashboard?.stats?.total_students??0}</h3>
                             </div>
 
                             <div className="kpi-card">
@@ -168,7 +167,7 @@ function MentorDashboard() {
                                     <span className="kpi-icon material-symbols-outlined">school</span>
                                 </div>
                                 <p className="kpi-label">Courses</p>
-                                <h3 className="kpi-value">12</h3>
+                                <h3 className="kpi-value">{dashboard?.stats?.total_courses??0}</h3>
                             </div>
 
                             <div className="kpi-card">
@@ -177,7 +176,7 @@ function MentorDashboard() {
                                     <span className="kpi-top">TOP</span>
                                 </div>
                                 <p className="kpi-label">Rating</p>
-                                <h3 className="kpi-value">{Number(mentor.rating || 0).toFixed(2)}</h3>
+                                <h3 className="kpi-value">{Number(dashboard?.stats?.rating || 0).toFixed(2)}</h3>
                             </div>
 
                             <div className="kpi-card">
@@ -185,7 +184,7 @@ function MentorDashboard() {
                                     <span className="kpi-icon material-symbols-outlined">forum</span>
                                 </div>
                                 <p className="kpi-label">Active Groups</p>
-                                <h3 className="kpi-value">8</h3>
+                                <h3 className="kpi-value">{dashboard?.stats?.active_groups}</h3>
                             </div>
                         </section>
                     )}
@@ -226,16 +225,16 @@ function MentorDashboard() {
 
                                     <div className="chart-area">
                                         {chartBars.map((bar) => (
-                                            <div className="chart-bar-wrapper" key={bar.label}>
-                                                <div className="chart-tooltip">{bar.value}</div>
-                                                <div className="chart-bar" style={{ height: bar.height }} />
+                                            <div className="chart-bar-wrapper" key={bar.month}>
+                                                <div className="chart-tooltip">{bar.students} students</div>
+                                                <div className="chart-bar" style={{ height: `${(bar.students/maxStudents)*100}%` }} />
                                             </div>
                                         ))}
                                     </div>
 
                                     <div className="chart-labels">
                                         {chartBars.map((bar) => (
-                                            <span key={bar.label}>{bar.label}</span>
+                                            <span key={bar.month}>{bar.month}</span>
                                         ))}
                                     </div>
                                 </div>
@@ -288,28 +287,62 @@ function MentorDashboard() {
                                         </button>
                                     </div>
 
-                                    <div className="d-flex flex-column gap-2">
-                                        {sessions.map((session) => (
-                                            <div key={session.date} className="session-card">
-                                                <div className={`date-box ${session.disabled ? "secondary-date" : ""}`}>
-                                                    <span className="date-month">{session.month}</span>
-                                                    <span className="date-number">{session.date}</span>
-                                                </div>
+                                    <div className="dashboard-upcoming-list">
+    {upcomingSessions.length > 0 ? (
+        upcomingSessions.slice(0, 3).map((session) => (
+            <div className="session-card" key={session.id}>
 
-                                                <div className="session-info min-w-0">
-                                                    <h4 className="session-title text-truncate">{session.title}</h4>
-                                                    <p className="session-meta mb-0 text-truncate">{session.meta}</p>
-                                                </div>
+                <div className="date-box">
+                    <span className="date-month">
+                        {new Date(session.scheduled_start)
+                            .toLocaleDateString("en-US", {
+                                month: "short"
+                            })}
+                    </span>
 
-                                                <button
-                                                    className={`join-btn ${session.disabled ? "disabled" : ""}`}
-                                                    disabled={session.disabled}
-                                                >
-                                                    Join
-                                                </button>
-                                            </div>
-                                        ))}
-                                    </div>
+                    <span className="date-number">
+                        {new Date(session.scheduled_start)
+                            .getDate()}
+                    </span>
+                </div>
+
+                <div className="session-info">
+                    <h4 className="session-title text-truncate">
+                        {session.title}
+                    </h4>
+
+                    <p className="session-meta mb-0 text-truncate">
+                        {session.student_name} · {
+                            new Date(session.scheduled_start)
+                                .toLocaleTimeString("en-US", {
+                                    hour: "2-digit",
+                                    minute: "2-digit"
+                                })
+                        }
+                    </p>
+                </div>
+
+                <button
+                    className="join-btn"
+                    disabled={
+                        !session.conversation_id ||
+                        new Date(session.scheduled_start).getTime() > Date.now()
+                    }
+                    onClick={() => navigate(
+                        `/video-call/course-session-${session.id}/${session.conversation_id}`
+                    )}
+                >
+                    Join
+                </button>
+
+            </div>
+        ))
+    ) : (
+        <p className="text-muted small mb-0">
+            No upcoming sessions.
+        </p>
+    )}
+</div>
                                 </div>
                             )}
                         </div>
