@@ -5,13 +5,19 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
 from django.conf import settings
+from django.utils import timezone
+from datetime import date,timedelta
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from .authentication import MentorJWTAuthentication
 from .models import MentorDocument,Mentor,MentorProfile
+from apps.sessions_mgmt.models import CourseSession
+from apps.chat.models import Conversation
 from apps.accounts.models import UserRating
 from apps.courses.models import Course,CourseEnrollment
 from django.db.models import Count,Avg,Q
+from django.db.models.functions import TruncMonth
+from django.core.exceptions import ObjectDoesNotExist
 from .serializers.documents import MentorDocumentSerializer,MentorRegisterSerializer,VerifyMentorRegistrationOTPSerializer,MentorLoginSerializer,MentorForgotPasswordSerialzer,MentorVerifyResetOTPSerializer,MentorResetPasswordSerializer,MentorProfileUpdateSerializer
 from .serializers.reviews import MentorReviewSerializer
 from .serializers.students import MentorStudentSerializer
@@ -421,11 +427,97 @@ class MentorDashboardView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
-        courses=Course.objects.filter(
+        mentor_courses=Course.objects.filter(
             mentor=mentor,
             status=Course.Status.PUBLISHED,
             is_active=True,
-        ).values('slug')
+        )
+        courses=list(mentor_courses.values('slug'))
+        total_students=CourseEnrollment.objects.filter(
+            course_in=mentor_courses
+        ).values('user').distinct().count()
+        total_courses=mentor_courses.count()
+        active_groups=Conversation.objects.filter(
+            course__in=mentor_courses,
+            conversation_type=Conversation.ConversationType.GROUP
+        ).count()
+        period=request.query_params.get('period','6')
+        if period not in ['6','12']:
+            period='6'
+        period=int(period)
+        today=timezone.localdate()       
+        month_index=(
+            today.year*12+today.month-1-(period-1)
+        )
+        start_date=date(
+            month_index//12,
+            month_index%12+1,
+            1,
+        )
+        growth_data=(
+            CourseEnrollment.objects.filter(
+                course__in=mentor_courses,
+                enrolled_at__date__gte=start_date,
+            ).annotate(
+                month=TruncMonth('enrolled_at')
+            )
+            .values('month')
+            .annotate(
+                students=Count('user',distinct=True)
+            )
+            .order_by('month')
+        )
+        growth_lookup={
+            item['month'].date.replace(day=1):item['students'] 
+            for item in growth_data
+        }
+        student_growth=[]
+        for i in range(period):
+            month_index=(
+                start_date.year*12+today.month-1+i
+            )
+            month_date=date(
+                month_index//12,
+                month_index%12+1,
+                1
+            )
+            student_growth.append({
+                'month':month_date.strftime('%b'),
+                'students':growth_lookup.get(month_date,0)
+            })
+        now=timezone.now()
+        upcoming_queryset=(
+            CourseSession.objects.filter(
+                mentor=mentor,
+                status=CourseSession.Status.SCHEDULED,
+                scheduled_start__gte=now
+            )
+            .select_related(
+                'enrollment__user',
+                'enrollment__course'
+            )
+            .order_by('scheduled_start')[:5]
+        )
+        upcoming_sessions=[]
+        for session in upcoming_queryset:
+            try:
+                conversation_id=session.video_conversation.id
+            except ObjectDoesNotExist:
+                conversation_id=None
+            student=session.enrollment.user
+            upcoming_sessions.append({
+                'id':session.id,
+                'title':session.enrollment.course.title,
+                'student_name':(
+                    student.full_name or student.username
+                ),
+                'student_username':student.username,
+                'scheduled_start':session.scheduled_start,
+                'duration_minutes':session.duration_minutes,
+                'status':session.status,
+                'message':session.message,
+                'conversation_id':conversation_id,
+            })
         profile_image=None
         if mentor.profile_image:
             profile_image=request.build_absolute_uri(
@@ -435,31 +527,41 @@ class MentorDashboardView(APIView):
             profile=mentor.profile
         except MentorProfile.DoesNotExist:
             profile=None
+        mentor_data={
+                                'id':mentor.id,
+                                'full_name':mentor.full_name,
+                                'username':mentor.username,
+                                'email':mentor.email,
+                                'profile_image':profile_image,
+                                'phone_number':mentor.phone_number,
+                                'is_verified':mentor.is_verified,
+                                'rating':str(mentor.rating),
+                                'total_reviews':mentor.total_reviews,
+                                'created_at':mentor.created_at,
+                                'updated_at':mentor.updated_at,
+                                'current_profession':(
+                                    profile.current_profession if profile else ''
+                                ),
+                                'professional_summary':(
+                                                        profile.professional_summary if profile else ''
+                                                    ),
+                                'teaching_niche':(
+                                                        profile.teaching_niche if profile else ''
+                                                    ),
+        }
         return Response(
             {
-                'mentor':{
-                    'id':mentor.id,
-                    'full_name':mentor.full_name,
-                    'username':mentor.username,
-                    'email':mentor.email,
-                    'profile_image':profile_image,
-                    'phone_number':mentor.phone_number,
-                    'is_verified':mentor.is_verified,
+                'mentor':mentor_data,
+                'courses':courses,
+                'stats':{
+                    'total_students':total_students,
+                    'total_courses':total_courses,
                     'rating':str(mentor.rating),
                     'total_reviews':mentor.total_reviews,
-                    'created_at':mentor.created_at,
-                    'updated_at':mentor.updated_at,
-                    'current_profession':(
-                        profile.current_profession if profile else ''
-                    ),
-                    'professional_summary':(
-                                            profile.professional_summary if profile else ''
-                                        ),
-                    'teaching_niche':(
-                                                                profile.teaching_niche if profile else ''
-                                                            ),
+                    'active_groups':active_groups,
                 },
-                'courses':list(courses),
+                'student_growth':student_growth,
+                'upcoming_sessions':upcoming_sessions,
             },
             status=status.HTTP_200_OK,
         )

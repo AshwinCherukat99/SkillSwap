@@ -199,14 +199,6 @@ function MentorDashboard() {
                             <div className="section-card">
                                 <div className="d-flex align-items-center justify-content-between mb-3">
                                     <h3 className="section-title mb-0">About Me</h3>
-                                    <div className="social-icons">
-                                        <button className="social-btn" title="Website">
-                                            <span className="material-symbols-outlined">public</span>
-                                        </button>
-                                        <button className="social-btn" title="Code / Portfolio">
-                                            <span className="material-symbols-outlined">terminal</span>
-                                        </button>
-                                    </div>
                                 </div>
 
                                 <p className="about-text mb-2">
@@ -219,16 +211,6 @@ function MentorDashboard() {
                                     </p>
                                 )}
 
-                                <div className="d-flex flex-wrap gap-2 pt-2">
-                                    <div className="contact-pill">
-                                        <span className="material-symbols-outlined">link</span>
-                                        <span>github.com/alexj-dev</span>
-                                    </div>
-                                    <div className="contact-pill">
-                                        <span className="material-symbols-outlined">work</span>
-                                        <span>portfolio.lumina.io/alex</span>
-                                    </div>
-                                </div>
                             </div>
 
                             {/* STUDENT GROWTH CHART */}
