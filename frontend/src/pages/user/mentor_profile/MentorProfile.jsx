@@ -47,7 +47,7 @@ function MentorProfile(){
                 }
             )
             navigate(
-                `/conversations?conversation=${response.data.id}`
+                `/direct-chat?conversation=${response.data.id}`
             )
         }catch(err){
             console.error(

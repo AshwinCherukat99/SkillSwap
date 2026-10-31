@@ -159,7 +159,7 @@ const ChatWindow = ({
                 <div>
 
                     <h3>
-                        {conversation.name}
+                        {conversation.person?.name||conversation.person?.username||conversation.name||'Conversation'}
                     </h3>
 
                     <span
