@@ -1089,8 +1089,13 @@ html.dark {
 
 .google-login-wrapper {
     width: 100%;
+    display: flex;
+    justify-content: center;
 }
 
+/* Ensure Google's outer container is centered and full width without blowing up inner icons */
 .google-login-wrapper > div {
     width: 100% !important;
+    display: flex;
+    justify-content: center;
 }

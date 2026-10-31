@@ -89,14 +89,7 @@
 }
 
 .online-dot {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 13px;
-  height: 13px;
-  background: #10b981;
-  border: 2px solid #fff;
-  border-radius: 50%;
+    display: none !important;
 }
 
 .conversation-info {

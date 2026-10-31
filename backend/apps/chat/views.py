@@ -572,3 +572,50 @@ class VideoCallDetailsView(APIView):
                 'status':session.status,
             }
         )
+
+class UserStartMentorDirectChatView(APIView):
+    permission_classes=[IsAuthenticated]
+    @transaction.atomic
+    def post(self,request):
+        mentor_id=request.data.get('mentor_id')
+        if not mentor_id:
+            return Response(
+                {
+                    'detail':'mentor id is required'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        mentor=get_object_or_404(
+            Mentor,
+            id=mentor_id,
+            is_active=True,
+        )
+        user=request.user
+        conversation=Conversation.objects.filter(
+            conversation_type=Conversation.ConversationType.DIRECT,
+            members__user=user,
+            members__is_active=True,
+        ).filter(
+            members__mentor=mentor,
+            members__is_active=True,
+        ).distinct().first()
+        if conversation:
+            return Response({
+                'id':conversation.id,
+                'conversation_type':conversation.conversation_type,
+            },status=status.HTTP_200_OK)
+        conversation=Conversation.objects.create(
+            conversation_type=conversation.conversation_type.DIRECT,
+        )
+        ConversationMember.objects.create(
+            conversation=conversation,
+            user=user
+        )
+        ConversationMember.objects.create(
+            conversation=conversation,
+            mentor=mentor
+        )
+        return Response({
+            'id':conversation.id,
+            'conversation_type':conversation.conversation_type,
+        },status=status.HTTP_201_CREATED)

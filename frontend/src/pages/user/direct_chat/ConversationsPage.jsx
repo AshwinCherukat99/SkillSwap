@@ -111,11 +111,11 @@ const ConversationsPage = ({
                 }
 
                 if (activeFilter==='mentors'){
-                    return (conversation.other_user?.is_mentor===true)
+                    return (conversation.person?.type==='MENTOR')
                 }
 
                 if (activeFilter==='users'){
-                    return (conversation.other_user?.is_mentor===false)
+                    return (conversation.person?.type==='USER')
                 }
 
                 

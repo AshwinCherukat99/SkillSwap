@@ -203,27 +203,6 @@
   padding: 20px;
 }
 
-.message-bubble {
-  padding: 11px 16px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
-}
-
-.other-message {
-  background-color: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 4px 16px 16px 16px;
-  color: #1e293b;
-}
-
-.my-message {
-  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
-  color: #ffffff;
-  border-radius: 16px 4px 16px 16px;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
-}
-
 .chat-input-wrapper {
   background-color: #ffffff;
   border-top: 1px solid #e2e8f0;
@@ -348,4 +327,111 @@
   .chat-col {
     min-height: 480px;
   }
+}
+
+.message-container {
+    max-width: 75%;
+    min-width: 0;
+}
+
+.message-bubble {
+    display: inline-block;
+    max-width: 100%;
+    min-width: 40px;
+    padding: 11px 16px;
+    font-size: 13.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Actual message text */
+.message-text {
+    display: block;
+    font-size: 13.5px;
+    line-height: 1.55;
+    visibility: visible;
+    opacity: 1;
+}
+
+/* Mentor's own messages */
+.my-message {
+    background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    border-radius: 16px 4px 16px 16px;
+}
+
+/* Other members' messages */
+.other-message {
+    background: #ffffff;
+    color: #1e293b !important;
+    -webkit-text-fill-color: #1e293b !important;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px 16px 16px 16px;
+}
+
+/* ==========================================
+   CHAT MESSAGE BUBBLES - FINAL OVERRIDE
+========================================== */
+
+.chat-messages .message-container {
+    max-width: 75%;
+    min-width: 0;
+}
+
+/* Common bubble styling */
+.chat-messages .message-bubble {
+    display: inline-block !important;
+    width: fit-content;
+    min-width: 40px;
+    max-width: 100%;
+    padding: 11px 16px !important;
+    font-family: "Inter", sans-serif;
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* Mentor's own messages */
+.chat-messages .message-bubble.my-message {
+    background: #4f46e5 !important;
+    background-image: linear-gradient(
+        135deg,
+        #4f46e5 0%,
+        #4338ca 100%
+    ) !important;
+
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+
+    border: none !important;
+    border-radius: 16px 4px 16px 16px !important;
+}
+
+/* Mentor's own message text */
+.chat-messages .message-bubble.my-message .message-text {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Other members' messages */
+.chat-messages .message-bubble.other-message {
+    background: #ffffff !important;
+    color: #1e293b !important;
+    -webkit-text-fill-color: #1e293b !important;
+
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 4px 16px 16px 16px !important;
+}
+
+/* Other members' message text */
+.chat-messages .message-bubble.other-message .message-text {
+    color: #1e293b !important;
+    -webkit-text-fill-color: #1e293b !important;
 }

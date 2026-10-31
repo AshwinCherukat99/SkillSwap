@@ -2,7 +2,8 @@ import { BACKEND_ORIGIN } from "../../../config"
 
 function MentorProfileHeader({
     mentor,
-    onRequestSession
+    onRequestSession,
+    onMessage
 }){
     const getImageUrl=(image)=>{
         if (!image){
@@ -117,7 +118,8 @@ function MentorProfileHeader({
                                 </button>
 
 
-                                <button className="btn btn-outline-secondary">
+                                <button className="btn btn-outline-secondary"
+                                onClick={onMessage}>
 
                                     <span className="material-symbols-outlined align-middle me-1">
                                         chat

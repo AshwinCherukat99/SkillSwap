@@ -4,6 +4,16 @@ const MessageBubble=({message,currentUserId,currentUserType})=>{
     const senderId=message.sender?.id 
     const isMine=Number(senderId)===Number(currentUserId) && message.sender?.type===currentUserType
     const isMentor=message.sender?.type==='MENTOR'
+    console.log(
+      'mentor chat message:',{
+        id:message.id,
+        content:message.content,
+        sender:message.sender,
+        currentUserId,
+        currentUserType,
+        isMine,
+      }
+    )
     return (
         <div
       className={`d-flex gap-3 mb-4 ${
@@ -41,15 +51,11 @@ const MessageBubble=({message,currentUserId,currentUserType})=>{
           </span>
         </div>
 
-        <div
-          className={`message-bubble ${
-            isMine
-              ? "my-message"
-              : "other-message"
-          }`}
-        >
-          {message.content}
-        </div>
+        <div className={`message-bubble ${isMine ? "my-message" : "other-message"}`}>
+    <span className="message-text">
+        {message.content}
+    </span>
+</div>
       </div>
     </div>
     )

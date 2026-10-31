@@ -58,6 +58,7 @@ const MentorGroupChat = () => {
                 mentorApi.get(`/chat/mentor/conversations/${conversationId}/messages/`),
                 mentorApi.get(`/chat/mentor/conversations/${conversationId}/members/`)
             ])
+            console.log('mentor group api response:',messagesResponse.data)
             setMessages(messagesResponse.data)
             setMembers(membersResponse.data)
             setResources([])

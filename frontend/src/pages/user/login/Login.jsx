@@ -422,6 +422,8 @@ function Login() {
             );
         }}
         useOneTap={false}
+        size='large'
+        width='350'
     />
 </div>
                         </div>

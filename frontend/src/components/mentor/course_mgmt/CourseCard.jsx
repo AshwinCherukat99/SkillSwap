@@ -1,12 +1,16 @@
 import React from 'react'
 import {useNavigate} from 'react-router-dom'
 
+import {BACKEND_ORIGIN} from '../../../config'
+
 const CourseCard=({course})=>{
     const navigate=useNavigate()
     const isPublished=course.status==='PUBLISHED'
     const handleOpenCourse=()=>{
         navigate(`/mentor/courses/${course.id}/`)
     }
+    console.log('course:',course.title)
+    console.log('thumbnail url:',course.thumbnail)
     return (
         <div
             className="course-management-card"
@@ -18,9 +22,13 @@ const CourseCard=({course})=>{
 
                 {course.thumbnail ? (
                     <img
-                        src={course.thumbnail}
+                        src={`${BACKEND_ORIGIN}${course.thumbnail}`}
                         alt={course.title}
                         className="course-card-image"
+                        onError={(e)=>{
+                            console.error('failed to load course image:',e.target.src)
+                            e.target.style.display='none'
+                        }}
                     />
                 ) : (
                     <div className="course-card-placeholder">

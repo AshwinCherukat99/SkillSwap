@@ -38,6 +38,27 @@ function MentorProfile(){
         }
         fetchMentorProfile()
     },[mentorId])
+    const handleMessageMentor=async ()=>{
+        try{
+            const response=await api.post(
+                '/chat/conversations/mentor/',
+                {
+                    mentor_id:mentor.id,
+                }
+            )
+            navigate(
+                `/conversations?conversation=${response.data.id}`
+            )
+        }catch(err){
+            console.error(
+                'failed to open mentor conversation:',
+                err
+            )
+            alert(
+                err.response?.data?.detail||'unable to open conversation'
+            )
+        }
+    }
     if (loading){
         return (
             <div className="container py-5 text-center">
@@ -109,6 +130,7 @@ function MentorProfile(){
                 onRequestSession={() => {
                     // session request will be connected here
                 }}
+                onMessge={handleMessageMentor}
             />
 
 
