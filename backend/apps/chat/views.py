@@ -605,7 +605,7 @@ class UserStartMentorDirectChatView(APIView):
                 'conversation_type':conversation.conversation_type,
             },status=status.HTTP_200_OK)
         conversation=Conversation.objects.create(
-            conversation_type=conversation.conversation_type.DIRECT,
+            conversation_type=Conversation.ConversationType.DIRECT,
         )
         ConversationMember.objects.create(
             conversation=conversation,
