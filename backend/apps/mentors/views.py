@@ -434,7 +434,7 @@ class MentorDashboardView(APIView):
         )
         courses=list(mentor_courses.values('slug'))
         total_students=CourseEnrollment.objects.filter(
-            course_in=mentor_courses
+            course__in=mentor_courses
         ).values('user').distinct().count()
         total_courses=mentor_courses.count()
         active_groups=Conversation.objects.filter(
