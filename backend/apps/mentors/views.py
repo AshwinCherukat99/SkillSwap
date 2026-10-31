@@ -468,7 +468,7 @@ class MentorDashboardView(APIView):
             .order_by('month')
         )
         growth_lookup={
-            item['month'].date.replace(day=1):item['students'] 
+            item['month'].date().replace(day=1):item['students'] 
             for item in growth_data
         }
         student_growth=[]
