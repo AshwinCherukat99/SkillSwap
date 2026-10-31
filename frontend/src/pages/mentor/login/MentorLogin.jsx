@@ -428,6 +428,8 @@ function MentorLogin() {
             setError("Google login failed. Please try again.")
         }}
         useOneTap={false}
+        size="large"
+        width="400"
     />
 </div>
                     </div>

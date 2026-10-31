@@ -141,15 +141,15 @@ function Feed(){
           {/* Quick Shortcuts */}
           <div className="card surface-card shadow-sm border-0 d-none d-lg-block">
             <div className="list-group list-group-flush rounded-3">
-              <Link to="/upcoming-sessions" className="sidebar-link">
+              <Link to="/upcoming_sessions" className="sidebar-link">
                 <span className="material-symbols-outlined fs-5">event</span>
                 <span>Sessions</span>
               </Link>
-              <Link to="/my-skills" className="sidebar-link">
+              <Link to="/my_skills" className="sidebar-link">
                 <span className="material-symbols-outlined fs-5">school</span>
                 <span>My Skills</span>
               </Link>
-              <Link to="/group-chats" className="sidebar-link">
+              <Link to="/chat" className="sidebar-link">
                 <span className="material-symbols-outlined fs-5">forum</span>
                 <span>Group Chats</span>
               </Link>

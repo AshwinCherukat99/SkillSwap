@@ -992,3 +992,18 @@
 .mentor-divider span {
     white-space: nowrap;
 }
+
+/* =========================================
+   GOOGLE LOGIN BUTTON (Full Width)
+========================================= */
+.mentor-google-login {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.mentor-google-login > div {
+    width: 100% !important;
+    display: flex;
+    justify-content: center;
+}
