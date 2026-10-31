@@ -130,7 +130,7 @@ function MentorProfile(){
                 onRequestSession={() => {
                     // session request will be connected here
                 }}
-                onMessge={handleMessageMentor}
+                onMessage={handleMessageMentor}
             />
 
 
