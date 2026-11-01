@@ -12,13 +12,6 @@ const FriendStats=({stats})=>{
             text:'text-primary',
         },
         {
-            title:'Online Friends',
-            value:stats.online_friends,
-            icon:Wifi,
-            bg:'bg-success-subtle',
-            text:'text-success',
-        },
-        {
             title:'Sessions Together',
             value:stats.sessions_together,
             icon:Handshake,

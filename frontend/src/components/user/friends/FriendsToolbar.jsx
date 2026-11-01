@@ -44,49 +44,6 @@ const FriendsToolbar=({
 
                         <div className="d-flex flex-wrap gap-2 align-items-center">
 
-                            <button
-                                className={`btn btn-sm rounded-pill ${
-                                    filter === 'all'
-                                        ? 'btn-primary'
-                                        : 'btn-outline-secondary'
-                                }`}
-                                onClick={() => setFilter('all')}
-                            >
-                                All
-                            </button>
-
-                            <button
-                                className={`btn btn-sm rounded-pill ${
-                                    filter === 'online'
-                                        ? 'btn-primary'
-                                        : 'btn-outline-secondary'
-                                }`}
-                                onClick={() => setFilter('online')}
-                            >
-                                Online
-                            </button>
-
-                            <button
-                                className={`btn btn-sm rounded-pill ${
-                                    filter === 'same_skills'
-                                        ? 'btn-primary'
-                                        : 'btn-outline-secondary'
-                                }`}
-                                onClick={() => setFilter('same_skills')}
-                            >
-                                Same Skills
-                            </button>
-
-                            <button
-                                className={`btn btn-sm rounded-pill ${
-                                    filter === 'mentors'
-                                        ? 'btn-primary'
-                                        : 'btn-outline-secondary'
-                                }`}
-                                onClick={() => setFilter('mentors')}
-                            >
-                                Mentors
-                            </button>
 
                             <button
                                 className="btn btn-sm btn-outline-secondary ms-lg-auto"

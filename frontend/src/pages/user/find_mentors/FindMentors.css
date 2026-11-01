@@ -60,26 +60,92 @@
 }
 
 
-/* SEARCH */
-
+/* ==========================================
+   SEARCH BAR
+========================================== */
 .mentor-search {
-    background: white;
+    background: #ffffff;
+    border: 1px solid #dee2e6;
     border-radius: 12px;
-    padding: 12px 16px;
-
+    padding: 10px 16px;
     display: flex;
     align-items: center;
-    gap: 10px;
-
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-}
-
-.mentor-search input {
-    border: none;
-    outline: none;
+    gap: 12px;
     width: 100%;
+    max-width: 440px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.mentor-search:focus-within {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+/* 1. Lowers both icons (search & close) so they are vertically centered with the text */
+.mentor-search i {
+    position: static !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 16px !important;
+    width: 16px !important;
+    min-width: 16px !important;
+    height: 16px !important;
+    color: #94a3b8;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    margin: 0 !important;
+    transform: translateY(2px); /* Moves icons down to match text baseline */
+}
+
+/* 2. Text input */
+.mentor-search input {
+    border: none !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #1e293b;
+}
+
+.mentor-search input::placeholder {
+    color: #94a3b8;
+}
+
+/* 3. Removes Bootstrap's link underline and outlines from the close button */
+.mentor-search button,
+.mentor-search .btn-link {
+    text-decoration: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #94a3b8 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1 !important;
+}
+
+.mentor-search button:hover,
+.mentor-search .btn-link:hover,
+.mentor-search button:focus,
+.mentor-search .btn-link:focus {
+    text-decoration: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: #64748b !important;
+}
 
 /* FILTERS */
 
