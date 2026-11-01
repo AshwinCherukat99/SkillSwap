@@ -145,7 +145,7 @@ function LeaderBoardTable({users,currentUserId,navigate}){
                                                 className="btn btn-sm btn-outline-primary"
                                                 onClick={() =>
                                                     navigate(
-                                                        `/users/${user.id}/profile`
+                                                        `/${user.id}/profile`
                                                     )
                                                 }
                                             >

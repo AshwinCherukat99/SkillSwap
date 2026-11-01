@@ -22,9 +22,9 @@ class FriendsListView(APIView):
         friend_ids=[]
         for friendship in friendships:
             if friendship.sender==user:
-                friend_id=friendship.receiver
+                friend_id=friendship.receiver.id
             else:
-                friend_id=friendship.sender
+                friend_id=friendship.sender.id
             friend_ids.append(
                 friend_id
             )
