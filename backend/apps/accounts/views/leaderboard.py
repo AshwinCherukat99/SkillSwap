@@ -37,6 +37,7 @@ class MyLeaderBoardRankView(APIView):
         rating_count=(UserRating.objects.filter(rated_user=user).count())
         return Response(
             {
+                'id':user.id,
                 'rank':rank,
                 'xp':user.xp,
                 'current_streak':user.current_streak,

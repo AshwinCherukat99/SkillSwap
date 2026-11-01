@@ -47,10 +47,11 @@ function LeaderBoard(){
     }
     const viewMyRank=()=>{
         if (!myRank) return
-        const element=document.getElementById('leaderboard-table')
+        const element=document.getElementById('my-rank-row')
         if (element){
             element.scrollIntoView({
-                behaviour:'smooth'
+                behavior:'smooth',
+                block:'center'
             })
         }
     }

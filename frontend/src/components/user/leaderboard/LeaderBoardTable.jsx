@@ -53,6 +53,7 @@ function LeaderBoardTable({users,currentUserId,navigate}){
 
                                     <tr
                                         key={user.id}
+                                        id={isCurrentUser?'my-rank-row':undefined}
                                         className={
                                             isCurrentUser
                                                 ? "table-primary"
