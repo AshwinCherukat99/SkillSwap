@@ -8,7 +8,7 @@ function MentorSearch({search,onSearch}){
 
             <input
                 type="text"
-                placeholder="Search mentors, skills, or topics..."
+                placeholder="Search mentors or courses"
                 value={search}
                 onChange={(event) => onSearch(event.target.value)}
             />

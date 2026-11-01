@@ -17,7 +17,7 @@ class MentorListSerializer(serializers.ModelSerializer):
 
         fields = [
             "id",
-            "full_name"
+            "full_name",
             "username",
             "profile_image",
             "is_verified",
