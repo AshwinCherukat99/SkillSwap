@@ -1,12 +1,21 @@
 import {useState,useEffect} from 'react'
 import api from '../../../services/api'
 
+import {BACKEND_ORIGIN} from '../../../config'
+
 function CommentSection({postId}){
     const [comments,setComments]=useState([])
     const [commentText,setCommentText]=useState("")
     const [loading,setLoading]=useState(false)
     const [submitting,setSubmitting]=useState(false)
     const [error,setError]=useState('')
+    const getImageUrl=(image)=>{
+        if (!image) return '/default-avatar.png'
+        if (image.startsWith("http")){
+            return image
+        }
+        return `${BACKEND_ORIGIN.replace(/\/+$/, "")}/${image.replace(/^\/+/, "")}`
+    }
     useEffect(()=>{
         fetchComments()
     },[postId])
@@ -90,8 +99,9 @@ function CommentSection({postId}){
 
                         <img
                             src={
-                                comment.user?.profile_image ||
-                                '/default-avatar.png'
+                                getImageUrl(
+                                    comment.user?.profile_image
+                                )
                             }
                             alt=""
                             width="36"

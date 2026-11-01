@@ -404,22 +404,6 @@ const handleLike=async ()=>{
                         </span>
                     </button>
 
-
-                    {/* Not functional yet */}
-
-                    <button
-                        type="button"
-                        className="post-action ms-auto"
-                    >
-                        <span className="material-symbols-outlined">
-                            share
-                        </span>
-
-                        <span className="d-none d-md-inline">
-                            Share
-                        </span>
-                    </button>
-
                 </div>
                 {showComments && (
                     <CommentSection

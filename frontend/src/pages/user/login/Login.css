@@ -653,7 +653,7 @@ a {
     input:not(:placeholder-shown)
     + label {
     transform:
-        translateY(-125%)
+        translateY(-190%)
         scale(0.85);
 
     color:
