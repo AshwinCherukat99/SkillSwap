@@ -3,7 +3,7 @@ import api from '../../../services/api'
 
 import {BACKEND_ORIGIN} from '../../../config'
 
-function CommentSection({postId}){
+function CommentSection({postId,onCommentAdded}){
     const [comments,setComments]=useState([])
     const [commentText,setCommentText]=useState("")
     const [loading,setLoading]=useState(false)
@@ -47,6 +47,7 @@ function CommentSection({postId}){
                     content:commentText.trim()
                 }
             )
+            onCommentAdded?.()
             setComments((currentComments)=>[
                 ...currentComments,
                 response.data

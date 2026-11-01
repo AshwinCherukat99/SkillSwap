@@ -29,10 +29,14 @@ const ConversationList = ({
             }
 
             return conversations.filter(
-                (conversation) =>
-                    conversation.name
-                        ?.toLowerCase()
-                        .includes(query)
+                (conversation) =>{
+                    const person=conversation.person
+                    return (
+                        person?.name?.toLowerCase().includes(query)||
+                        person?.username?.toLowerCase().includes(query)||
+                        conversation.name?.toLowerCase().includes(query)
+                    )
+                }
             );
 
         }, [

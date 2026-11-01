@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from ..models import Friendship
+from ..models import Friendship,User
 from ..serializers.friends import FriendSerializer,AddFriendSerializer,FriendRequestSerializer
 
 class FriendsListView(APIView):
@@ -19,22 +19,41 @@ class FriendsListView(APIView):
             Q(sender=user)|Q(receiver=user),
             status=Friendship.Status.ACCEPTED,
         ).select_related('sender','receiver')
-        friends=[]
+        friend_ids=[]
         for friendship in friendships:
             if friendship.sender==user:
-                friend=friendship.receiver
+                friend_id=friendship.receiver
             else:
-                friend=friendship.sender
-            friends.append(
-                friend
+                friend_id=friendship.sender
+            friend_ids.append(
+                friend_id
             )
+        friends=User.objects.filter(id__in=friend_ids)
+        search_query=request.query_params.get(
+            'search',''
+        ).strip()
+        if search_query:
+            friends=friends.filter(
+                Q(username__icontains=search_query)|
+                Q(full_name__icontains=search_query)|
+                Q(user_skills__skill__name__icontains=search_query)
+            ).distinct()
+        sort=request.query_params.get('sort','name')
+        if sort=='name':
+            friends=friends.order_by('username')
+        serializer=FriendSerializer(
+            friends,
+            many=True,
+            context={'request':request}
+        )
         return Response(
             {
-                'friends':FriendSerializer(
-                    friends,
-                    many=True,
-                    context={'request':request}
-                ).data
+                'friends':serializer.data,
+                'stats':{
+                    'total_friends':len(friend_ids),
+                    'sessions_together':0,
+                    'new_this_month':0,
+                }
             },
             status=status.HTTP_200_OK,
         )

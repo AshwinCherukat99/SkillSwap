@@ -14,8 +14,8 @@ class PostAuthorSerializer(serializers.Serializer):
 class PostSerializer(serializers.ModelSerializer):
     is_owner=serializers.SerializerMethodField()
     author=serializers.SerializerMethodField()
-    likes_count=serializers.IntegerField(read_only=True)
-    comments_count=serializers.IntegerField(read_only=True)
+    likes_count=serializers.SerializerMethodField(read_only=True)
+    comments_count=serializers.SerializerMethodField(read_only=True)
     liked_by_me=serializers.SerializerMethodField()
     class Meta:
         model=Post
@@ -68,6 +68,10 @@ class PostSerializer(serializers.ModelSerializer):
                 'author_type':'MENTOR',
             }
         return None
+    def get_likes_count(self,obj):
+        return obj.likes.count()
+    def get_comments_count(self,obj):
+        return obj.comments.count()
     def get_liked_by_me(self,obj):
         request=self.context.get('request')
         if not request or not request.user.is_authenticated:

@@ -17,6 +17,7 @@ function PostCard({
 }) {
     const [liked,setLiked]=useState(post.liked_by_me||false)
         const [likesCount,setLikesCount]=useState(post.likes_count||0)
+        const [commentsCount,setCommentsCount]=useState(Number(post.comments_count)||0)
         const [showComments,setShowComments]=useState(false)
         const [deleting,setDeleting]=useState(false)
         const [reportTarget,setReportTarget]=useState(null)
@@ -26,6 +27,13 @@ function PostCard({
         currentUser &&
         post.author?.author_type === "USER" &&
         Number(post.author.id) === Number(currentUser.id);
+    useEffect(()=>{
+        setLiked(Boolean(post.liked_by_me))
+        setLikesCount(Number(post.likes_count||0))
+    },[post.id,post.liked_by_me,post.likes_count])
+    useEffect(()=>{
+        setCommentsCount(Number(post.comments_count)||0)
+    },[post.id,post.comments_count])
     const getImageUrl = (image) => {
         if (!image) return null;
 
@@ -100,22 +108,12 @@ const handleLike=async ()=>{
         }
     }
     const handleDelete=async ()=>{
-        const confirmed=window.confirm(
-            'are you sure you want to delete this post?'
-        )
-        if (!confirmed){
+        if (!onDelete){
             return
         }
         setDeleting(true)
         try{
-            await api.delete(
-                `/posts/${post.id}/delete/`
-            )
-            if (onDelete){
-                onDelete(post.id)
-            }
-        }catch(error){
-            console.error('error deleting post:',error)
+            await onDelete(post.id)
         }finally{
             setDeleting(false)
         }
@@ -381,8 +379,8 @@ const handleLike=async ()=>{
                         </span>
 
                         <span>
-                            {post.comments_count || 0}{" "}
-                            {post.comments_count === 1
+                            {commentsCount || 0}{" "}
+                            {commentsCount === 1
                                 ? "Comment"
                                 : "Comments"}
                         </span>
@@ -391,6 +389,7 @@ const handleLike=async ()=>{
 
                     {/* Not functional yet */}
 
+                    {!isOwnPost&&(
                     <button
                         type="button"
                         className="post-action"
@@ -403,11 +402,15 @@ const handleLike=async ()=>{
                             Request Session
                         </span>
                     </button>
+                    )}
 
                 </div>
                 {showComments && (
                     <CommentSection
                         postId={post.id}
+                        onCommentAdded={()=>{
+                            setCommentsCount((count)=>count+1)
+                        }}
                     />
                 )}
 

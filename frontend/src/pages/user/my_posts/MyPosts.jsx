@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 
 import api from '../../../services/api'
 
+import EditPost from '../../../components/user/feed/EditPost'
 import PostCard from '../../../components/user/posts/PostCard'
 import CreatePostModal from '../../../components/user/posts/CreatePostModal'
 
@@ -14,6 +15,7 @@ function MyPosts(){
     const user=useSelector(
         (state)=>state.auth.user
     )
+    const [editingPost,setEditingPost]=useState(null)
     const [posts,setPosts]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
@@ -56,11 +58,22 @@ function MyPosts(){
             return posts
         }
         return posts.filter(
-            (post)=>{
+            (post)=>
                 post.content?.toLowerCase().includes(query)
-            }
         )
     },[posts,searchQuery])
+    const handlePostEdit=(post)=>{
+        setEditingPost(post)
+    }
+    const handlePostUpdated=(updatedPost)=>{
+        setPosts((currentPosts)=>
+            currentPosts.map((post)=>
+            post.id===updatedPost.id
+    ?updatedPost
+:post)
+        )
+        setEditingPost(null)
+    }
     const postsWithImages=posts.filter(
         (post)=>post.image
     ).length
@@ -424,6 +437,7 @@ function MyPosts(){
                                         onDelete={
                                             handleDelete
                                         }
+                                        onEdit={handlePostEdit}
                                         currentUser={user}
                                     />
 
@@ -460,6 +474,12 @@ function MyPosts(){
 
             )}
 
+            {editingPost&&(
+                <EditPost
+                post={editingPost}
+                onClose={()=>setEditingPost(null)}
+                onUpdated={handlePostUpdated}/>
+            )}
 
         </div>
     )

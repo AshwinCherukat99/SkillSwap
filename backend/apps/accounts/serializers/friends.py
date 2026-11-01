@@ -22,7 +22,7 @@ class FriendSerializer(serializers.ModelSerializer):
             'friends_since',
         ]
     def get_name(self,obj):
-        return obj.username
+        return obj.full_name or obj.username
     def get_profile_image(self,obj):
         if not obj.profile_image:
             return None
