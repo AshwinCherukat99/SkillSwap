@@ -14,7 +14,7 @@ const SessionHistory=()=>{
     const [stats,setStats]=useState({
         total_sessions:0,
         completed_sessions:0,
-        total_hours:0,
+        learning_hours:0,
     })
     const [search,setSearch]=useState('')
     const [statusFilter,setStatusFilter]=useState('ALL')

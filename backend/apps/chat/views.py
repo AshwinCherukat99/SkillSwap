@@ -619,3 +619,73 @@ class UserStartMentorDirectChatView(APIView):
             'id':conversation.id,
             'conversation_type':conversation.conversation_type,
         },status=status.HTTP_201_CREATED)
+
+class UserVideoCallMessagesView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request,conversation_id):
+        conversation=Conversation.objects.filter(
+            id=conversation_id,
+            conversation_type=Conversation.ConversationType.VIDEO_CALL,
+            members__user=request.user,
+            members__is_active=True,
+        ).first()
+        if not conversation:
+            return Response(
+                {
+                    'detail':'conversation not found'
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        messages=Message.objects.filter(
+            conversation=conversation,
+            is_deleted=False,
+        ).select_related(
+            'sender_user',
+            'sender_mentor'
+        ).order_by('created_at','id')
+        serializer=ChatMessageSerializer(
+            messages,
+            many=True,
+            context={'request':request}
+        )
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
+class MentorVideoCallMessagesView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[MentorJWTAuthentication]
+    def get(self,request,conversation_id):
+        mentor=request.user
+        conversation=Conversation.objects.filter(
+            id=conversation_id,
+            conversation_type=Conversation.ConversationType.VIDEO_CALL,
+            members__mentor=mentor,
+            members__is_active=True,
+        ).first()
+        if not conversation:
+            return Response(
+                {
+                    'detail':'conversation not found'
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        messages=Message.objects.filter(
+            conversation=conversation,
+            is_deleted=False,
+        ).select_related(
+            'sender_user',
+            'sender_mentor'
+        ).order_by(
+            'created_at','id'
+        )
+        serializer=ChatMessageSerializer(
+            messages,
+            many=True,
+            context={'request':request}
+        )
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )

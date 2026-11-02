@@ -1,8 +1,7 @@
 import React from 'react'
 
 const CertificateHeader=({
-    totalCertificates,
-    onVerify
+    totalCertificates
 })=>{
     return (
         <section className="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-4 mb-4">
@@ -49,17 +48,6 @@ const CertificateHeader=({
             </div>
 
             <div className="d-flex align-items-center gap-3">
-
-                <button
-                    className="btn btn-light border shadow-sm"
-                    onClick={onVerify}
-                >
-                    <span className="material-symbols-outlined align-middle me-2">
-                        domain_verification
-                    </span>
-
-                    Verify Any Credential
-                </button>
 
                 <div className="certificate-earned-badge">
                     <span className="material-symbols-outlined align-middle me-1">

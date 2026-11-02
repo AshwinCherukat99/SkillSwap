@@ -35,7 +35,7 @@ function LeaderBoard(){
     const loadMyRank=async ()=>{
         try{
             const response=await api.get(
-                '/auth/leaderboard/my-rank/'
+                '/auth/leaderboard/my_rank/'
             )
             setMyRank(response.data)
         }catch(error){

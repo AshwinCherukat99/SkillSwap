@@ -106,7 +106,7 @@ const CertificateStats=({certificates})=>{
                         </div>
 
                         <h2 className="fw-bold mb-1">
-                            {averageScore}%
+                            {(averageScore*100)/10}%
                         </h2>
 
                         <p className="text-secondary small mb-0">

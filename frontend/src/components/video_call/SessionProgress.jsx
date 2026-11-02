@@ -1,22 +1,35 @@
 import React,{useEffect,useState} from "react";
 
 const SessionProgress=({
-    duration
+    duration,
+    actualStartedAt
 })=>{
     const [elapsedSeconds,setElapsedSeconds]=useState(0)
     useEffect(()=>{
-        const interval=setInterval(()=>{
-            setElapsedSeconds(prev=>{
-                if (prev>=duration*60){
-                    return prev
-                }
-                return prev+1
-            })
-        },1000)
-        return ()=>clearInterval(interval)
-    },[duration])
-    const totalSeconds=duration*60
-    const progress=Math.min((elapsedSeconds/totalSeconds)*100,100)
+        if (!actualStartedAt||duration==null){
+            setElapsedSeconds(0)
+            return
+        }
+        const startTime=new Date(actualStartedAt).getTime()
+        const totalSeconds=Number(duration)*60
+        if (!Number.isFinite(startTime)||
+        !Number.isFinite(totalSeconds)||
+        totalSeconds<=0){
+        return
+        }
+        const updateProgress=()=>{
+            const elapsed=Math.max(
+                0,
+                Math.floor((Date.now()-startTime)/1000)            
+            )
+            setElapsedSeconds(Math.min(elapsed,totalSeconds))
+        }
+        updateProgress()
+        const intervalId=window.setInterval(updateProgress,1000)
+        return ()=>window.clearInterval(intervalId)
+    },[actualStartedAt,duration])
+    const duration=Number(duration)*60||0
+    const progress=totalSeconds>0??Math.min((elapsedSeconds/totalSeconds)*100,100)
     const remainingSeconds=Math.max(totalSeconds-elapsedSeconds,0)    
     const minutes=Math.floor(remainingSeconds/60)
     const seconds=remainingSeconds%60

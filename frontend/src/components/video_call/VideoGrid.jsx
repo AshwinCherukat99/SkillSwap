@@ -55,7 +55,9 @@ const VideoGrid = ({
 
                 {remoteHandRaised && !sessionTimeUp && (
                     <div className="remote-hand-raised">
-                        <i className="bi bi-hand-index-fill" />
+                        <span className="material-symbols-outlined raise-hand-icon">
+    front_hand
+</span>
                         <span>Hand Raised</span>
                     </div>
                 )}
@@ -91,7 +93,9 @@ const VideoGrid = ({
 
                 {isHandRaised && !sessionTimeUp && (
                     <div className="remote-hand-raised local-hand-raised">
-                        <i className="bi bi-hand-index-fill" />
+                        <span className="material-symbols-outlined raise-hand-icon">
+    front_hand
+</span>
                         <span>Hand Raised</span>
                     </div>
                 )}

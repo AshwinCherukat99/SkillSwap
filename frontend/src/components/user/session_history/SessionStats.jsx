@@ -84,7 +84,7 @@ const SessionStats=({stats})=>{
 
                     <div className="session-stat-value">
 
-                        {stats.total_hours || 0}h
+                        {stats.learning_hours*60 || 0} min
 
                     </div>
 

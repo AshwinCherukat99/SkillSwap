@@ -8,7 +8,7 @@ const CallSidebar=({
     durationMinutes,
 })=>{
     return (
-        <aside className="call-sidebar">
+        <div className="call-sidebar-content">
 
             {/* Session information */}
             <div className="sidebar-section">
@@ -86,9 +86,9 @@ const CallSidebar=({
 
         <div className="participant-info">
             <strong>
-                {remoteUsername || "Waiting for participant"}
+                Skill Partner
             </strong>
-            <span>Participant</span>
+            <span>{remoteUsername || "Waiting for participant"}</span>
         </div>
 
         <span
@@ -99,21 +99,8 @@ const CallSidebar=({
         </span>
     </div>
 </div>
-
-
-            {/* Session notes */}
-            <div className="sidebar-section">
-
-                <h3>Session Notes</h3>
-
-                <textarea
-                    className="session-notes"
-                    placeholder="Write notes about this session..."
-                />
-
-            </div>
-
-        </aside>
+    
+        </div>
     )
 }
 

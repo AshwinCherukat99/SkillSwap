@@ -8,9 +8,9 @@ const InCallChat=({
     const messagesEndRef=useRef(null)
     useEffect(()=>{
         messagesEndRef.current?.scrollIntoView({
-            behaviour:'smooth',
-        },[messages])
-    })
+            behavior:'smooth',
+        })
+    },[messages])
     const handleSubmit=(e)=>{
         e.preventDefault()
         if (!message.trim()){

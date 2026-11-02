@@ -236,7 +236,7 @@ const RequestSessionModal=({
                 <div className="request-session-content">
 
                     <h1>
-                        Request a Mentoring Session
+                        Request a Skill Exchange Session
                     </h1>
 
 

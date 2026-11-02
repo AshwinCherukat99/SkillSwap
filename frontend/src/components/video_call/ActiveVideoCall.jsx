@@ -59,6 +59,36 @@ const ActiveVideoCall = ({
     }
   },[conversationId])
 
+  useEffect(()=>{
+    let cancelled=false
+    const fetchChatHistory=async ()=>{
+      try{
+        const isMentor=Boolean(
+          localStorage.getItem('mentor_access_token')
+        )
+        const client=isMentor?mentorApi:api
+        const endpoint=isMentor?
+        `/chat/mentor/video-call/${conversationId}/messages/`
+        :`/chat/video-call/${conversationId}/messages/`
+        const response=await client.get(endpoint)
+        if (!cancelled){
+          const history=Array.isArray(response.data)
+          ?response.data
+          :response.data.messages||[]
+          setChatMessages(history)
+        }
+      }catch(err){
+        console.error('failed to load chat history:',err.response?.data||err)
+      }
+    }
+    if (conversationId){
+      fetchChatHistory()
+    }
+    return ()=>{
+      cancelled=true
+    }
+  },[conversationId])
+
   const {
     localVideoRef,
     remoteVideoRef,
@@ -81,12 +111,12 @@ const ActiveVideoCall = ({
   } = useWebRTC(roomName, conversationId, accessToken);
 
   useEffect(()=>{
-    if (!sessionDetails?.scheduled_start||sessionDetails?.duration_minutes==null){
+    if (!sessionDetails?.actual_started_at||sessionDetails?.duration_minutes==null){
       return
     }
-    const scheduledStart=new Date(sessionDetails?.scheduled_start).getTime()
-    const endTime=scheduledStart+Number(sessionDetails?.duration_minutes)*60*1000
-    if (!Number.isFinite(scheduledStart)||!Number.isFinite(endTime)){
+    const actualStart=new Date(sessionDetails?.actual_started_at).getTime()
+    const endTime=actualStart+Number(sessionDetails?.duration_minutes)*60*1000
+    if (!Number.isFinite(actualStart)||!Number.isFinite(endTime)){
       return
     }
     const updateTimer=()=>{
@@ -105,13 +135,18 @@ const ActiveVideoCall = ({
     const intervalId=window.setInterval(updateTimer,1000)
     return ()=>window.clearInterval(intervalId)
   },[
-    sessionDetails?.scheduled_start,
+    sessionDetails?.actual_started_at,
     sessionDetails?.duration_minutes,
     leaveCall
   ])
 
   const handleChatMessage = useCallback((message) => {
-    setChatMessages((prev) => [...prev, message]);
+    setChatMessages((prev) => {
+      if (prev.some((item)=>item.id===message.id)){
+        return prev
+      }
+      return [...prev, message]
+    });
   }, []);
 
   const {
@@ -137,7 +172,8 @@ const ActiveVideoCall = ({
             remoteScreenVideoRef={remoteScreenVideoRef} 
             remoteCameraThumbnailRef={remoteCameraThumbnailRef}
           />
-          <SessionProgress duration={sessionDetails?.duration_minutes}/>
+          <SessionProgress duration={sessionDetails?.duration_minutes}
+          actualStartedAt={sessionDetails?.actual_started_at}/>
         </section>
 
         <aside className="call-sidebar">

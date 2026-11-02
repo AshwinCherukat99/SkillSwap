@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import (UserStartMentorDirectChatView,MentorGroupListView,VideoCallDetailsView,ChatAttachmentUploadView,ConversationMembersView,ConversationMessagesView,UserConversationMembersView,UserConversationMessagesView,UserGroupListView,ConversationListView,DirectConversationMessagesView,DirectConversationView,MentorDirectConversationMessagesView,MentorConversationListView,MentorStartDirectChatView)
+from .views import (UserVideoCallMessagesView,MentorVideoCallMessagesView,UserStartMentorDirectChatView,MentorGroupListView,VideoCallDetailsView,ChatAttachmentUploadView,ConversationMembersView,ConversationMessagesView,UserConversationMembersView,UserConversationMessagesView,UserGroupListView,ConversationListView,DirectConversationMessagesView,DirectConversationView,MentorDirectConversationMessagesView,MentorConversationListView,MentorStartDirectChatView)
 
 urlpatterns=[
     path(
@@ -77,5 +77,15 @@ urlpatterns=[
         'conversations/mentor/',
         UserStartMentorDirectChatView.as_view(),
         name='user-start-mentor-direct-chat',
-    )
+    ),
+    path(
+        'video-call/<int:conversation_id>/messages/',
+        UserVideoCallMessagesView.as_view(),
+        name='user-video-call-messages',
+    ),
+    path(
+        'mentor/video-call/<int:conversation_id>/messages/',
+        MentorVideoCallMessagesView.as_view(),
+        name='mentor-video-call-messages',
+    ),
 ]

@@ -47,12 +47,9 @@ const CallControls=({
             }
             onClick={onToggleHand}
             title={isHandRaised?'lower hand':'raise hand'}>
-                <i className="bi bi-hand-index-fill"/>
-            </button>
-
-
-            <button title="Whiteboard">
-                <i className="bi bi-pencil-square" />
+                <span className="material-symbols-outlined raise-hand-icon">
+    front_hand
+</span>
             </button>
 
             <button onClick={onShareScreen}>

@@ -166,7 +166,6 @@ const filteredCertificates = useMemo(() => {
 
                 <CertificateHeader
                     totalCertificates={certificates.length}
-                    onVerify={() => setShowVerifyModal(true)}
                 />
 
                 {/* ================================= */}
