@@ -15,6 +15,7 @@ function MentorRegister() {
         phone_number: "",
         password: "",
         password2:"",
+        qualification:"",
         experience_years: "",
         current_profession: "",
         organization: "", 
@@ -243,6 +244,11 @@ function MentorRegister() {
             "phone_number",
             formData.phone_number
         );
+
+        formDataToSend.append(
+            'qualification',
+            formData.qualification
+        )
 
         formDataToSend.append(
             "current_profession",
@@ -738,7 +744,38 @@ function MentorRegister() {
                                     Expertise & Background
                                 </h3>
 
+
+
                                 <div className="mentor-form-grid">
+
+                                    <div className='mentor-field full-width'>
+
+                                        <label>
+                                            Educational Qualification
+                                        </label>
+                                        
+                                        <select
+                                        name='qualification'
+                                        value={formData.qualification}
+                                        onChange={handleChange}
+                                        required>
+
+                                            <option value=''>
+                                                Select your qualification
+                                            </option>
+
+                                            <option value="BTECH">B.Tech</option>
+        <option value="MTECH">M.Tech</option>
+        <option value="BSC">B.Sc</option>
+        <option value="MSC">M.Sc</option>
+        <option value="BCA">BCA</option>
+        <option value="MCA">MCA</option>
+        <option value="BE">B.E.</option>
+        <option value="ME">M.E.</option>
+        <option value="PHD">Ph.D.</option>
+
+                                        </select>
+                                    </div>
 
                                     <div className="mentor-field">
 
@@ -1290,7 +1327,7 @@ function MentorRegister() {
                                     type="button"
                                     className="mentor-cancel-button"
                                     onClick={() =>
-                                        navigate("/")
+                                        navigate("/mentor/login/")
                                     }
                                 >
                                     Cancel

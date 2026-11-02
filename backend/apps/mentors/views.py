@@ -123,6 +123,7 @@ class MentorRegisterView(APIView):
             email=serializer.validated_data["email"],
             password=serializer.validated_data["password"],
             phone_number=serializer.validated_data["phone_number"],
+            qualification=serializer.validated_data['qualification'],
             current_profession=serializer.validated_data.get(
                 'current_profession',
                 '',
@@ -539,6 +540,15 @@ class MentorDashboardView(APIView):
                                 'total_reviews':mentor.total_reviews,
                                 'created_at':mentor.created_at,
                                 'updated_at':mentor.updated_at,
+                                'qualification':(
+                                    profile.qualification if profile else ''
+                                ),
+                                'organization':(
+                                    profile.organization if profile else ''
+                                ),
+                                'experience_years':(
+                                    profile.experience_years if profile else 0
+                                ),
                                 'current_profession':(
                                     profile.current_profession if profile else ''
                                 ),

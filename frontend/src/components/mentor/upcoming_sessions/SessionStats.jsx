@@ -72,7 +72,7 @@ const SessionStats=({stats})=>{
                         </div>
 
                         <div className="small text-muted">
-                            Mentoring & exchange
+                            Mentoring
                         </div>
 
                     </div>

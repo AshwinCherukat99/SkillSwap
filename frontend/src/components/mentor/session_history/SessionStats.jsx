@@ -53,13 +53,6 @@ const SessionStats=({stats})=>{
             className:'stat-neutral',
             description:'Mentoring time'
         },
-        {
-            label:'Gross Earnings',
-            value:'-',
-            icon:Wallet,
-            className:'stat-success',
-            description:'Not provided by current API'
-        },
     ]
     return (
         <div className="row g-3 mb-4">

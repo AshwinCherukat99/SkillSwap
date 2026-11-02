@@ -33,18 +33,17 @@ function Notifications(){
     const handleMarkAsRead=async (notificationId)=>{
         try{
             await api.patch(
-                `/notifications/${notificationId}/read/`
+                `/notifications/${notificationId}/read`
             )
             setNotifications(
-                (currentNotifications)=>{
+                (currentNotifications)=>
                     currentNotifications.map(
                         (notification)=>notification.id===notificationId?{
-                            ...notifiation,
+                            ...notification,
                             is_read:true,
                         }
                         :notification
                     )
-                }
             )
         }catch(error){
             console.error('mark notification read error:',error)

@@ -18,6 +18,7 @@ function MentorEditProfile(){
         username: "",
         phone_number: "",
         email: "",
+        qualification:"",
         experience_years: "",
         current_profession: "",
         organization: "",
@@ -41,12 +42,14 @@ function MentorEditProfile(){
                 )
                 const data=response.data
                 const mentorData=data.mentor
+                console.log('mentor profile data:',mentorData)
                 setMentor(mentorData)
                 setFormData({
                     full_name: mentorData.full_name || "",
                     username: mentorData.username || "",
                     phone_number: mentorData.phone_number || "",
                     email: mentorData.email || "",
+                    qualification:mentorData.qualification||"",
                     experience_years:
                         mentorData.experience_years ?? "",
                     current_profession:

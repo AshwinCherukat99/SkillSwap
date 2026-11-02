@@ -162,10 +162,10 @@ const ActiveVideoCall = ({
       localStorage.getItem('mentor_access_token')
     )
     if (isMentor){
-      navigate('/mentor/upcoming-sessions/',{replace:true})
+      navigate('/mentor/upcoming_sessions/',{replace:true})
     }
     else{
-      navigate('/upcoming-sessions/',{replace:true})
+      navigate('/upcoming_sessions/',{replace:true})
     }
   },[leaveCall,navigate])
 

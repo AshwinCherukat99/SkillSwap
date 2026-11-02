@@ -24,7 +24,7 @@ def generate_mentor_tokens(mentor):
         'access':str(access),
     }
 
-def start_mentor_registration(full_name,username,email,password,phone_number,current_profession='',organization='',experience_years=None,professional_summary='',teaching_niche='',documents=None,document_types=None):
+def start_mentor_registration(full_name,username,email,password,phone_number,qualification,current_profession='',organization='',experience_years=None,professional_summary='',teaching_niche='',documents=None,document_types=None):
     print(
     "SERVICE RECEIVED EMAIL:",
     email
@@ -85,6 +85,7 @@ def start_mentor_registration(full_name,username,email,password,phone_number,cur
         'email':email,
         'password':password,
         'phone_number':phone_number,
+        'qualification':qualification,
         'current_profession':current_profession,
         'organization':organization,
         'experience_years':experience_years,
@@ -219,6 +220,9 @@ def verify_mentor_registration_otp(email,otp_code):
         organization=registration_data.get(
             "organization",
             "",
+        ),
+        qualification=registration_data.get(
+            'qualification'
         ),
         experience_years=registration_data.get(
             "experience_years"

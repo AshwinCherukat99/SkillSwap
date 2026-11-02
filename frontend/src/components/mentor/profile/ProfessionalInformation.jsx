@@ -89,6 +89,33 @@ function ProfessionalInformation({formData}){
 
                     </div>
 
+                    <div className="col-md-6">
+
+                        <label className="form-label fw-semibold text-muted">
+                            Educational Qualification
+                        </label>
+
+                        <div className="input-group">
+
+                            <span className="input-group-text">
+                                <span className="material-symbols-outlined">
+                                    school
+                                </span>
+                            </span>
+
+                            <input
+                                type="text"
+                                className="form-control bg-light"
+                                value={
+                                    formData.qualification||'Not Provided'
+                                }
+                                readOnly
+                            />
+
+                        </div>
+
+                    </div>
+
                     {/* Experience */}
                     <div className="col-md-6">
 
@@ -111,7 +138,7 @@ function ProfessionalInformation({formData}){
                                     formData.experience_years !== null &&
                                     formData.experience_years !== undefined
                                         ? `${formData.experience_years} Years`
-                                        : ""
+                                        : "Not Provided"
                                 }
                                 readOnly
                             />
@@ -147,10 +174,10 @@ function ProfessionalInformation({formData}){
                     </div>
 
                     {/* Organization */}
-                    <div className="col-12">
+                    <div className="col-md-6">
 
                         <label className="form-label fw-semibold text-muted">
-                            Current Organization & Proven Track Record
+                            Current Organization
                         </label>
 
                         <div className="input-group">
@@ -164,7 +191,7 @@ function ProfessionalInformation({formData}){
                             <input
                                 type="text"
                                 className="form-control bg-light"
-                                value={formData.organization || ""}
+                                value={formData.organization || "Not Provided"}
                                 readOnly
                             />
 

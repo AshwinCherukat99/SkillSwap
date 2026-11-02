@@ -89,11 +89,13 @@
 ========================================= */
 
 .mentor-register-layout {
-    height: 100vh;
-
     display: flex;
+    align-items: stretch;
 
-    overflow: hidden;
+    min-height: 100vh;
+    height: auto;
+
+    overflow: visible;
 }
 
 /* =========================================
@@ -102,7 +104,8 @@
 
 .mentor-register-left {
     width: 40%;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
 
     position: relative;
 
@@ -117,23 +120,21 @@
 
     color: white;
 
-    background:
-        linear-gradient(
-            135deg,
-            #4f46e5 0%,
-            #3525cd 100%
-        );
+    background: linear-gradient(
+        135deg,
+        #4f46e5 0%,
+        #3525cd 100%
+    );
 }
 
 .mentor-left-content {
     position: relative;
-
     z-index: 10;
 
-    height: 100%;
+    min-height: calc(100vh - 96px);
+    height: auto;
 
     display: flex;
-
     flex-direction: column;
 
     justify-content: space-between;
@@ -385,15 +386,15 @@
 
 .mentor-register-right {
     width: 60%;
-    height: 100vh;
 
-    padding:
-        48px 80px;
+    min-height: 100vh;
+    height: auto;
 
-    overflow-y: auto;
+    padding: 48px 80px;
 
-    background:
-        var(--mentor-surface);
+    overflow: visible;
+
+    background: var(--mentor-surface);
 }
 
 .mentor-register-right::-webkit-scrollbar {
@@ -581,12 +582,22 @@
         var(--mentor-muted);
 }
 
-.mentor-timeline-step span:last-child {
-    font-family:
-        "JetBrains Mono",
-        monospace;
-
+/* Style only the step labels, not the icons */
+.mentor-timeline-step > span {
+    font-family: "JetBrains Mono", monospace;
     font-size: 10px;
+}
+
+/* Ensure Material Symbols render correctly */
+.timeline-circle .material-symbols-outlined {
+    font-family: "Material Symbols Outlined";
+    font-size: 20px;
+    font-weight: normal;
+    font-style: normal;
+    line-height: 1;
+    white-space: nowrap;
+    font-feature-settings: "liga";
+    -webkit-font-feature-settings: "liga";
 }
 
 .mentor-timeline-step.active {

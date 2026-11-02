@@ -106,10 +106,14 @@ function App(){
           </PublicRoute>
           }/>
           <Route path='/forgot-password/' element={
-            <ForgotPassword/>
+            <PublicRoute>
+              <ForgotPassword/>
+            </PublicRoute>
           }/>
           <Route path='/reset-password/' element={
-            <ResetPassword/>
+            <PublicRoute>
+              <ResetPassword/>
+            </PublicRoute>
           }/>
         <Route path='/register' element={
           <PublicRoute>
@@ -117,7 +121,9 @@ function App(){
           </PublicRoute>
         }/>
         <Route path='/verify-email/' element={
-          <VerifyEmail/>
+          <PublicRoute>
+            <VerifyEmail/>
+          </PublicRoute>
         }/>
         <Route
   path="/video-call/:roomName/:conversationId"
@@ -270,16 +276,24 @@ function App(){
           </MentorPublicRoute>
         }/>
         <Route path='/mentor/register/' element={
-          <MentorRegister/>
+          <MentorPublicRoute>
+            <MentorRegister/>
+          </MentorPublicRoute>
         }/>
         <Route path='/mentor/verify-email/' element={
-          <MentorVerifyEmail/>
+          <MentorPublicRoute>
+            <MentorVerifyEmail/>
+          </MentorPublicRoute>
         }/>
         <Route path='/mentor/forgot-password/' element={
-          <MentorForgotPassword/>
+          <MentorPublicRoute>
+            <MentorForgotPassword/>
+          </MentorPublicRoute>
         }/>
         <Route path='/mentor/reset-password/' element={
-          <MentorResetPassword/>
+          <MentorPublicRoute>
+            <MentorResetPassword/>
+          </MentorPublicRoute>
         }/>
         <Route element={<MentorLayout/>}>
         <Route path='/mentor/dashboard/' element={

@@ -15,30 +15,10 @@ const ReviewsHeader=({mentor})=>{
                     Reviews & Ratings
                 </h1>
 
-                <div className="d-none d-md-flex gap-4">
-                    <span className="reviews-top-link">
-                        Direct Messages
-                    </span>
-
-                    <span className="reviews-top-link">
-                        Announcements
-                    </span>
-                </div>
-
             </div>
 
 
             <div className="d-flex align-items-center gap-3">
-
-                <button
-                    type="button"
-                    className="btn btn-link position-relative p-2 text-secondary"
-                    title="Notifications"
-                >
-                    <i className="bi bi-bell fs-5"></i>
-
-                    <span className="notification-dot"></span>
-                </button>
 
 
                 <div className="mentor-profile-pill">

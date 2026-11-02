@@ -60,6 +60,20 @@ class MentorRegisterSerializer(serializers.Serializer):
     phone_number=serializers.CharField(
         max_length=15
     )
+    qualification=serializers.ChoiceField(
+        choices=[
+            'BTECH',
+        'MTECH',
+        'BSC',
+        'MSC',
+        'BCA',
+        'MCA',
+        'BE',
+        'ME',
+        'PHD',
+        ],
+        required=True,
+    )
     current_profession=serializers.CharField(
         max_length=255,
         required=False,
