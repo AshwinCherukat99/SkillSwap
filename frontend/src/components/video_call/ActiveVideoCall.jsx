@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from "react";
+import {useNavigate} from 'react-router-dom'
 import useWebRTC from "../../hooks/useWebRTC";
 import useChatSocket from "../../hooks/useChatSocket";
 
@@ -18,6 +19,7 @@ const ActiveVideoCall = ({
   conversationId,
   accessToken,
 }) => {
+  const navigate=useNavigate()
   const [chatMessages, setChatMessages] = useState([]);
   const [sessionTimeUp,setSessionTimeUp]=useState(false)
   const [remainingSeconds,setRemainingSeconds]=useState(null)
@@ -154,6 +156,19 @@ const ActiveVideoCall = ({
     sendMessage,
   } = useChatSocket(conversationId, handleChatMessage);
 
+  const handleLeaveCall=useCallback(()=>{
+    leaveCall()
+    const isMentor=Boolean(
+      localStorage.getItem('mentor_access_token')
+    )
+    if (isMentor){
+      navigate('/mentor/upcoming-sessions/',{replace:true})
+    }
+    else{
+      navigate('/upcoming-sessions/',{replace:true})
+    }
+  },[leaveCall,navigate])
+
   return (
     <div className="video-call-page">
       <VideoCallHeader connected={connected} />
@@ -196,7 +211,7 @@ const ActiveVideoCall = ({
         cameraEnabled={cameraEnabled}
         onToggleMicrophone={toggleMicrophone}
         onToggleCamera={toggleCamera}
-        onLeave={leaveCall}
+        onLeave={handleLeaveCall}
         onShareScreen={shareScreen}
         isHandRaised={isHandRaised}
         onToggleHand={toggleHand}

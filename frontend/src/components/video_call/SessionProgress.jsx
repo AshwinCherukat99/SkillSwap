@@ -28,8 +28,8 @@ const SessionProgress=({
         const intervalId=window.setInterval(updateProgress,1000)
         return ()=>window.clearInterval(intervalId)
     },[actualStartedAt,duration])
-    const duration=Number(duration)*60||0
-    const progress=totalSeconds>0??Math.min((elapsedSeconds/totalSeconds)*100,100)
+    const totalSeconds=Number(duration)*60||0
+    const progress=totalSeconds>0?Math.min((elapsedSeconds/totalSeconds)*100,100):0
     const remainingSeconds=Math.max(totalSeconds-elapsedSeconds,0)    
     const minutes=Math.floor(remainingSeconds/60)
     const seconds=remainingSeconds%60
