@@ -1017,7 +1017,7 @@ class MentorStudentsView(APIView):
                     'completed_students':completed_students,
                     'active_now': 0,
         'sessions_this_week': 0,
-        'average_rating': None,
+        'average_rating': mentor.rating,
         'success_rate': None,
                 }
             },

@@ -145,6 +145,10 @@ class MentorEnrollmentProfileSerializer(serializers.ModelSerializer):
             is_completed=True,
             lesson__module__course=course
         ).count()
+        unlocked_lessons=obj.lesson_progress.filter(
+            is_unlocked=True,
+            lesson__module__course=course
+        ).count()
         return {
             'id':course.id,
             'title':course.title,
@@ -153,6 +157,7 @@ class MentorEnrollmentProfileSerializer(serializers.ModelSerializer):
             'module_count':course.modules.count(),
             'total_lessons':total_lessons,
             'completed_lessons':completed_lessons,
+            'unlocked_lessons':unlocked_lessons,
         }
     def get_modules(self,obj):
         modules=obj.course.modules.prefetch_related(

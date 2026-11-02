@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 
 import ModuleAccordion from "./ModuleAccordion";
 
@@ -43,7 +43,7 @@ function CourseAccordion({
 
           <div className="course-summary-stats">
             <strong>
-              {completed}/{lessons.length} completed
+              {unlocked}/{lessons.length} completed
             </strong>
 
             <span>{unlocked} unlocked</span>

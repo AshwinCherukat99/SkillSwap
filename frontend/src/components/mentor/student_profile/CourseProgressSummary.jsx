@@ -19,7 +19,7 @@ function CourseProgressSummary({
         ],
         [
             'Lessons Completed',
-            `${course.completed_lessons??0}/${course.total_lessons??0}`,
+            `${course.unlocked_lessons??0}/${course.total_lessons??0}`,
             'Completed Lessons'
         ]
     ]
