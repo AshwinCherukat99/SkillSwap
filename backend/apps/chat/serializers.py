@@ -164,10 +164,10 @@ class ConversationSerializer(serializers.ModelSerializer):
                 person=member.mentor
                 return {
                     'id':person.id,
-                    'name':person.full_name or person.username,
+                    'full_name':person.full_name or person.username,
                     'username':getattr(person,'username',''),
                     'type':'MENTOR',
-                    'avatar':request.build_absolute_uri(
+                    'profile_image':request.build_absolute_uri(
                         person.profile_image.url
                     )
                     if person.profile_image else None

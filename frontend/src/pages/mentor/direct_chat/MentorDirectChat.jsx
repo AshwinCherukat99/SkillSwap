@@ -400,7 +400,7 @@ const MentorDirectChat=()=>{
 
                   {getStudent().profile_image ? (
                     <img
-                      src={getStudent().profile_image}
+                      src={`${BACKEND_ORIGIN}${getStudent().profile_image}`}
                       alt={getStudent().full_name}
                       className="chat-avatar"
                     />
