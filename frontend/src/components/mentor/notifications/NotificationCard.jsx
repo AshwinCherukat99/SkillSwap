@@ -75,7 +75,7 @@ function NotificationCard({
         icon:"notifications",
         color:"secondary"
     }
-    const categeory=getNotificationCategory(
+    const category=getNotificationCategory(
         notification.notification_type
     )
     return (

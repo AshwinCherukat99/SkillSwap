@@ -1,6 +1,7 @@
 import React,{useEffect,useState,useMemo,useRef} from "react";
 import { useSearchParams } from "react-router-dom";
 
+import { BACKEND_ORIGIN } from "../../../config";
 import MentorChatMessage from "../../../components/mentor/direct_chat/MentorChatMessage";
 
 import mentorApi from "../../../services/mentorApi";
@@ -297,7 +298,7 @@ const MentorDirectChat=()=>{
 
                       {student.profile_image ? (
                         <img
-                          src={student.profile_image}
+                          src={`${BACKEND_ORIGIN}${student.profile_image}`}
                           alt={student.full_name}
                           className="avatar"
                         />
