@@ -515,8 +515,16 @@ class VideoCallDetailsView(APIView):
                     'detail':'conversation not found'
                 },status=status.HTTP_404_NOT_FOUND,
             )
+        is_mentor=isinstance(request.user,Mentor)
         if conversation.skill_exchange_session_id:
             session=conversation.skill_exchange_session
+            if is_mentor:
+                return Response(
+                    {
+                        'detail':'mentors cannot access skill exchange sessions'
+                    },
+                    status=status.HTTP_403_FORBIDDEN,
+                )
             participant_ids={
                 session.requester_id,
                 session.recipient_id,
@@ -536,23 +544,21 @@ class VideoCallDetailsView(APIView):
             session_type='SKILL_EXCHANGE'
         elif conversation.course_session_id:
             session=conversation.course_session
-            is_student=session.enrollment.user_id==request.user.id
-            is_mentor=(
-                getattr(request.user,'role',None)=='MENTOR'
-                and session.mentor_id==request.user.id
-            )
-            if not (is_student or is_mentor):
-                return Response(
-                    {
-                        'detail':'you are not a participant in this session'
-                    },
-                    status=status.HTTP_403_FORBIDDEN,
-                )
             if is_mentor:
+                if session.mentor_id!=request.user.id:
+                    return Response(
+                        {'detail':'you are not the mentor for this session'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
                 remote_user=session.enrollment.user
             else:
+                if session.enrollment.user_id!=request.user.id:
+                    return Response(
+                        {'detail':'you are not the student for this session'},
+                        status=status.HTTP_403_FORBIDDEN,
+                    )
                 remote_user=session.mentor
-            session_type='COURSE'
+                session_type='COURSE'
         else:
             return Response(
                 {
@@ -570,7 +576,8 @@ class VideoCallDetailsView(APIView):
                 'current_username':request.user.username,
                 'remote_username':remote_user.username,
                 'status':session.status,
-            }
+            },
+            status=status.HTTP_200_OK,
         )
 
 class UserStartMentorDirectChatView(APIView):

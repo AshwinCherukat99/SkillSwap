@@ -30,6 +30,11 @@ function Feed(){
     const [posts,setPosts]=useState([])
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
+    useEffect(() => {
+    console.log("Trending skills state:", trendingSkills);
+    console.log("Suggested mentors state:", suggestedMentors);
+    console.log("Sidebar loading:", loadingSidebar);
+}, [trendingSkills, suggestedMentors, loadingSidebar]);
     const profileImage = user?.profile_image
     ? user.profile_image.startsWith("http")
         ? user.profile_image
@@ -37,15 +42,19 @@ function Feed(){
     : "/default-avatar.png";
     const fetchSidebarData=async ()=>{
       try{
+        console.log('fetching sidebar data')
         const response=await api.get(
           '/posts/feed/sidebar/'
         )
+        console.log('sidebar api response:',response.data)
         setTrendingSkills(response.data.trending_skills||[])
         setSuggestedMentors(response.data.suggested_mentors||[])
       }catch(err){
-        console.error('failed to load sidebar:',err)
+        console.error("Sidebar API failed:", err);
+        console.error("Response status:", err.response?.status);
+        console.error("Response data:", err.response?.data);
       }finally{
-        setLoading(false)
+        setLoadingSidebar(false)
       }
     }
     const handleMessageMentor = async (mentor) => {

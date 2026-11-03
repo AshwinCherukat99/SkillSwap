@@ -102,7 +102,7 @@ function FindMentors(){
                 const courseName =
                     typeof course === "string"
                         ? course
-                        : course.name || "";
+                        : course.title || "";
 
                 return (
                     courseName.toLowerCase() ===

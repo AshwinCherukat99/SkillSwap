@@ -19,26 +19,22 @@ function MentorFilters({
     const normalizedCourseSearch =
         courseSearch.trim().toLowerCase();
 
-    const courseSuggestions = courses.filter((course) => {
+    const getCourseName=(course)=>{
+        return typeof course==='String'
+        ?course
+        :course.title||course.name||''
+    }
 
-        const courseName =
-            typeof course === "string"
-                ? course
-                : course.name || "";
+    const courseSuggestions = courses.filter((course) => 
 
-        return courseName
-            .toLowerCase()
-            .includes(normalizedCourseSearch);
+        getCourseName(course).toLowerCase().includes(normalizedCourseSearch)
 
-    }).slice(0, 8);
+    ).slice(0, 8);
 
 
     const handleCourseSelect = (course) => {
 
-        const courseName =
-            typeof course === "string"
-                ? course
-                : course.name;
+        const courseName = getCourseName(course)
 
         setCourseSearch(courseName);
 
@@ -57,14 +53,9 @@ function MentorFilters({
 
         setCourseSearch(value);
 
-        /*
-         * Don't immediately apply arbitrary text as
-         * a course filter. The user selects a suggestion.
-         */
-
-        if (!value.trim()) {
-            onFilterChange("course", "");
-        }
+        
+            onFilterChange("course", value);
+        
 
         setShowCourseSuggestions(true);
     };
@@ -105,7 +96,7 @@ function MentorFilters({
                         className="form-label fw-semibold"
                         htmlFor="course-search"
                     >
-                        Course / Skill
+                        Course 
                     </label>
 
                     <input
@@ -130,10 +121,7 @@ function MentorFilters({
 
                             {courseSuggestions.map((course) => {
 
-                                const courseName =
-                                    typeof course === "string"
-                                        ? course
-                                        : course.name;
+                                const courseName = getCourseName(course)
 
                                 const courseId =
                                     typeof course === "string"

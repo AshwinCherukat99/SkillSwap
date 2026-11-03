@@ -120,7 +120,7 @@ function TopRatedMentors({mentors=[]}){
                                     className="btn btn-outline-primary w-100 mt-2"
                                     onClick={() =>
                                         navigate(
-                                            `/mentors/${mentor.id}/`
+                                            `/mentors/mentor-profile/${mentor.id}/`
                                         )
                                     }
                                 >

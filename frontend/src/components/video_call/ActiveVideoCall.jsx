@@ -26,15 +26,14 @@ const ActiveVideoCall = ({
   const endCallTriggered=React.useRef(false)
   const [sessionDetails,setSessionDetails]=useState(null)
   const [sessionDetailsError,setSessionDetailsError]=useState('')
+  const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
 
   useEffect(()=>{
     let cancelled=false
     const fetchSessionDetails=async ()=>{
       try{
         setSessionDetailsError('')
-        const isMentor=Boolean(
-          localStorage.getItem('mentor_access_token')
-        )
+        const isMentor=chatTokenKey==='mentor_access_token'
         const client=isMentor?mentorApi:api
         const response=await client.get(
           `/chat/video-call/${conversationId}/details/`
@@ -59,15 +58,13 @@ const ActiveVideoCall = ({
     return ()=>{
       cancelled=true
     }
-  },[conversationId])
+  },[conversationId,chatTokenKey])
 
   useEffect(()=>{
     let cancelled=false
     const fetchChatHistory=async ()=>{
       try{
-        const isMentor=Boolean(
-          localStorage.getItem('mentor_access_token')
-        )
+        const isMentor=chatTokenKey==='mentor_access_token'
         const client=isMentor?mentorApi:api
         const endpoint=isMentor?
         `/chat/mentor/video-call/${conversationId}/messages/`
@@ -89,7 +86,7 @@ const ActiveVideoCall = ({
     return ()=>{
       cancelled=true
     }
-  },[conversationId])
+  },[conversationId,chatTokenKey])
 
   const {
     localVideoRef,
@@ -154,7 +151,7 @@ const ActiveVideoCall = ({
   const {
     connected: chatConnected,
     sendMessage,
-  } = useChatSocket(conversationId, handleChatMessage);
+  } = useChatSocket(conversationId, handleChatMessage,chatTokenKey);
 
   const handleLeaveCall=useCallback(()=>{
     leaveCall()
