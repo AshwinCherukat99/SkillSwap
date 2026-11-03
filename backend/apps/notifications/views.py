@@ -2,9 +2,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from apps.accounts.permissions import IsAdmin
+from apps.mentors.authentication import MentorJWTAuthentication
 from rest_framework import status
 from django.utils import timezone
 from django.db.models import Q,Count
+from django.shortcuts import get_object_or_404
 from apps.accounts.models import User
 
 from .models import Notification,AdminNotification
@@ -263,3 +265,91 @@ class AdminNotificationUserSearchView(APIView):
         return Response({
             'users':data,
         })
+
+class MentorNotificationListView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        mentor=request.user
+        if not mentor.user_id:
+            return Response(
+                {
+                    'detail':'no user account is linked to this mentor'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        notifications=Notification.objects.filter(
+            recipient_id=mentor.user_id
+        ).order_by('-created_at')
+        serializer=NotificationSerializer(
+            notifications,
+            many=True,
+        )
+        return Response(serializer.data)
+
+class MentorNotificationMarkReadView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def patch(self,request,notification_id):
+        mentor=request.user
+        notification=get_object_or_404(
+            Notification,
+            id=notification_id,
+            recipient_id=mentor.user_id,
+        )
+        if not notification.is_read:
+            notification.is_read=True
+            notification.save(
+                update_fields=['is_read']
+            )
+        return Response(
+            {
+                'message':'notification marked as read',
+                'is_read':notification.is_read,
+            }
+        )
+
+class MentorNotifcationMarkAllReadView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def patch(self,request):
+        mentor=request.user
+        if not mentor.user_id:
+            return Response(
+                {
+                    'detail':'no user account is linked to this mentor'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        Notification.objects.filter(
+            recipient_id=mentor.user_id,
+            is_read=False,
+        ).update(is_read=True)
+        return Response(
+            {
+                'message':'all notifications marked as read'
+            }
+        )
+
+class MentorNotificationClearReadView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def delete(self,request):
+        mentor=request.user
+        if not mentor.user_id:
+            return Response(
+                {
+                    'detail':'no user account is linked to this mentor'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        deleted_count,_=Notification.objects.filter(
+            recipient_id=mentor.user_id,
+            is_read=True
+        ).delete()
+        return Response(
+            {
+                'message':'read notifications cleared',
+                'deleted_count':deleted_count,
+            }
+        )

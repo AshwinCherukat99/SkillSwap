@@ -83,6 +83,7 @@ import EditBadge from './components/admin/badge_mgmt/EditBadge'
 import AdminMentorProfile from './pages/admin/mentor_profile/AdminMentorProfile'
 import AdminUserProfile from './pages/admin/user_profile/AdminUserProfile'
 import PublicUserProfile from './pages/user/user_profile/PublicUserProfile'
+import MentorNotifications from './pages/mentor/notifications/MentorNotifications'
 import ProtectedVideoCallRoute from './ProtectedVideoCallRoute'
 
 function App(){
@@ -314,6 +315,11 @@ function App(){
         <Route path='/mentor/courses/' element={
           <MentorProtectedRoute>
             <MentorCourseManagement/>
+          </MentorProtectedRoute>
+        }/>
+        <Route path='/mentor/notifications/' element={
+          <MentorProtectedRoute>
+            <MentorNotifications/>
           </MentorProtectedRoute>
         }/>
         <Route path='/mentor/students/' element={

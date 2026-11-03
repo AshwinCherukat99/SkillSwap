@@ -10,6 +10,10 @@ from .views import (
     AdminNotificationDetailView,
     CancelAdminNotificationView,
     AdminNotificationUserSearchView,
+    MentorNotificationListView,
+    MentorNotificationMarkReadView,
+    MentorNotifcationMarkAllReadView,
+    MentorNotificationClearReadView
 )
 
 urlpatterns=[
@@ -58,4 +62,24 @@ urlpatterns=[
         AdminNotificationUserSearchView.as_view(),
         name='admin-notification-user-search',
     ),
+    path(
+        'mentor/',
+        MentorNotificationListView.as_view(),
+        name='mentor-notification-list',
+    ),
+    path(
+        'mentor/<int:notification_id>/read/',
+        MentorNotificationMarkReadView.as_view(),
+        name='mentor-notification-read',
+    ),
+    path(
+        'mentor/read_all/',
+        MentorNotifcationMarkAllReadView.as_view(),
+        name='mentor-notifcation-read-all',
+    ),
+    path(
+        'mentor/clear_read/',
+        MentorNotificationClearReadView.as_view(),
+        name='mentor-notification-clear-read',
+    )
 ]

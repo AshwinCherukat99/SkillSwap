@@ -464,7 +464,7 @@ class MentorCourseManagementView(APIView):
                     'published':published_courses,
                     'drafts':draft_courses,
                     'enrollments':total_enrollments,
-                    'average_rating':None,
+                    'average_rating':mentor.rating,
                     'completion_rate':None,
                 },
                 'courses':serializer.data,
