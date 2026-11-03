@@ -23,6 +23,9 @@ function Feed(){
     const user=useSelector(
         (state)=>state.auth.user
     )
+    const [trendingSkills,setTrendingSkills]=useState([])
+    const [suggestedMentors,setSuggestedMentors]=useState([])
+    const [loadingSidebar,setLoadingSidebar]=useState(true)
     const [editingPost,setEditingPost]=useState(null)
     const [posts,setPosts]=useState([])
     const [loading,setLoading]=useState(true)
@@ -32,6 +35,44 @@ function Feed(){
         ? user.profile_image
         : `${BACKEND_ORIGIN}${user.profile_image}`
     : "/default-avatar.png";
+    const fetchSidebarData=async ()=>{
+      try{
+        const response=await api.get(
+          '/posts/feed/sidebar/'
+        )
+        setTrendingSkills(response.data.trending_skills||[])
+        setSuggestedMentors(response.data.suggested_mentors||[])
+      }catch(err){
+        console.error('failed to load sidebar:',err)
+      }finally{
+        setLoading(false)
+      }
+    }
+    const handleMessageMentor = async (mentor) => {
+    try {
+        const response = await api.post(
+            '/chat/conversations/mentor/',
+            {
+                mentor_id: mentor.id,
+            }
+        );
+
+        navigate(
+            `/direct-chat?conversation=${response.data.id}`
+        );
+
+    } catch (err) {
+        console.error(
+            'failed to open mentor conversation:',
+            err
+        );
+
+        alert(
+            err.response?.data?.detail ||
+            'unable to open conversation'
+        );
+    }
+};
     const handlePostEdit=(post)=>{
         setEditingPost(post)
     }
@@ -42,6 +83,7 @@ function Feed(){
     }
     useEffect(()=>{
         fetchPosts()
+        fetchSidebarData()
     },[])
     useEffect(() => {
     const fetchUserProfile = async () => {
@@ -219,34 +261,133 @@ function Feed(){
       <div className="col-lg-3 d-none d-lg-block">
         <div className="sticky-sidebar">
           {/* Trending Topics / Skills */}
-          <div className="card surface-card shadow-sm border-0 mb-3 p-3">
-            <h6 className="widget-title mb-3">Trending Skills</h6>
-            <div className="d-flex flex-wrap gap-2">
-              <span className="trending-skill">#ReactJS</span>
-              <span className="trending-skill">#FigmaUI</span>
-              <span className="trending-skill">#Python</span>
-              <span className="trending-skill">#MachineLearning</span>
-            </div>
-          </div>
+          
+<div className="card surface-card shadow-sm border-0 mb-3 p-3">
+
+    <h6 className="widget-title mb-3">
+        Trending Skills
+    </h6>
+
+    <div className="d-flex flex-wrap gap-2">
+
+        {loadingSidebar ? (
+            <small className="text-muted">
+                Loading trending skills...
+            </small>
+        ) : trendingSkills.length > 0 ? (
+
+            trendingSkills.map((skill) => (
+                <span
+                    key={skill.id}
+                    className="trending-skill"
+                    title={`${skill.selection_count} users selected this skill`}
+                >
+                    #{skill.name.replace(/\s+/g, '')}
+                </span>
+            ))
+
+        ) : (
+            <small className="text-muted">
+                No trending skills available.
+            </small>
+        )}
+
+    </div>
+
+</div>
 
           {/* Suggested Mentors / Users */}
-          <div className="card surface-card shadow-sm border-0 p-3">
-            <h6 className="widget-title mb-3">Suggested Mentors</h6>
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <div className="d-flex align-items-center gap-2">
-                <div className="avatar-placeholder rounded-circle bg-light border p-2">
-                  <span className="material-symbols-outlined fs-5 text-muted">
-                    person
-                  </span>
+          
+<div className="card surface-card shadow-sm border-0 p-3">
+
+    <h6 className="widget-title mb-3">
+        Suggested Mentors
+    </h6>
+
+    {loadingSidebar ? (
+
+        <p className="text-muted small">
+            Loading mentors...
+        </p>
+
+    ) : suggestedMentors.length > 0 ? (
+
+        suggestedMentors.map((mentor) => (
+
+            <div
+                key={mentor.id}
+                className="d-flex align-items-center justify-content-between mb-3"
+            >
+
+                {/* Mentor information */}
+                <div className="d-flex align-items-center gap-2">
+
+                    {mentor.profile_image ? (
+
+                        <img
+                            src={mentor.profile_image}
+                            alt={mentor.full_name}
+                            className="rounded-circle border"
+                            style={{
+                                width: "42px",
+                                height: "42px",
+                                objectFit: "cover",
+                                flexShrink: 0
+                            }}
+                            onError={(e) => {
+                                e.currentTarget.src =
+                                    "/default-avatar.png";
+                            }}
+                        />
+
+                    ) : (
+
+                        <div className="avatar-placeholder rounded-circle bg-light border p-2">
+                            <span className="material-symbols-outlined fs-5 text-muted">
+                                person
+                            </span>
+                        </div>
+
+                    )}
+
+                    <div style={{ minWidth: 0 }}>
+
+                        <p className="mb-0 fw-semibold fs-sm">
+                            {mentor.full_name}
+                        </p>
+
+                        <small className="text-muted fs-xs">
+                            {mentor.current_profession ||
+                                "Mentor"}
+                        </small>
+
+                    </div>
+
                 </div>
-                <div>
-                  <p className="mb-0 fw-semibold fs-sm">Elena Rostova</p>
-                  <small className="text-muted fs-xs">UI/UX Designer</small>
-                </div>
-              </div>
-              <button className="follow-btn">Connect</button>
+
+                {/* Connect button */}
+                <button
+                    type="button"
+                    className="follow-btn"
+                    onClick={() => handleMessageMentor(mentor)}
+                >
+                    Connect
+                </button>
+
             </div>
-          </div>
+
+        ))
+
+    ) : (
+
+        <p className="text-muted small mb-0">
+            No suggested mentors available.
+        </p>
+
+    )}
+
+</div>
+
         </div>
       </div>
     </div>

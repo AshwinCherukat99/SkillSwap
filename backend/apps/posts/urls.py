@@ -5,6 +5,7 @@ from .views import (
     CreatePostView,
     DeletePostView,
     FeedPostsView,
+    FeedSidebarView,
     PostLikeView,
     PostCommentsView,
     EditPostView
@@ -30,6 +31,11 @@ urlpatterns=[
         'feed/',
         FeedPostsView.as_view(),
         name='feed-posts',
+    ),
+    path(
+        'feed/sidebar/',
+        FeedSidebarView.as_view(),
+        name='feed-sidebar',
     ),
     path(
         '<int:post_id>/like/',

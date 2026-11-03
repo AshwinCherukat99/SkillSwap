@@ -6,6 +6,8 @@ from rest_framework import status
 from django.db.models import Count
 from rest_framework.parsers import MultiPartParser, FormParser
 from apps.notifications.models import Notification
+from apps.skills.models import Skill
+from apps.mentors.models import Mentor
 from apps.badges.services import BadgeService
 
 from .models import Post,PostComment,PostLike
@@ -138,6 +140,69 @@ class FeedPostsView(APIView):
         return Response(
             serializer.data,
             status=status.HTTP_200_OK
+        )
+
+class FeedSidebarView(APIView):
+    permission_classes=[IsAuthenticated]
+    def get(self,request):
+        trending_skills=(
+            Skill.objects.filter(
+                is_active=True
+            ).annotate(
+                selection_count=Count(
+                    'user_skills__user',
+                    distinct=True
+                )
+            ).filter(
+                selection_count__gt=0
+            ).order_by(
+                '-selection_count',
+                'name'
+            )[:4]
+        )
+        trending_data=[
+            {
+                'id':skill.id,
+                'name':skill.name,
+                'slug':skill.slug,
+                'selection_count':skill.selection_count
+            }
+            for skill in trending_skills
+        ]
+        top_mentors=Mentor.objects.filter(
+            status=Mentor.Status.ACTIVE,
+            is_active=True,
+            is_verified=True,
+            total_reviews__gt=0,
+        ).select_related(
+            'profile'
+        ).order_by(
+            '-rating',
+            '-total_reviews'
+        )[:3]
+        mentor_data=[]
+        for mentor in top_mentors:
+            mentor_profile=getattr(mentor,'profile',None)
+            mentor_data.append({
+                'id':mentor.id,
+                'full_name':mentor.full_name or mentor.username,
+                'username':mentor.username,
+                'current_profession':(mentor.profile.current_profession
+                                      if mentor.profile else ''),
+                'rating':float(mentor.rating),
+                'total_reviews':mentor.total_reviews,
+                'profile_image':(
+                    request.build_absolute_uri(
+                    mentor.profile_image
+                ) if mentor.profile_image else None
+                )
+            })
+        return Response(
+            {
+                'trending_skills':trending_data,
+                'suggested_mentors':mentor_data,
+            },
+            status=status.HTTP_200_OK,
         )
 
 class PostLikeView(APIView):
