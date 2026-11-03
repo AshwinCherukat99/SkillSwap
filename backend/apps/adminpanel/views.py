@@ -1341,9 +1341,7 @@ class AdminDashboardView(APIView):
                 'time':session.scheduled_start.isoformat(),
                 'participants':participants,
                 'extra':0,
-                'category':(
-                    session.skill_wanted.name if session.skill_wanted else 'Skill Exchange'
-                ),
+                'category':'Skill Exchange',
                 'status':session.status.title(),
                 'statusType':session.status.lower(),
                 'scheduled_start':session.scheduled_start,

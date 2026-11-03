@@ -47,26 +47,6 @@ const VerificationHeader=()=>{
 
                 </div>
 
-                <div className="d-flex gap-2">
-
-                    <button
-                        type="button"
-                        className="btn btn-light border"
-                    >
-                        <i className="bi bi-book me-2"></i>
-                        Audit Guidelines
-                    </button>
-
-                    <button
-                        type="button"
-                        className="btn btn-light border"
-                    >
-                        <i className="bi bi-download me-2"></i>
-                        Export Queue
-                    </button>
-
-                </div>
-
             </div>
 
         </div>

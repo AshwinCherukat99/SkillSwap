@@ -1,5 +1,20 @@
 import StatusBadge from './StatusBadge'       
 
+import { BACKEND_ORIGIN } from '../../../config'
+
+const formatSessionTime=(timestamp)=>{
+    if (!timestamp) return ''
+    return new Date(timestamp).toLocaleString('en-IN',{
+        day:'2-digit',
+        month:'short',
+        year:'numeric',
+        hour:'2-digit',
+        minute:'2-digit',
+        hour12:true,
+        timeZone:'Asia/Kolkata',
+    })
+}
+
 function RecentSessions({sessions=[],onViewAll,}){
     return (
         <div className="admin-panel sessions-panel">
@@ -63,7 +78,7 @@ function RecentSessions({sessions=[],onViewAll,}){
                                             </strong>
 
                                             <span>
-                                                {session.time}
+                                                {formatSessionTime(session.time)}
                                             </span>
 
                                         </div>
@@ -80,8 +95,9 @@ function RecentSessions({sessions=[],onViewAll,}){
                                                     <img
                                                         key={participant.id}
                                                         src={
-                                                            participant.profile_image ||
-                                                            "/default-avatar.png"
+                                                            participant.profile_image
+                                                            ?`${BACKEND_ORIGIN}${participant.profile_image}` 
+                                                            :"/default-avatar.png"
                                                         }
                                                         alt={
                                                             participant.username ||

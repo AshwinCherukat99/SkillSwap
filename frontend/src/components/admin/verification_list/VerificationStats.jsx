@@ -1,6 +1,7 @@
 import React from "react";
 
 const VerificationStats=({stats})=>{
+    const total=stats.pending+stats.under_review+stats.verified+stats.rejected
     const cards=[
         {
             title:'Pending Verification',
@@ -19,14 +20,14 @@ const VerificationStats=({stats})=>{
         {
             title:'Verified Mentors',
             value:stats.verified,
-            suffix:`${stats.verified_percentage}%`,
+            suffix:`${(stats.verified*100)/total}%`,
             icon:'bi-patch-check',
             iconClass:'text-success',
         },
         {
             title:'Deficient/Rejected',
             value:stats.rejected,
-            suffix:`${stats.rejected_percentage}%`,
+            suffix:`${(stats.rejected*100)/total}%`,
             icon:'bi-exclamation-triangle',
             iconClass:'text-danger',
         },
