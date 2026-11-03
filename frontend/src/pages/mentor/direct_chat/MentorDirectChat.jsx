@@ -1,7 +1,6 @@
 import React,{useEffect,useState,useMemo,useRef} from "react";
 import { useSearchParams } from "react-router-dom";
 
-import { BACKEND_ORIGIN } from "../../../config";
 import MentorChatMessage from "../../../components/mentor/direct_chat/MentorChatMessage";
 
 import mentorApi from "../../../services/mentorApi";
@@ -298,15 +297,15 @@ const MentorDirectChat=()=>{
 
                       {student.profile_image ? (
                         <img
-                          src={`${BACKEND_ORIGIN}${student.profile_image}`}
+                          src={student.profile_image}
                           alt={student.full_name}
                           className="avatar"
                         />
                       ) : (
                         <div className="avatar avatar-placeholder">
-                          {student.full_name
-                            ?.charAt(0)
-                            ?.toUpperCase()}
+                          {(student.full_name||student.username||'?')
+                            .charAt(0)
+                            .toUpperCase()}
                         </div>
                       )}
 
@@ -400,7 +399,7 @@ const MentorDirectChat=()=>{
 
                   {getStudent().profile_image ? (
                     <img
-                      src={`${BACKEND_ORIGIN}${getStudent().profile_image}`}
+                      src={getStudent().profile_image}
                       alt={getStudent().full_name}
                       className="chat-avatar"
                     />
@@ -417,7 +416,7 @@ const MentorDirectChat=()=>{
                     <div className="d-flex align-items-center gap-2">
 
                       <h6 className="mb-0 fw-bold">
-                        {getStudent().full_name}
+                        {getStudent().full_name||getStudent().username}
                       </h6>
 
                       </div>
