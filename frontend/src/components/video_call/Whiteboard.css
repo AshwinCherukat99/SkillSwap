@@ -1,0 +1,417 @@
+/* =====================================================
+   WHITEBOARD OVERLAY
+===================================================== */
+
+.whiteboard-overlay {
+    position: fixed;
+    top: 64px;
+    right: 0;
+    bottom: 78px;
+    left: 0;
+    z-index: 40;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #f1f5f9;
+    color: #0f172a;
+    overflow: hidden;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.whiteboard-header {
+    height: 62px;
+    min-height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 22px;
+    background: #111827;
+    color: white;
+    border-bottom: 1px solid #334155;
+}
+
+.whiteboard-header-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.whiteboard-logo {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #4f46e5;
+    border-radius: 10px;
+    font-size: 17px;
+}
+
+.whiteboard-header-title h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.whiteboard-header-title span {
+    display: block;
+    margin-top: 3px;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.whiteboard-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.whiteboard-connection {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+}
+
+.whiteboard-connection > span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f59e0b;
+}
+
+.whiteboard-connection.connected > span {
+    background: #22c55e;
+}
+
+.whiteboard-connection.disconnected > span {
+    background: #ef4444;
+}
+
+.whiteboard-close-button {
+    height: 38px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 13px;
+
+    background: #334155;
+    color: white;
+    border: 1px solid #475569;
+    border-radius: 8px;
+
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.whiteboard-close-button:hover {
+    background: #475569;
+}
+
+/* =====================================================
+   TOOLBAR
+===================================================== */
+
+.whiteboard-toolbar {
+    min-height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 18px;
+
+    padding: 9px 16px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.whiteboard-tool-group {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.whiteboard-tool-group > button {
+    min-width: 42px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 10px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+
+    color: #334155;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.whiteboard-tool-group > button:hover:not(:disabled) {
+    background: #f1f5f9;
+}
+
+.whiteboard-tool-group > button.active {
+    background: #eef2ff;
+    border-color: #6366f1;
+    color: #4f46e5;
+}
+
+.whiteboard-tool-group > button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.whiteboard-tool-group > .whiteboard-clear-button {
+    color: #dc2626;
+}
+
+.whiteboard-colors {
+    gap: 9px;
+}
+
+.whiteboard-color {
+    width: 23px;
+    min-width: 23px !important;
+    height: 23px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    border: 2px solid white !important;
+    outline: 1px solid #cbd5e1;
+}
+
+.whiteboard-color.selected {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+.whiteboard-brush-size {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 11px;
+    color: #475569;
+}
+
+.whiteboard-brush-size input {
+    width: 90px;
+    accent-color: #4f46e5;
+}
+
+.whiteboard-brush-size span {
+    min-width: 30px;
+}
+
+/* =====================================================
+   VIEWER NOTICE
+===================================================== */
+
+.whiteboard-viewer-notice {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 10px;
+    background: #eef2ff;
+    color: #4338ca;
+    font-size: 12px;
+}
+
+/* =====================================================
+   WORKSPACE
+===================================================== */
+
+.whiteboard-workspace {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    padding: 16px;
+    overflow: hidden;
+}
+
+.whiteboard-canvas-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+
+    background: white;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+
+    box-shadow: 0 3px 12px rgba(15, 23, 42, 0.06);
+}
+
+.whiteboard-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: white;
+}
+
+.whiteboard-canvas.drawing-enabled {
+    cursor: crosshair;
+    touch-action: none;
+}
+
+.whiteboard-canvas.view-only {
+    cursor: default;
+    pointer-events: none;
+}
+
+/* =====================================================
+   VIDEO THUMBNAILS
+===================================================== */
+
+.whiteboard-video-thumbnails {
+    position: absolute;
+    right: 30px;
+    bottom: 28px;
+    z-index: 5;
+
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.whiteboard-video-card {
+    position: relative;
+    width: 150px;
+    height: 95px;
+
+    overflow: hidden;
+    background: #111827;
+    border: 2px solid white;
+    border-radius: 10px;
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.25);
+}
+
+.whiteboard-video-card video {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.whiteboard-video-card:first-child video {
+    transform: scaleX(-1);
+}
+
+.whiteboard-video-card span {
+    position: absolute;
+    left: 7px;
+    bottom: 6px;
+
+    padding: 3px 7px;
+    background: rgba(0, 0, 0, 0.65);
+    border-radius: 4px;
+
+    color: white;
+    font-size: 10px;
+}
+
+/* =====================================================
+   ERROR
+===================================================== */
+
+.whiteboard-error {
+    padding: 9px 15px;
+    background: #fee2e2;
+    color: #b91c1c;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+    .whiteboard-overlay {
+        top: 64px;
+        bottom: 78px;
+    }
+
+    .whiteboard-header {
+        padding: 0 12px;
+    }
+
+    .whiteboard-header-title h2 {
+        font-size: 13px;
+    }
+
+    .whiteboard-header-actions {
+        gap: 8px;
+    }
+
+    .whiteboard-connection {
+        font-size: 10px;
+    }
+
+    .whiteboard-close-button {
+        padding: 0 9px;
+        font-size: 10px;
+    }
+
+    .whiteboard-toolbar {
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 8px;
+    }
+
+    .whiteboard-tool-group > button {
+        min-width: 36px;
+        padding: 0 7px;
+    }
+
+    .whiteboard-brush-size input {
+        width: 65px;
+    }
+
+    .whiteboard-workspace {
+        padding: 8px;
+    }
+
+    .whiteboard-video-thumbnails {
+        right: 16px;
+        bottom: 16px;
+        gap: 7px;
+    }
+
+    .whiteboard-video-card {
+        width: 105px;
+        height: 68px;
+    }
+}
+
+@media (max-width: 480px) {
+    .whiteboard-header-title span {
+        display: none;
+    }
+
+    .whiteboard-close-button span {
+        display: none;
+    }
+
+    .whiteboard-tool-group > button span {
+        display: none;
+    }
+
+    .whiteboard-video-card {
+        width: 85px;
+        height: 58px;
+    }
+}

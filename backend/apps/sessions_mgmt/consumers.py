@@ -248,3 +248,139 @@ class VideoCallConsumer(AsyncWebsocketConsumer):
             participant_type=account_type,
             participant=participant
         )
+
+class WhiteBoardConsumer(AsyncWebsocketConsumer):
+    ALLOWED_EVENTS={
+        'draw',
+        'undo',
+        'redo',
+        'clear'
+    }
+    async def connect(self):
+        self.conversation_id=self.scope['url_route']['kwargs']['conversation_id']
+        user=self.scope.get('user')
+        account_type=self.scope.get('account_type')
+        if not user or isinstance(user,AnonymousUser):
+            await self.close(code=4001)
+            return
+        if account_type not in ("USER","MENTOR"):
+            if isinstance(user,Mentor):
+                account_type='MENTOR'
+            elif isinstance(user,User):
+                account_type='USER'
+            else:
+                await self.close(code=4001)
+                return
+        self.account_type=account_type
+        self.participant_id=user.id
+        is_authorized=self.check_whiteboard_access(
+            self.conversation_id,
+            self.participant_id,
+            self.account_type,
+        )
+        if not is_authorized:
+            await self.close(code=4003)
+            return
+        self.room_group_name=(
+            f'whiteboard_conversation_{self.conversation_id}'
+        )
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name,
+        )
+        await self.accept()
+        print(
+            f'WHITEBOARD_CONNECTED:{self.room_group_name},'
+            f'{self.account_type}{self.participant_id}'
+        )
+    async def disconnect(self,close_code):
+        if hasattr(self,'room_group_name'):
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name,
+            )
+    async def receive(self,text_data=None,bytes_data=None):
+        if self.account_type!='MENTOR':
+            await self.send(text_data=json.dumps({
+                'type':'error',
+                'message':'only mentor can modify the whiteboard'
+            }))
+            return
+        if not text_data or len(text_data)>65536:
+            await self.send(text_data=json.dumps({
+                'type':'error',
+                'message':'invalid or oversized whiteboard event'
+            }))
+            return
+        try:
+            data=json.loads(text_data)
+        except json.JSONDecodeError:
+            await self.send(json.dumps({
+                'type':'error',
+                'message':'invalid json',
+            }))
+            return 
+        if not isinstance(data,dict):
+            return
+        event_type=data.get('type')
+        if event_type not in self.ALLOWED_EVENTS:
+            await self.send(text_data=json.dumps({
+                'type':'error',
+                'message':'unsupported whiteboard event'
+            }))
+            return
+        payload=data.get('payload',{})
+        if not isinstance(payload,dict):
+            return
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type':'whiteboard_event',
+                'data':{
+                    'type':event_type,
+                    'payload':payload,
+                    'sender_type':self.account_type,
+                },
+                'sender_channel_name':self.channel_name,
+            }
+        )
+    async def whiteboard_event(self,event):
+        if event.get('sender_channel_name')==self.channel_name:
+            return
+        await self.send(text_data=json.dumps(event['data']))
+    @database_sync_to_async
+    def check_whiteboard_access(
+        self,
+        conversation_id,
+        participant_id,
+        account_type
+    ):
+        try:
+            conversation=Conversation.objects.select_related(
+                'course_session',
+                'course_session__enrollment',
+            ).get(id=conversation_id)
+        except Conversation.DoesNotExist:
+            return False
+        course_session=conversation.course_session
+        if course_session is None:
+            return False
+        if course_session.status!=course_session.Status.SCHEDULED:
+            return False
+        membership_filters={
+            'conversation_id':conversation_id,
+            'is_active':True,
+        }
+        if account_type=='MENTOR':
+            membership_filters['mentor_id']=participant_id
+            if course_session.mentor_id!=participant_id:
+                return False
+        elif account_type=='USER':
+            membership_filters['user_id']=participant_id
+            if course_session.enrollment.user!=participant_id:
+                return False
+        else:
+            return False
+        return ConversationMember.objects.filter(
+            **membership_filters
+        ).exists()

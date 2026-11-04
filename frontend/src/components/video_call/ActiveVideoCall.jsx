@@ -7,6 +7,7 @@ import useChatSocket from "../../hooks/useChatSocket";
 import api from "../../services/api";
 import mentorApi from "../../services/mentorApi";
 
+import Whiteboard from "./Whiteboard";
 import VideoCallHeader from "./VideoCallHeader";
 import VideoGrid from "./VideoGrid";
 import SessionProgress from "./SessionProgress";
@@ -27,13 +28,14 @@ const ActiveVideoCall = ({
   const [sessionDetails,setSessionDetails]=useState(null)
   const [sessionDetailsError,setSessionDetailsError]=useState('')
   const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
+  const isMentor=chatTokenKey==='mentor_access_token'
+  const [showWhiteboard,setShowWhiteboard]=useState(false)
 
   useEffect(()=>{
     let cancelled=false
     const fetchSessionDetails=async ()=>{
       try{
         setSessionDetailsError('')
-        const isMentor=chatTokenKey==='mentor_access_token'
         const client=isMentor?mentorApi:api
         const response=await client.get(
           `/chat/video-call/${conversationId}/details/`
@@ -155,16 +157,13 @@ const ActiveVideoCall = ({
 
   const handleLeaveCall=useCallback(()=>{
     leaveCall()
-    const isMentor=Boolean(
-      localStorage.getItem('mentor_access_token')
-    )
     if (isMentor){
       navigate('/mentor/upcoming_sessions/',{replace:true})
     }
     else{
       navigate('/upcoming_sessions/',{replace:true})
     }
-  },[leaveCall,navigate])
+  },[leaveCall,navigate,isMentor])
 
   return (
     <div className="video-call-page">
@@ -201,6 +200,15 @@ const ActiveVideoCall = ({
             onSendMessage={(message) => sendMessage({ message })}
           />
         </aside>
+        {showWhiteboard&&(
+          <Whiteboard
+          conversationId={conversationId}
+          accessToken={accessToken}
+          isMentor={isMentor}
+          localVideoRef={localVideoRef}
+          remoteVideoRef={remoteVideoRef}
+          onClose={()=>setShowWhiteboard(false)}/>
+        )}
       </main>
 
       <CallControls
@@ -212,6 +220,8 @@ const ActiveVideoCall = ({
         onShareScreen={shareScreen}
         isHandRaised={isHandRaised}
         onToggleHand={toggleHand}
+        onOpenWhiteboard={()=>setShowWhiteboard(true)}
+        isMentor={isMentor}
       />
     </div>
   );

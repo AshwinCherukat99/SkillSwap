@@ -7,6 +7,8 @@ const CallControls=({
     onShareScreen,
     isHandRaised,
     onToggleHand,
+    onOpenWhiteboard,
+    isMentor,
 })=>{
     return (
         <footer className="call-controls">
@@ -55,6 +57,17 @@ const CallControls=({
             <button onClick={onShareScreen}>
                 Share Screen
             </button>
+
+            {isMentor&&(
+                <button
+                type='button'
+                className="open-whiteboard-button"
+                onClick={onOpenWhiteboard}
+                title='Open Whiteboard'>
+                    <i className="fas fa-chalkboard" />
+                    <span>Whiteboard</span>
+                </button>
+            )}
 
             <button
                 className="leave-button"
