@@ -385,3 +385,27 @@
     }
 
 }
+
+.course-filter-panel {
+    padding: 20px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.course-filter-panel .form-label {
+    font-weight: 600;
+    font-size: 14px;
+    color: #374151;
+}
+
+.course-filter-panel .form-select {
+    min-height: 44px;
+    border-radius: 8px;
+}
+
+.course-filter-btn {
+    min-height: 44px;
+    border-radius: 8px;
+}

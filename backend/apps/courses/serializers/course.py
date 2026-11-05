@@ -2,6 +2,10 @@ from rest_framework import serializers
 from ..models import Course,CourseLesson
 
 class CourseListSerializer(serializers.ModelSerializer):
+    category_id=serializers.IntegerField(
+        source='category.id',
+        read_only=True,
+    )
     category_name=serializers.CharField(
         source='category.name',
         read_only=True
@@ -32,6 +36,8 @@ class CourseListSerializer(serializers.ModelSerializer):
             "mentor_rating",
             "student_count",
             "progress",
+            'category_id',
+            'published_at',
         ]
     def get_mentor_name(self,obj):
         return obj.mentor.full_name or obj.mentor.username

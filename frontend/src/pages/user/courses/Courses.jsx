@@ -13,6 +13,12 @@ function Courses(){
     const navigate=useNavigate()
     const [courses,setCourses]=useState([])
     const [search,setSearch]=useState('')
+    const [filters,setFilters]=useState({
+        level:'',
+        category:'',
+        published:'',
+        duration:'',
+    })
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
     useEffect(()=>{
@@ -33,16 +39,84 @@ function Courses(){
     }
     const filteredCourses=courses.filter((course)=>{
         const searchText=search.toLowerCase()
-        return (
+        const matchesSearch=
             course.title?.toLowerCase().includes(searchText)||
             course.category_name?.toLowerCase().includes(searchText)||
             course.mentor_name?.toLowerCase().includes(searchText)
+        const matchesLevel=!filters.level||course.level===filters.level
+        const categories=[
+        ...new Map(
+            courses
+            .filter(course=>course.category_id&&course.category_name)
+            .map(course=>[
+                course.category_id,
+                {
+                    id:course.category_id,
+                    name:course.category_name
+                }
+            ])
+        ).values()
+    ]
+        const matchesCategory=!filters.category||
+        String(course.category_id)===String(filters.category)
+        let matchesPublished=true
+        if (filters.published){
+            const publishedDate=course.published_at?new Date(course.published_at):null
+            const now=new Date()
+            const daysDifference=
+            (now-publishedDate)/(1000*60*60*24)
+            if (filters.published==='LATEST'){
+                matchesPublished=
+                !isNaN(publishedDate.getTime())
+            }
+            if (filters.published==='7_DAYS'){
+                matchesPublished=
+                !isNaN(publishedDate.getTime())&&
+                daysDifference>=0&&
+                daysDifference<=7
+            }
+            if (filters.published==='30_DAYS'){
+                matchesPublished=
+                !isNaN(publishedDate.getTime())&&
+                daysDifference>=0&&
+                daysDifference<=30
+            }
+            if (filters.published==='OLDER'){
+                matchesPublished=
+                !isNaN(publishedDate.getTime())&&
+                daysDifference>=30
+            }
+        }
+        let matchesDuration=true
+        const duration=Number(course.estimated_duration)
+        if (filters.duration==='SHORT'){
+            matchesDuration=duration<60
+        }
+        if (filters.duration==='MEDIUM'){
+            matchesDuration=duration>=60&&duration<=180
+        }
+        if (filters.duration==='LONG'){
+            matchesDuration=duration>180
+        }
+        return (
+            matchesSearch&&
+            matchesLevel&&
+            matchesCategory&&
+            matchesPublished&&
+            matchesDuration
         )
     })
-    const continueCourses=filteredCourses.filter(
+    const sortedCourses=[...filteredCourses]
+    if (filters.published==='LATEST'){
+        sortedCourses.sort(
+            (a,b)=>
+                new Date(b.published_at)-new Date(a.published_at)
+        )
+    }
+    const continueCourses=sortedCourses.filter(
         (course)=>course.progress!==null && course.progress!==undefined
     )         
-    const discoveryCourses=filteredCourses.filter(
+    const discoveryCourses=sortedCourses.filter(
         (course)=>course.progress===null || course.progress===undefined
     )
     const recommendedCourses=discoveryCourses.slice(0,4)
@@ -63,6 +137,9 @@ function Courses(){
                 <CourseHeader
                     search={search}
                     setSearch={setSearch}
+                    filters={filters}
+                    setFilters={setFilters}
+                    categories={categories}
                 />
 
                 {loading && (
