@@ -37,14 +37,7 @@ function Courses(){
             setLoading(false)
         }
     }
-    const filteredCourses=courses.filter((course)=>{
-        const searchText=search.toLowerCase()
-        const matchesSearch=
-            course.title?.toLowerCase().includes(searchText)||
-            course.category_name?.toLowerCase().includes(searchText)||
-            course.mentor_name?.toLowerCase().includes(searchText)
-        const matchesLevel=!filters.level||course.level===filters.level
-        const categories=[
+    const categories=[
         ...new Map(
             courses
             .filter(course=>course.category_id&&course.category_name)
@@ -57,34 +50,37 @@ function Courses(){
             ])
         ).values()
     ]
+    const filteredCourses=courses.filter((course)=>{
+        const searchText=search.toLowerCase()
+        const matchesSearch=
+            course.title?.toLowerCase().includes(searchText)||
+            course.category_name?.toLowerCase().includes(searchText)||
+            course.mentor_name?.toLowerCase().includes(searchText)
+        const matchesLevel=!filters.level||course.level===filters.level
         const matchesCategory=!filters.category||
         String(course.category_id)===String(filters.category)
         let matchesPublished=true
         if (filters.published){
             const publishedDate=course.published_at?new Date(course.published_at):null
-            const now=new Date()
-            const daysDifference=
-            (now-publishedDate)/(1000*60*60*24)
-            if (filters.published==='LATEST'){
-                matchesPublished=
-                !isNaN(publishedDate.getTime())
-            }
+            const validPublishedDate=publishedDate&&!isNaN(publishedDate.getTime())
+            const daysDifference=validPublishedDate?
+            (Date.now()-publishedDate.getTime())/(1000*60*60*24):null
             if (filters.published==='7_DAYS'){
                 matchesPublished=
-                !isNaN(publishedDate.getTime())&&
+                validPublishedDate&&
                 daysDifference>=0&&
                 daysDifference<=7
             }
             if (filters.published==='30_DAYS'){
                 matchesPublished=
-                !isNaN(publishedDate.getTime())&&
+                validPublishedDate&&
                 daysDifference>=0&&
                 daysDifference<=30
             }
             if (filters.published==='OLDER'){
                 matchesPublished=
-                !isNaN(publishedDate.getTime())&&
-                daysDifference>=30
+                validPublishedDate&&
+                daysDifference>30
             }
         }
         let matchesDuration=true
