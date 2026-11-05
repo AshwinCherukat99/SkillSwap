@@ -60,7 +60,7 @@ function CourseHeader({search,setSearch,filters,setFilters,categories}){
                         onClick={setShowFilters(!showFilters)}
                     >
                         <i className="bi bi-sliders me-2"></i>
-                        <i className={`bi ms-2 ${showFilers?'bi-chevron-up':'bi-chevron-down'}`}></i>
+                        <i className={`bi ms-2 ${showFilters?'bi-chevron-up':'bi-chevron-down'}`}></i>
                         Filters
                     </button>
 
