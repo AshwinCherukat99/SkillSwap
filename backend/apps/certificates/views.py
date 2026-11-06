@@ -127,4 +127,4 @@ class UserCertificateViewAPIView(APIView):
             content_type='application/pdf'
         )
         response['Cache-Control']='private, no-store'
-        return Response
+        return response

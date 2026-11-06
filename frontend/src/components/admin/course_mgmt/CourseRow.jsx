@@ -3,6 +3,8 @@ import React from "react";
 import CourseStatusBadge from "./CourseStatusBadge";
 import CourseActionMenu from "./CourseActionMenu";
 
+import { BACKEND_ORIGIN } from "../../../config";
+
 const CourseRow=({
     course,
     onView,
@@ -20,7 +22,7 @@ const CourseRow=({
 
                         {course.thumbnail ? (
                             <img
-                                src={course.thumbnail}
+                                src={`${BACKEND_ORIGIN}${course.thumbnail}`}
                                 alt={course.title}
                             />
                         ) : (
