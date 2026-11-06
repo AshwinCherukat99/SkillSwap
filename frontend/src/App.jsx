@@ -84,6 +84,7 @@ import AdminMentorProfile from './pages/admin/mentor_profile/AdminMentorProfile'
 import AdminUserProfile from './pages/admin/user_profile/AdminUserProfile'
 import PublicUserProfile from './pages/user/user_profile/PublicUserProfile'
 import MentorNotifications from './pages/mentor/notifications/MentorNotifications'
+import CertificateView from './pages/user/certificates/CertificateView'
 import ProtectedVideoCallRoute from './ProtectedVideoCallRoute'
 
 function App(){
@@ -183,6 +184,11 @@ function App(){
         <Route path='/mentors/mentor-profile/:mentorId' element={
           <ProtectedRoute>
             <MentorProfile/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/certificates/:certificateId/view' element={
+          <ProtectedRoute>
+            <CertificateView/>
           </ProtectedRoute>
         }/>
         <Route path='/recommendations/' element={

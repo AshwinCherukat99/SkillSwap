@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import UserCertificateDetailView,UserCertificatesView,UserCertificateDownloadView
+from .views import UserCertificateDetailView,UserCertificatesView,UserCertificateDownloadView,UserCertificateViewAPIView
 
 urlpatterns=[
     path(
@@ -17,4 +17,9 @@ urlpatterns=[
         UserCertificateDownloadView.as_view(),
         name='user-certificate-download'
     ),
+    path(
+            '<uuid:certificate_id>/view/',
+            UserCertificateViewAPIView.as_view(),
+            name='user-certificate-view'
+        ),
 ]

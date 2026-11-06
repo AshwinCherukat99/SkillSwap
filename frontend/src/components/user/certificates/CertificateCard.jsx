@@ -16,7 +16,7 @@ function CertificateCard({certificate,isSelected=false}){
         }
     },[isSelected])
     const handleViewCertificate=()=>{
-        navigate(`/certificates/${certificate.certificate_id}`)
+        navigate(`/certificates/${certificate.certificate_id}/view`)
     }
     const handleDownloadCertificate=async ()=>{
         if (!certificate.is_valid||downloading) return
