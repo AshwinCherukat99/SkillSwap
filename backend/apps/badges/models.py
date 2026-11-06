@@ -78,3 +78,32 @@ class BadgeRule(models.Model):
         ordering=['id']
     def __str__(self):
         return f'{self.badge.name}-{self.rule_type}'
+
+class UserMilestone(models.Model):
+    class MilestoneType(models.TextChoices):
+        JOINED='JOINED','Joined Skillswap'
+        FIRST_SESSION='FIRST_SESSION','Completed First Session'
+        FIRST_POST='FIRST_POST','Put Up First Post'
+        FIRST_MESSAGE='FIRST_MESSAGE','Sent First Message'
+        FIRST_ENROLLMENT='FIRST_ENROLLMENT','Enrolled In A Course'
+        FIRST_COURSE='FIRST_COURSE','Completed A Course'
+    user=models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='milestones'
+    )
+    milestone_type=models.CharField(
+        max_length=30,
+        choices=MilestoneType.choices,
+    )
+    xp_awarded=models.PositiveIntegerField(default=500)
+    completed_at=models.DateTimeField()
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(
+                fields=['user','milestone_type'],
+                name='unique_user_milestone'
+            )
+        ]
+    def __str__(self):
+        return f'{self.user.username}-{self.milestone_type}'

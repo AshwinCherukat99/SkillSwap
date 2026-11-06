@@ -1,5 +1,4 @@
 import {useState,useEffect} from 'react'
-import axios from 'axios'
 
 import BadgeCard from '../../../components/user/badges/BadgeCard'
 import BadgeFilters from '../../../components/user/badges/BadgeFilters'
@@ -20,7 +19,6 @@ function Badges(){
             try{
                 setLoading(true) 
                 setError("")
-                const accessToken=localStorage.getItem('access_token')
                 const response=await api.get("/badges/")
                 setBadgeData(response.data)
             }catch(err){
@@ -28,7 +26,7 @@ function Badges(){
                     'Badge loading error:',err
                 )
                 setError(
-                    err.reponse?.data?.detail||
+                    err.response?.data?.detail||
                     'unable to load badges'
                 )
             }finally{

@@ -3,7 +3,7 @@ import React from 'react'
 import {Clock3,CheckCircle2,XCircle,AlertCircle,CalendarDays,UserRound,GraduationCap,CircleSlash2, CircleSlash} from 'lucide-react'
 
 const SessionCard=({session,onClick})=>{
-    const isSkillExchange=session.skill_wanted!=='undefined' && session.skill_offered!=='undefined'
+    const isSkillExchange=session.skill_wanted!=null && session.skill_offered!=null
     const formatDate=(dateString)=>{
         if (!dateString){
             return 'unknown date'

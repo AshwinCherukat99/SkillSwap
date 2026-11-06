@@ -1052,6 +1052,16 @@
     opacity: 0.4;
 }
 
+.journey-item:hover .journey-node {
+    transform: scale(1.1);
+}
+
+.journey-item:has(.journey-completed) .journey-node {
+    background: var(--milestone-color);
+    color: #ffffff;
+}
+
+
 .journey-item span {
     width: 8px;
     height: 8px;

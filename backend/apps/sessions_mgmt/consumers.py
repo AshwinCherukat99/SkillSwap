@@ -273,7 +273,7 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
                 return
         self.account_type=account_type
         self.participant_id=user.id
-        is_authorized=self.check_whiteboard_access(
+        is_authorized=await self.check_whiteboard_access(
             self.conversation_id,
             self.participant_id,
             self.account_type,
@@ -315,7 +315,7 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
         try:
             data=json.loads(text_data)
         except json.JSONDecodeError:
-            await self.send(json.dumps({
+            await self.send(text_data=json.dumps({
                 'type':'error',
                 'message':'invalid json',
             }))
@@ -377,7 +377,7 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
                 return False
         elif account_type=='USER':
             membership_filters['user_id']=participant_id
-            if course_session.enrollment.user!=participant_id:
+            if course_session.enrollment.user_id!=participant_id:
                 return False
         else:
             return False

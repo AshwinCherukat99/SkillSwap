@@ -57,7 +57,7 @@ function CourseHeader({search,setSearch,filters,setFilters,categories}){
                     <button
                         type="button"
                         className="btn course-filter-btn"
-                        onClick={setShowFilters(!showFilters)}
+                        onClick={()=>setShowFilters(!showFilters)}
                     >
                         <i className="bi bi-sliders me-2"></i>
                         <i className={`bi ms-2 ${showFilters?'bi-chevron-up':'bi-chevron-down'}`}></i>
@@ -143,7 +143,7 @@ function CourseHeader({search,setSearch,filters,setFilters,categories}){
                         </div>
                         <div className="d-flex justify-content-end mt-3">
                                 <button
-                                type='button-type'
+                                type='button'
                                 className="btn btn-outline-secondary"
                                 onClick={clearFilters}>
                                     Clear Filters

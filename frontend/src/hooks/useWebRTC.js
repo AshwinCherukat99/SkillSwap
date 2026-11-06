@@ -98,6 +98,20 @@ const useWebRTC = (roomName, conversationId, accessToken) => {
       setCallConnected(state === 'connected');
     };
 
+    peerConnection.oniceconnectionstatechange = () => {
+    console.log(
+        'WebRTC ICE connection state:',
+        peerConnection.iceConnectionState
+    );
+};
+
+peerConnection.onsignalingstatechange = () => {
+    console.log(
+        'WebRTC signalling state:',
+        peerConnection.signalingState
+    );
+};
+
     peerConnection.ontrack = (event) => {
       if (event.track.kind !== 'video') return;
 
