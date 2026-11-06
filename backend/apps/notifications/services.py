@@ -16,10 +16,10 @@ def send_admin_notification(admin_notification):
         if admin_notification.recipient:
             recipient_ids.add(admin_notification.recipient.id)
     elif audience==AdminNotification.Audience.USER:
-        user_ids=User.objects.filter(role=User.Role.USER).values_list('id',flat=True)
+        user_ids=User.objects.filter(role=User.Role.USER,is_active=True,mentor_profile__isnull=True).values_list('id',flat=True)
         recipient_ids.update(user_ids)
     elif audience==AdminNotification.Audience.MENTOR:
-        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
+        mentor_user_ids=(Mentor.objects.filter(is_active=True,status=Mentor.Status.ACTIVE,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
         recipient_ids.update(mentor_user_ids)
     elif audience==AdminNotification.Audience.ALL:
         user_ids=(User.objects.filter(is_active=True).values_list('id',flat=True))
