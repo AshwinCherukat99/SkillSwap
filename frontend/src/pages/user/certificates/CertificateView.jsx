@@ -37,7 +37,7 @@ const CertificateView=()=>{
                     if (response.status===403||response.status===404){
                         throw new Error('certificate not found or you do not have permisssion to view it')
                     }
-                    if (response.status=400){
+                    if (response.status===400){
                         throw new Error('this certificate is no longer valid')
                     }
                     throw new Error('unable to load certificate')

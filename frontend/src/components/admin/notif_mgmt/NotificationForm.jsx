@@ -314,7 +314,7 @@ function NotificationForm({editingNotification,quickAction,onSaved,onDiscard,sho
                                 Users Only
                             </option>
 
-                            <option value="MENTORS">
+                            <option value="MENTOR">
                                 Mentors Only
                             </option>
 
