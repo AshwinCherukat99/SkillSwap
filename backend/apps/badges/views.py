@@ -13,6 +13,8 @@ from apps.sessions_mgmt.models import SkillExchangeSession,CourseSession
 from django.db import transaction
 from django.db.models import Count,Q,F
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from datetime import timedelta
 
 from .models import UserBadge,Badge,UserMilestone
 from .services import BadgeService
@@ -175,10 +177,12 @@ class AdminBadgeListCreateView(APIView):
         search=request.query_params.get('search')
         rarity=request.query_params.get('rarity')
         status_filter=request.query_params.get('status')
+        created_date=request.query_params.get('created_date')
         if search:
             badges=badges.filter(
                 Q(name__icontains=search)|
-                Q(description__icontains=search)
+                Q(description__icontains=search)|
+                Q(slug__icontains=search)
             )
         if rarity:
             badges=badges.filter(
@@ -191,6 +195,19 @@ class AdminBadgeListCreateView(APIView):
         if status_filter=='inactive':
             badges=badges.filter(
                 is_active=False
+            )
+        now=timezone.now()
+        if created_date=='last_7_days':
+            badges=badges.filter(
+                created_at__gte=now-timedelta(days=7)
+            )
+        elif created_date=='last_month':
+            badges=badges.filter(
+                created_at__gte=now-timedelta(days=30)
+            )
+        elif created_date=='last_6_months':
+            badges=badges.filter(
+                created_at__gte=now-timedelta(days=180)
             )
         serializer=BadgeSerializer(
             badges,

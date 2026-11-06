@@ -8,6 +8,7 @@ import adminApi from "../../../services/adminApi";
 
 const BadgeManagement=()=>{
     const navigate=useNavigate()
+    const [createdDate,setCreatedDate]=useState('')
     const [badges,setBadges]=useState([])
     const [loading,setLoading]=useState(true)
     const [search,setSearch]=useState('')
@@ -15,15 +16,19 @@ const BadgeManagement=()=>{
     const [statusFilter,setStatusFilter]=useState('')
     useEffect(()=>{
         loadBadges()
-    },[search,rarity,statusFilter])
+    },[search,rarity,statusFilter,createdDate])
     const loadBadges=async ()=>{
         try{
             setLoading(true)
             const response=await adminApi.get(
                 '/badges/admin/',{
-                search,
+                params:{
+                    search,
                 rarity,
-                status:statusFilter,}
+                status:statusFilter,
+                created_date:createdDate,
+                }
+                }
             )
             setBadges(response.data.badges)
         }catch(err){
@@ -96,7 +101,7 @@ const BadgeManagement=()=>{
 
                         </div>
 
-                        <div className="col-md-3">
+                        <div className="col-md-2">
 
                             <select
                                 className="form-select"
@@ -132,7 +137,7 @@ const BadgeManagement=()=>{
 
                         </div>
 
-                        <div className="col-md-3">
+                        <div className="col-md-2">
 
                             <select
                                 className="form-select"
@@ -158,6 +163,17 @@ const BadgeManagement=()=>{
 
                             </select>
 
+                        </div>
+
+                        <div className="col-md-2">
+                                <select
+                                className="form-select"
+                                value={createdDate}
+                                onChange={(e)=>setCreatedDate(e.target.value)}>
+                                    <option value="">All Dates</option>
+                                    <option value="last_month">Last Month</option>
+                                    <option value="last_6_months">Last 6 Months</option>
+                                </select>
                         </div>
 
                     </div>
