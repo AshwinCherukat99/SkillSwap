@@ -208,7 +208,7 @@ const BadgeManagement=()=>{
                                 badge={badge}
                                 onView={(badge) =>
                                     navigate(
-                                        `/admin/badges/${badge.id}`
+                                        `/admin/badge-management/${badge.id}`
                                     )
                                 }
                                 onEdit={(badge) =>

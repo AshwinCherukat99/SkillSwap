@@ -85,6 +85,7 @@ import AdminUserProfile from './pages/admin/user_profile/AdminUserProfile'
 import PublicUserProfile from './pages/user/user_profile/PublicUserProfile'
 import MentorNotifications from './pages/mentor/notifications/MentorNotifications'
 import CertificateView from './pages/user/certificates/CertificateView'
+import BadgeDetail from './pages/admin/badge_mgmt/BadgeDetail'
 import ProtectedVideoCallRoute from './ProtectedVideoCallRoute'
 
 function App(){
@@ -476,6 +477,11 @@ function App(){
         <Route path='/admin/user-management/:userId/' element={
           <AdminProtectedRoute>
             <AdminUserProfile/>
+          </AdminProtectedRoute>
+        }/>
+        <Route path='/admin/badge-management/:badgeId/' element={
+          <AdminProtectedRoute>
+            <BadgeDetail/>
           </AdminProtectedRoute>
         }/>
         </Route>

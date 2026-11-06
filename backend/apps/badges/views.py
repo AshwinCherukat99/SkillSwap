@@ -218,7 +218,7 @@ class AdminBadgeDetailView(APIView):
     permission_classes=[IsAdmin]
     def get_object(self,badge_id):
         return get_object_or_404(
-            Badge.objects.prefetch_related('rules'),
+            Badge.objects.prefetch_related('rules','user_badges__user'),
             id=badge_id,
         )
     def get(self,request,badge_id):

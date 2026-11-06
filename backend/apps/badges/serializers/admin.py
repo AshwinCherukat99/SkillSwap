@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.badges.models import Badge,BadgeRule
+from apps.badges.models import Badge,BadgeRule,UserBadge
 
 class BadgeRuleSerializer(serializers.ModelSerializer):
     rule_type_display=serializers.CharField(
@@ -77,3 +77,47 @@ class AdminBadgeUpdateSerializer(serializers.ModelSerializer):
             for rule_data in rules_data:
                 BadgeRule.objects.create(badge=instance,**rule_data)
         return instance
+
+class AdminBadgeAwardedUserSerializer(serializers.ModelSerializer):
+    user_id=serializers.IntegerField(source='user.id',read_only=True)
+    username=serializers.CharField(source='user.username',read_only=True)
+    full_name=serializers.CharField(source='user.full_name',read_only=True)
+    class Meta:
+        model=UserBadge
+        fields=[
+            'id',
+            'user_id',
+            'username',
+            'full_name',
+            'earned_at',
+        ]
+
+class AdminBadgeDetailSerializer(serializers.ModelSerializer):
+    rules=BadgeRuleSerializer(
+        many=True,
+        read_only=True,
+    )
+    awarded_users=AdminBadgeAwardedUserSerializer(
+        source='user_badges',
+        many=True,
+        read_only=True,
+    )
+    awarded_users_count=serializers.SerializerMethodField()
+    class Meta:
+        model=Badge
+        fields=[
+            'id',
+            'name',
+            'slug',
+            'description',
+            'icon',
+            'rarity',
+            'xp_reward',
+            'is_active',
+            'created_at',
+            'rules',
+            'awarded_users_count',
+            'awarded_users',
+        ]
+    def awarded_users_count(self,obj):
+        return obj.user_badges.count()

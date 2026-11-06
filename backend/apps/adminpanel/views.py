@@ -14,7 +14,7 @@ from apps.accounts.models import User,UserRating
 from apps.accounts.permissions import IsAdmin
 from apps.accounts.services import generate_tokens
 from apps.mentors.models import Mentor,MentorDocument,MentorVerification
-from apps.courses.models import Course
+from apps.courses.models import Course,CourseCategory
 from apps.skills.models import Skill,SuggestedSkill
 from apps.reports.models import Report
 from apps.sessions_mgmt.models import SkillExchangeSession,CourseSession
@@ -25,7 +25,7 @@ from .serializers.mentor_verification import (
     RejectMentorSerializer,
     RequestMentorInfoSerializer,
 )
-from .serializers.course import AdminCourseDetailSerializer,AdminCourseListSerializer,AdminCourseModuleSerializer,AdminCourseLessonSerializer,AdminCourseRejectSerializer
+from .serializers.course import AdminCourseDetailSerializer,AdminCourseListSerializer,AdminCourseModuleSerializer,AdminCourseLessonSerializer,AdminCourseRejectSerializer,CourseCategorySerializer
 from .serializers.skills import AdminSkillSerializer,SuggestedSkillSerializer
 from .serializers.users import AdminUserSerializer,AdminUserDetailSerializer       
 from .serializers.reviews import AdminReviewSerializer,ReviewReportSerializer
@@ -1536,3 +1536,33 @@ class AdminUserDetailView(APIView):
             user,
             context={'request':request},
         ).data)
+
+class AdminCourseCategoryView(APIView):
+    permission_classes=[IsAdmin]
+    def get(self,request):
+        categories=CourseCategory.objects.all().order_by('name')
+        serializer=CourseCategorySerializer(
+            categories,
+            many=True,
+        )
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+    def post(self,request):
+        serializer=CourseCategorySerializer(
+            data=request.data
+        )
+        if serializer.is_valid():
+            category=serializer.save()
+            return Response(
+                {
+                    'message':'course category created successfully',
+                    'category':CourseCategorySerializer(category).data
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )

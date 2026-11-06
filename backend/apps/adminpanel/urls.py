@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import AdminLoginView,AdminUserDetailView,AdminMentorDetailView,MentorVerificationDetailView,ApproveMentorView,RequestMentorInfoView,RejectMentorView,MentorVerificationListView,AdminCourseManagementView,AdminCourseDetailView,AdminCourseApproveView,AdminCourseRejectView,AdminSkillListCreateView,AdminSkillDeleteView,AdminSuggestedSkillListView,AdminApproveSuggestedSkillView,AdminRejectSuggestedSkillView,AdminReviewManagementView,AdminHideReviewView,AdminRevealReviewView,AdminRemoveReviewView,AdminReviewReportsView,AdminReviewReportUpdateView,AdminUserManagementView,AdminUserDetailView,AdminUserUpdateView,AdminBlockUserView,AdminSuspendUserView,AdminActivateUserView,AdminMentorActionView,AdminMentorDetailView,AdminMentorManagementView,AdminMentorStatsView,AdminMentorUpdateView,AdminDashboardView
+from .views import AdminLoginView,AdminUserDetailView,AdminMentorDetailView,MentorVerificationDetailView,ApproveMentorView,RequestMentorInfoView,RejectMentorView,MentorVerificationListView,AdminCourseManagementView,AdminCourseDetailView,AdminCourseApproveView,AdminCourseRejectView,AdminSkillListCreateView,AdminSkillDeleteView,AdminSuggestedSkillListView,AdminApproveSuggestedSkillView,AdminRejectSuggestedSkillView,AdminReviewManagementView,AdminHideReviewView,AdminRevealReviewView,AdminRemoveReviewView,AdminReviewReportsView,AdminReviewReportUpdateView,AdminUserManagementView,AdminUserDetailView,AdminUserUpdateView,AdminBlockUserView,AdminSuspendUserView,AdminActivateUserView,AdminMentorActionView,AdminMentorDetailView,AdminMentorManagementView,AdminMentorStatsView,AdminMentorUpdateView,AdminDashboardView,AdminCourseCategoryView
 
 urlpatterns=[
     path('login/',AdminLoginView.as_view(),name='admin-login'),
@@ -37,4 +37,5 @@ urlpatterns=[
     path('dashboard/',AdminDashboardView.as_view(),name='admin-dashboard',),
     path('mentors/<int:pk>/',AdminMentorDetailView.as_view(),name='admin-mentor-detail'),
     path('users/<int:pk>/',AdminUserDetailView.as_view(),name='admin-user-detail'),
+    path('course-categories/',AdminCourseCategoryView.as_view(),name='admin-course-category'),
 ]

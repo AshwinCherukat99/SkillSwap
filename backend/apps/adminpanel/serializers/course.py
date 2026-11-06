@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.courses.models import Course,CourseModule,CourseLesson
+from apps.courses.models import Course,CourseModule,CourseLesson,CourseCategory
 from apps.accounts.models import User            
 
 class AdminCourseListSerializer(serializers.ModelSerializer):
@@ -132,3 +132,15 @@ class AdminCourseRejectSerializer(serializers.Serializer):
         required=True,
         allow_blank=False,
     )
+
+class CourseCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model=CourseCategory
+        fields=['id','name']
+    def validate_name(self,value):
+        value=value.strip()
+        if not value:
+            raise serializers.ValidationError(
+                'category name cannot be empty'
+            )
+        return value
