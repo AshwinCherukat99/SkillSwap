@@ -31,7 +31,7 @@ const MentorManagement=()=>{
         try{
             setStatsLoading(true)
             const data=await adminApi.get('/admin/mentor-management/stats/')
-            setStats(data)
+            setStats(data.data)
         }catch(err){
             console.error('failed to load mentor stats:',err)
         }finally{

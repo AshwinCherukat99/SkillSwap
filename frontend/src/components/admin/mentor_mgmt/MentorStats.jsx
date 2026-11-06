@@ -28,7 +28,7 @@ const MentorStats=({stats})=>{
         },
         {
             title:'Blocked',
-            value:stats.Blocked,
+            value:stats.blocked,
             icon:'bi-person-x',
             className:'mentor-stat-secondary',
         },

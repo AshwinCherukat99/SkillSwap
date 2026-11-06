@@ -1105,6 +1105,7 @@ class AdminMentorStatsView(APIView):
     def get(self,request):
         total=Mentor.objects.count()
         active=Mentor.objects.filter(
+            is_active=True,
             status=Mentor.Status.ACTIVE
         ).count()
         pending=Mentor.objects.filter(

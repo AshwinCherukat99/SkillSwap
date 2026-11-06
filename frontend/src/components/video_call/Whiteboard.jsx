@@ -108,7 +108,7 @@ const Whiteboard=({
             stroke,
         })
     }
-    const handleundo=()=>{
+    const handleUndo=()=>{
         if (!isMentor||!strokes.length) return
         const lastStroke=strokes[strokes.length-1]
         setStrokes((previous)=>previous.slice(0,-1))
