@@ -42,6 +42,7 @@ const ActiveVideoCall = ({
         const response=await client.get(
           `/chat/video-call/${conversationId}/details/`
         )
+        console.log('session details reponse:',response.data)
         if (!cancelled){
           setSessionDetails(response.data)
         }
@@ -184,9 +185,11 @@ const ActiveVideoCall = ({
             remoteScreenSharing={remoteScreenSharing}
             remoteScreenVideoRef={remoteScreenVideoRef} 
             remoteCameraThumbnailRef={remoteCameraThumbnailRef}
+            isMentor={isMentor}
+            sessionType={sessionDetails?.session_type}
           />
           <SessionProgress duration={sessionDetails?.duration_minutes}
-          actualStartedAt={sessionDetails?.scheduled_start}/>
+          scheduledStart={sessionDetails?.scheduled_start}/>
         </section>
 
         <aside className="call-sidebar">

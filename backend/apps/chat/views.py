@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser,FormParser
 from rest_framework.renderers import JSONRenderer
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import json
 
 from channels.layers import get_channel_layer
@@ -499,6 +500,7 @@ class ChatAttachmentUploadView(APIView):
         )
 
 class VideoCallDetailsView(APIView):
+    authentication_classes=[MentorJWTAuthentication,JWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request,conversation_id):
         try:

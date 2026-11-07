@@ -10,9 +10,14 @@ const VideoGrid = ({
     isHandRaised,
     remoteCameraThumbnailRef,
     sessionTimeUp = false,
+    isMentor,
+    sessionType,
 }) => {
     const sharing = isScreenSharing || remoteScreenSharing;
-
+    const remoteParticipantLabel=
+    sessionType==='COURSE'
+    ?(isMentor?'Student':'Mentor')
+    :'Skill Partner'
     return (
         <div className={`video-grid ${sharing ? "screen-sharing-active" : ""}`}>
 
@@ -49,8 +54,8 @@ const VideoGrid = ({
                     {isScreenSharing
                         ? "Your Screen"
                         : remoteScreenSharing
-                            ? "Participant's Screen"
-                            : "Mentor"}
+                            ? `${remoteParticipantLabel}'s Screen`
+                            : remoteParticipantLabel}
                 </div>
 
                 {remoteHandRaised && !sessionTimeUp && (
@@ -77,7 +82,7 @@ const VideoGrid = ({
         playsInline
         className="remote-thumbnail-video"
     />
-    <span className="video-name-small">Participant</span>
+    <span className="video-name-small">{remoteParticipantLabel}</span>
 </div>
 
 
