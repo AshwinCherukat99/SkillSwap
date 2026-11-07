@@ -2,15 +2,15 @@ import React,{useEffect,useState} from "react";
 
 const SessionProgress=({
     duration,
-    actualStartedAt
+    scheduledStart
 })=>{
     const [elapsedSeconds,setElapsedSeconds]=useState(0)
     useEffect(()=>{
-        if (!actualStartedAt||duration==null){
+        if (!scheduledStart||duration==null){
             setElapsedSeconds(0)
             return
         }
-        const startTime=new Date(actualStartedAt).getTime()
+        const startTime=new Date(scheduledStart).getTime()
         const totalSeconds=Number(duration)*60
         if (!Number.isFinite(startTime)||
         !Number.isFinite(totalSeconds)||
@@ -27,7 +27,7 @@ const SessionProgress=({
         updateProgress()
         const intervalId=window.setInterval(updateProgress,1000)
         return ()=>window.clearInterval(intervalId)
-    },[actualStartedAt,duration])
+    },[scheduledStart,duration])
     const totalSeconds=Number(duration)*60||0
     const progress=totalSeconds>0?Math.min((elapsedSeconds/totalSeconds)*100,100):0
     const remainingSeconds=Math.max(totalSeconds-elapsedSeconds,0)    

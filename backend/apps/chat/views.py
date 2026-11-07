@@ -544,6 +544,7 @@ class VideoCallDetailsView(APIView):
             session_type='SKILL_EXCHANGE'
         elif conversation.course_session_id:
             session=conversation.course_session
+            session_type='COURSE'
             if is_mentor:
                 if session.mentor_id!=request.user.id:
                     return Response(
@@ -558,7 +559,6 @@ class VideoCallDetailsView(APIView):
                         status=status.HTTP_403_FORBIDDEN,
                     )
                 remote_user=session.mentor
-                session_type='COURSE'
         else:
             return Response(
                 {

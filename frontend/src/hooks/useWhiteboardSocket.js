@@ -19,7 +19,7 @@ const useWhiteBoardSocket=(
             return
         }
         let active=true
-        const socketUrl=`${WS_BASE_URL}/ws/whiteboard/${conversationId}`+`?token=${encodeURIComponent(accessToken)}`
+        const socketUrl=`${WS_BASE_URL}/ws/whiteboard/${conversationId}/`+`?token=${encodeURIComponent(accessToken)}`
         const socket=new WebSocket(socketUrl)
         socketRef.current=socket
         socket.onopen=()=>{

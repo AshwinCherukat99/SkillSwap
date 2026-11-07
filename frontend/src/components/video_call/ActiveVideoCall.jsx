@@ -114,12 +114,12 @@ const ActiveVideoCall = ({
   } = useWebRTC(roomName, conversationId, accessToken);
 
   useEffect(()=>{
-    if (!sessionDetails?.actual_started_at||sessionDetails?.duration_minutes==null){
+    if (!sessionDetails?.scheduled_start||sessionDetails?.duration_minutes==null){
       return
     }
-    const actualStart=new Date(sessionDetails?.actual_started_at).getTime()
-    const endTime=actualStart+Number(sessionDetails?.duration_minutes)*60*1000
-    if (!Number.isFinite(actualStart)||!Number.isFinite(endTime)){
+    const scheduledStart=new Date(sessionDetails?.scheduled_start).getTime()
+    const endTime=scheduledStart+Number(sessionDetails?.duration_minutes)*60*1000
+    if (!Number.isFinite(scheduledStart)||!Number.isFinite(endTime)){
       return
     }
     const updateTimer=()=>{
@@ -138,7 +138,7 @@ const ActiveVideoCall = ({
     const intervalId=window.setInterval(updateTimer,1000)
     return ()=>window.clearInterval(intervalId)
   },[
-    sessionDetails?.actual_started_at,
+    sessionDetails?.scheduled_start,
     sessionDetails?.duration_minutes,
     leaveCall
   ])
@@ -186,7 +186,7 @@ const ActiveVideoCall = ({
             remoteCameraThumbnailRef={remoteCameraThumbnailRef}
           />
           <SessionProgress duration={sessionDetails?.duration_minutes}
-          actualStartedAt={sessionDetails?.actual_started_at}/>
+          actualStartedAt={sessionDetails?.scheduled_start}/>
         </section>
 
         <aside className="call-sidebar">
