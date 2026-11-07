@@ -171,6 +171,7 @@ const BadgeManagement=()=>{
                                 value={createdDate}
                                 onChange={(e)=>setCreatedDate(e.target.value)}>
                                     <option value="">All Dates</option>
+                                    <option value="last_7_dys">Last Week</option>
                                     <option value="last_month">Last Month</option>
                                     <option value="last_6_months">Last 6 Months</option>
                                 </select>

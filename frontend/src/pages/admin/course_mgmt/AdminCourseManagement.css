@@ -146,3 +146,30 @@
         font-size: 24px;
     }
 }
+
+.view-categories-btn {
+    background-color: #3525cd;
+    border-color: #3525cd;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+.view-categories-btn:hover {
+    background-color: #2819a8;
+    border-color: #2819a8;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(53, 37, 205, 0.2);
+}
+
+@media (max-width: 576px) {
+    .admin-course-header {
+        align-items: flex-start !important;
+        flex-direction: column;
+        gap: 16px;
+    }
+}

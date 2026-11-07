@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams,useNavigate } from 'react-router-dom'
 
 import adminApi from '../../../services/adminApi'
 
@@ -12,6 +12,7 @@ import RejectCourseModal from "../../../components/admin/course_mgmt/RejectCours
 import "./AdminCourseManagement.css";
 
 const AdminCourseManagement = () => {
+    const navigate=useNavigate()
     const [searchParams] = useSearchParams()
     const [courses, setCourses] = useState([])
     const [stats, setStats] = useState({
@@ -128,6 +129,13 @@ const AdminCourseManagement = () => {
                             Review, manage and publish mentor courses.
                         </p>
                     </div>
+                    <button
+                    type='button'
+                    className="btn btn-primary view-categories-btn"
+                    onClick={()=>navigate("/admin/course-categories")}>
+                        <i className="bi bi-folder-2-open me-2"></i>
+                        View Course Categories
+                    </button>
                 </div>
 
                 {/* Statistics */}

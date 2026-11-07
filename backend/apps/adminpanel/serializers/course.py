@@ -134,9 +134,13 @@ class AdminCourseRejectSerializer(serializers.Serializer):
     )
 
 class CourseCategorySerializer(serializers.ModelSerializer):
+    course_count=serializers.IntegerField(
+        source='courses.count',
+        read_only=True,
+    )
     class Meta:
         model=CourseCategory
-        fields=['id','name']
+        fields=['id','name','course_count']
     def validate_name(self,value):
         value=value.strip()
         if not value:

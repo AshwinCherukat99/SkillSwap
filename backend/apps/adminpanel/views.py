@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db import transaction
-from django.db.models import Q,Count
+from django.db.models import Q,Count,ProtectedError
 from django.utils import timezone
 from datetime import timedelta
 
@@ -1561,6 +1561,47 @@ class AdminCourseCategoryView(APIView):
                     'category':CourseCategorySerializer(category).data
                 },
                 status=status.HTTP_201_CREATED,
+            )
+        return Response(
+            serializer.errors,
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    def delete(self,request,category_id):
+        category=get_object_or_404(
+            CourseCategory,
+            id=category_id
+        )
+        try:
+            category.delete()
+        except ProtectedError:
+            return Response(
+                {
+                    'error':'cannot delete this category because courses are assigned to it'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            {'message':'course category deleted successfully'},
+            status=status.HTTP_200_OK,
+        )
+    def patch(self,request,category_id):
+        category=get_object_or_404(
+            CourseCategory,
+            id=category_id,
+        )
+        serializer=CourseCategorySerializer(
+            category,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            category=serializer.save()
+            return Response(
+                {
+                    'message':'course category updated successfully',
+                    'category':CourseCategorySerializer(category).data
+                },
+                status=status.HTTP_200_OK,
             )
         return Response(
             serializer.errors,
