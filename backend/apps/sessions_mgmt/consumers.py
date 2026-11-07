@@ -254,7 +254,9 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
         'draw',
         'undo',
         'redo',
-        'clear'
+        'clear',
+        'whiteboard_open',
+        'whiteboard_close',
     }
     async def connect(self):
         self.conversation_id=self.scope['url_route']['kwargs']['conversation_id']
@@ -300,12 +302,6 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
                 self.channel_name,
             )
     async def receive(self,text_data=None,bytes_data=None):
-        if self.account_type!='MENTOR':
-            await self.send(text_data=json.dumps({
-                'type':'error',
-                'message':'only mentor can modify the whiteboard'
-            }))
-            return
         if not text_data or len(text_data)>65536:
             await self.send(text_data=json.dumps({
                 'type':'error',
@@ -328,6 +324,12 @@ class WhiteBoardConsumer(AsyncWebsocketConsumer):
                 'type':'error',
                 'message':'unsupported whiteboard event'
             }))
+            return
+        if self.account_type!='MENTOR':
+            await self.send(text_data=json.dumps({
+                        'type':'error',
+                        'message':'only mentor can modify the whiteboard'
+                    }))
             return
         payload=data.get('payload',{})
         if not isinstance(payload,dict):

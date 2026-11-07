@@ -20,10 +20,6 @@ function ReportsManagement(){
     const [priority,setPriority]=useState('')
     const [status,setStatus]=useState('')
     const [activeTab,setActiveTab]=useState('ALL')
-    useEffect(()=>{
-        fetchStats()
-        fetchReports()
-    },[])
     const fetchStats=async ()=>{
         try{
             const response=await adminApi.get(
@@ -37,15 +33,17 @@ function ReportsManagement(){
     const fetchReports=async ()=>{
         try{
             setLoading(true)
-            const params={}
-            if (search)
-                params.search=search
-            if (reportType)
-                params.report_type=reportType
-            if (priority)
-                params.priority=priority
-            if (status)
-                params.status=status
+            const params={
+                search:search.trim(),
+                report_type:reportType,
+                priority:priority,
+                report_status:status,
+            }
+            Object.keys(params).forEach((key)=>{
+                if (!params[key]){
+                    delete params[key]
+                }
+            })
             if (activeTab==='USERS'){
                 params.target_type='USER'
             }
@@ -59,7 +57,8 @@ function ReportsManagement(){
                 params.target_type='SESSION'
             }
             const response=await adminApi.get(
-                '/reports/admin/'
+                '/reports/admin/',
+                {params}
             )
             setReports(response.data)
         }catch(err){
@@ -68,6 +67,21 @@ function ReportsManagement(){
             setLoading(false)
         }
     }
+    useEffect(()=>{
+        fetchStats()
+    },[])
+    useEffect(()=>{
+        const timer=setTimeout(()=>{
+            fetchReports()
+        },300)
+        return ()=>clearTimeout(timer)
+    },[
+        search,
+        reportType,
+        priority,
+        status,
+        activeTab
+    ])
     const handleUpdate=async (reportId,data)=>{
         try{
             await adminApi.patch(
@@ -94,6 +108,13 @@ function ReportsManagement(){
         }catch(err){
             console.error('failed to suspend user:',err)
         }
+    }
+    const resetFilters=()=>{
+        setSearch('')
+        setReportType('')
+        setPriority('')
+        setStatus('')
+        setActiveTab('ALL')
     }
     return (
         <div className="reports-page">
@@ -138,16 +159,7 @@ function ReportsManagement(){
 
                     <ReportTabs
                         activeTab={activeTab}
-                        setActiveTab={(tab) => {
-
-                            setActiveTab(tab)
-
-                            setTimeout(
-                                fetchReports,
-                                0
-                            )
-
-                        }}
+                        setActiveTab={setActiveTab}
                     />
 
                 </div>
@@ -171,6 +183,7 @@ function ReportsManagement(){
                         setStatus={setStatus}
 
                         onSearch={fetchReports}
+                        onReset={resetFilters}
                     />
 
                 </div>
@@ -185,6 +198,10 @@ function ReportsManagement(){
                         <h5 className="fw-bold mb-0">
                             Moderation Queue
                         </h5>
+
+                        <small className="text-muted">
+                            {reports.length} reports
+                        </small>
 
                     </div>
 

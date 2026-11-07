@@ -30,7 +30,9 @@ const ActiveVideoCall = ({
   const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
   const isMentor=chatTokenKey==='mentor_access_token'
   const [showWhiteboard,setShowWhiteboard]=useState(false)
-
+  const handleWhiteboardVisibility=useCallback((isOpen)=>{
+    setShowWhiteboard(isOpen)
+  },[])
   useEffect(()=>{
     let cancelled=false
     const fetchSessionDetails=async ()=>{
@@ -194,21 +196,22 @@ const ActiveVideoCall = ({
           currentUsername={sessionDetails?.current_username}
           remoteUsername={sessionDetails?.remote_username}
           durationMinutes={sessionDetails?.duration_minutes}
+          isMentor={isMentor}
           />
           <InCallChat
             messages={chatMessages}
             onSendMessage={(message) => sendMessage({ message })}
           />
         </aside>
-        {showWhiteboard&&(
           <Whiteboard
           conversationId={conversationId}
           accessToken={accessToken}
           isMentor={isMentor}
+          isOpen={showWhiteboard}
+          onVisibilityChange={handleWhiteboardVisibility}
           localVideoRef={localVideoRef}
           remoteVideoRef={remoteVideoRef}
           onClose={()=>setShowWhiteboard(false)}/>
-        )}
       </main>
 
       <CallControls

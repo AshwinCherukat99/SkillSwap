@@ -951,20 +951,28 @@ class MentorReceivedReviewsView(APIView):
         if not mentor.user:
             return Response(
                 {
-                    'error':'this mentor account is not linked to a user accound'
+                    'error':'this mentor account is not linked to a user account'
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         reviews=(UserRating.objects.filter(rated_user=mentor.user).select_related('rated_by').order_by('-created_at'))
-        serializer=MentorReviewSerializer(
-            reviews,
-            many=True,
-            context={'request':request}
-        )
+        visible_reviews=reviews.filter(is_hidden=False)
+        hidden_reviews=reviews.filter(is_hidden=True)
+        serializer_context={'request':request}
         return Response(
             {
-                'reviews':serializer.data,
-                'total_reviews':reviews.count(),
+                'reviews':MentorReviewSerializer(
+                    visible_reviews,
+                    many=True,
+                    context=serializer_context
+                ).data,
+                'hidden_reviews':MentorReviewSerializer(
+                    hidden_reviews,
+                    many=True,
+                    context=serializer_context
+                ),
+                'total_reviews':visible_reviews.count(),
+                'hidden_reviews_count':hidden_reviews.count(),
             },
             status=status.HTTP_200_OK,
         )

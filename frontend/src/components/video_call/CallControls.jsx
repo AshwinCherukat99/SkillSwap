@@ -54,8 +54,11 @@ const CallControls=({
 </span>
             </button>
 
-            <button onClick={onShareScreen}>
-                Share Screen
+            <button 
+            type='button'
+            onClick={onShareScreen}
+            title='Share Screen'>
+                <i className="bi bi-display"/>
             </button>
 
             {isMentor&&(
@@ -64,8 +67,7 @@ const CallControls=({
                 className="open-whiteboard-button"
                 onClick={onOpenWhiteboard}
                 title='Open Whiteboard'>
-                    <i className="fas fa-chalkboard" />
-                    <span>Whiteboard</span>
+                    <i className="bi bi-easel" />
                 </button>
             )}
 

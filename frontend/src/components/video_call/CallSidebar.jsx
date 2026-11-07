@@ -6,7 +6,12 @@ const CallSidebar=({
     currentUsername,
     remoteUsername,
     durationMinutes,
+    isMentor
 })=>{
+    const remoteParticipantLabel=
+    sessionType==='COURSE'
+    ?(isMentor?'Student':'Mentor')
+    :'Skill Partner'
     return (
         <div className="call-sidebar-content">
 
@@ -86,7 +91,7 @@ const CallSidebar=({
 
         <div className="participant-info">
             <strong>
-                Skill Partner
+                {remoteParticipantLabel}
             </strong>
             <span>{remoteUsername || "Waiting for participant"}</span>
         </div>

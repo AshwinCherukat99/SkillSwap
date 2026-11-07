@@ -38,7 +38,7 @@ class AdminReportListView(APIView):
         if search:
             reports=reports.filter(
                 Q(reporter__username__icontains=search)|
-                Q(reported_user__username__icontainse=search)|
+                Q(reported_user__username__icontains=search)|
                 Q(description__icontains=search)|
                 Q(id__icontains=search)
             )

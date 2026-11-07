@@ -9,7 +9,8 @@ function ReportFilters({
     priority,
     setPriority,
     status,
-    setStatus
+    setStatus,
+    onReset
 }){
     return (
         <div className="card border-0 shadow-sm">
@@ -174,11 +175,11 @@ function ReportFilters({
                     <div className="col-lg-2">
 
                         <button
-                            className="btn btn-primary w-100"
-                            onClick={onSearch}
-                        >
-                            <i className="bi bi-search me-2" />
-                            Search
+                        type='button'
+                        className="btn btn-outline-secondary w-100"
+                        onClick={onReset}>
+                            <i className="bi bi-arrow-counterclockwise me-2"/>
+                            Reset Filters
                         </button>
 
                     </div>

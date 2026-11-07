@@ -9,18 +9,33 @@ const Whiteboard=({
     conversationId,
     accessToken,
     isMentor,
+    isOpen,
+    onVisibilityChange,
     localVideoRef,
     remoteVideoRef,
     onClose,
 })=>{
-    const localThubnailRef=useRef(null)
+    const localThumbnailRef=useRef(null)
     const remoteThumbnailRef=useRef(null)
+    const openSentRef=useRef(false)
     const [strokes,setStrokes]=useState([])
     const [redoStack,setRedoStack]=useState([])
     const [tool,setTool]=useState('pen')
     const [color,setColor]=useState('#111827')
     const [brushSize,setBrushSize]=useState(4)
     const handleWhiteboardMessage=useCallback((message)=>{
+        if (message.type==='whiteboard_open'){
+            if (!isMentor){
+                onVisibilityChange?.(true)
+            }
+            return
+        }
+        if (message.type==='whiteboard_close'){
+            if (!isMentor){
+                onVisibilityChange?.(false)
+            }
+            return
+        }
         if (message.type==='draw'){
             if (!message.payload?.stroke) return 
             setStrokes((previous)=>[
@@ -64,10 +79,22 @@ const Whiteboard=({
         handleWhiteboardMessage
     )
     useEffect(()=>{
+        if (!isMentor) return
+        if (isOpen&&connected&&!openSentRef.current){
+            const sent=sendEvent('whiteboard_open')
+            if (sent){
+                openSentRef.current=true
+            }
+        }
+        if (!isOpen){
+            openSentRef.current=false
+        }
+    },[isMentor,isOpen,connected,sendEvent])
+    useEffect(()=>{
         const attachThumbnails=()=>{
             const localStream=localVideoRef?.current?.srcObject
             const remoteStream=remoteVideoRef?.current?.srcObject
-            const localVideo=localThubnailRef.current
+            const localVideo=localThumbnailRef.current
             const remoteVideo=remoteThumbnailRef.current
             if (localVideo&&localStream){
                 if (localVideo.srcObject!==localStream){
@@ -89,8 +116,8 @@ const Whiteboard=({
             )
             return ()=>{
                 window.clearInterval(intervalId)
-                if (localThubnailRef.current){
-                    localThubnailRef.current.srcObject=null
+                if (localThumbnailRef.current){
+                    localThumbnailRef.current.srcObject=null
                 }
                 if (remoteThumbnailRef.current){
                     remoteThumbnailRef.current.srcObject=null
@@ -136,6 +163,15 @@ const Whiteboard=({
         setRedoStack([])
         sendEvent('clear')
     }
+    const handleClose=()=>{
+        if (isMentor&&connected){
+            sendEvent('whiteboard_close')
+        }
+        onClose?.()
+    }
+    if (!isOpen){
+        return null
+    }
     return (
         <div className="whiteboard-overlay">
 
@@ -158,13 +194,13 @@ const Whiteboard=({
                 <div className="whiteboard-header-actions">
                     <div className={`whiteboard-connection ${connected ? "connected" : "disconnected"}`}>
                         <span />
-                        {connected ? "Connected" : "Connecting..."}
+                        {connected ? "Connected" : error||"Connecting..."}
                     </div>
 
                     <button
                         type="button"
                         className="whiteboard-close-button"
-                        onClick={onClose}
+                        onClick={handleClose}
                     >
                         <i className="fas fa-compress" />
                         <span>Return to call</span>

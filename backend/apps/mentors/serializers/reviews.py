@@ -23,6 +23,7 @@ class MentorReviewSerializer(serializers.ModelSerializer):
             'rating',
             'review',
             'created_at',
+            'is_hidden'
         ]
         read_only_fields=[
             'id',
@@ -31,6 +32,7 @@ class MentorReviewSerializer(serializers.ModelSerializer):
             'reviewer_username',
             'reviewer_image',
             'created_at',
+            'is_hidden'
         ]
     def get_reviewer_name(self,obj):
         return (
