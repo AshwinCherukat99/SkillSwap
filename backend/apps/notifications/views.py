@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.db.models import Q,Count
 from django.shortcuts import get_object_or_404
 from apps.accounts.models import User
+from apps.mentors.models import Mentor
 
 from .models import Notification,AdminNotification
 
@@ -198,6 +199,23 @@ class AdminNotificationDetailView(APIView):
             partial=True
         )
         serializer.is_valid(raise_exception=True)
+        scheduled_at=serializer.validated_data.get(
+            'scheduled_at',
+            notification.scheduled_at
+        )
+        if (notification.status==AdminNotification.Status.SCHEDULED and scheduled_at is None):
+            return Response(
+                {
+                    'scheduled_at':'scheduled time cannot be removed from a scheduled notification'
+                }
+            )
+        if scheduled_at and scheduled_at<=timezone.now():
+            return Response(
+                {
+                    'scheduled_at':'scheduled time must be in the future'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         notification=serializer.save()
         return Response(
             AdminNotificationSerializer(
@@ -223,7 +241,7 @@ class AdminNotificationDetailView(APIView):
 class CancelAdminNotificationView(APIView):
     permission_classes=[IsAdmin]
     def post(self,request,notification_id):
-        notification=(Notification.objects.filter(id=notification_id,
+        notification=(AdminNotification.objects.filter(id=notification_id,
                                                   status=AdminNotification.Status.SCHEDULED,).first())
         if not notification:
             return Response(
@@ -251,7 +269,7 @@ class AdminNotificationUserSearchView(APIView):
         ).strip()
         if not query:
             return Response({'users':[]})
-        users=(User.objects.filter(is_active=True).filter(Q(username__icontains=query)|Q(email__icontains=query)|Q(full_name__icontains=query)).order_by('username')[:20])
+        users=(User.objects.filter(is_active=True,status=User.Status.ACTIVE,role=User.Role.USER).filter(Q(mentor_profile__isnull=True)|Q(mentor_profile__status=Mentor.Status.ACTIVE,mentor_profile__is_active=True)).filter(Q(username__icontains=query)|Q(email__icontains=query)|Q(full_name__icontains=query)).order_by('username')[:20])
         data=[]
         for user in users:
             data.append({

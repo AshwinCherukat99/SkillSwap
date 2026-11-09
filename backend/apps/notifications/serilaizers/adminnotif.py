@@ -93,7 +93,7 @@ class AdminNotificationSerializer(serializers.ModelSerializer):
             getattr(
                 self.instance,
                 'in_app',
-                False
+                True
             )
         )
         push=attrs.get(

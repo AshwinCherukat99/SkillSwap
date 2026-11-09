@@ -95,5 +95,7 @@ def send_admin_notification(admin_notification):
             )
     if admin_notification.in_app:
         for notification in created_notifications:
-                send_notification_toast(notification)
+                transaction.on_commit(
+                    lambda n=notification:send_notification_toast(n)
+                )
     return admin_notification

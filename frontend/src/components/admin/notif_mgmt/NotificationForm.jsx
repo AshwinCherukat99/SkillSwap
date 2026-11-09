@@ -232,9 +232,7 @@ function NotificationForm({editingNotification,quickAction,onSaved,onDiscard,sho
     }
     const handleDiscard=()=>{
         resetForm()
-        if (onDiscard()){
-            onDiscard()
-        }
+        onDiscard?.()
     }
     return (
         <div className="notification-form-card">

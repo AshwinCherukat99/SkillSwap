@@ -58,7 +58,7 @@ function NotificationManagement(){
         setQuickAction(action)
         setTimeout(()=>{
             document.getElementById('notification-form')?.scrollIntoView({
-                behaviour:'smooth',
+                behavior:'smooth',
                 block:'start',
             })
         },100)
@@ -73,7 +73,7 @@ function NotificationManagement(){
         setEditingNotification(notification)
         setTimeout(()=>{
             document.getElementById('notification-form')?.scrollIntoView({
-                behaviour:'smooth',
+                behavior:'smooth',
                 block:'start',
             })
         },100)
