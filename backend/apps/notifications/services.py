@@ -8,47 +8,92 @@ from .models import (Notification,AdminNotification)
 from apps.mentors.models import Mentor
 from apps.accounts.models import User
 
-@transaction.atomic
-def send_admin_notification(admin_notification):
+from .tasks import deliver_admin_notification
+
+def get_admin_notification_recipients(admin_notification):
     audience=admin_notification.audience
-    recipient_ids=set()
+    recipients={
+        'users':[],
+        'mentors':[]
+    }
     if audience==AdminNotification.Audience.INDIVIDUAL:
         if admin_notification.recipient:
-            recipient_ids.add(admin_notification.recipient.id)
+            recipients['users']=[
+                admin_notification.recipient
+            ]
     elif audience==AdminNotification.Audience.USER:
-        user_ids=User.objects.filter(role=User.Role.USER,is_active=True,mentor_profile__isnull=True).values_list('id',flat=True)
-        recipient_ids.update(user_ids)
-    elif audience==AdminNotification.Audience.MENTOR:
-        mentor_user_ids=(Mentor.objects.filter(is_active=True,status=Mentor.Status.ACTIVE,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
-        recipient_ids.update(mentor_user_ids)
-    elif audience==AdminNotification.Audience.ALL:
-        user_ids=(User.objects.filter(is_active=True).values_list('id',flat=True))
-        recipient_ids.update(user_ids)
-        mentor_user_ids=(Mentor.objects.filter(is_active=True,user__isnull=False,user__is_active=True).values_list('user_id',flat=True))
-        recipient_ids.update(mentor_user_ids)
-    notification_objects=[
-        Notification(
-            recipient_id=user_id,
-            notification_type=(Notification.NotificationType.ADMIN_ANNOUNCEMENT),
-            title=admin_notification.title,
-            message=admin_notification.message,
+        recipients['users']=list(
+            User.objects.filter(
+                role=User.Role.USER,
+                status=User.Status.ACTIVE,
+                is_active=True,
+                mentor_profile__isnull=True,
+            ).only('id','email','username')
         )
-        for user_id in recipient_ids
-    ]
-    created_notifications=Notification.objects.bulk_create(notification_objects)
-    print("CREATED NOTIFICATIONS:", len(created_notifications))
-    print("IN_APP ENABLED:", admin_notification.in_app)
+    elif audience==AdminNotification.Audience.MENTOR:
+        recipients['mentors']=list(
+            Mentor.objects.filter(
+                is_active=True,
+                status=Mentor.Status.ACTIVE,
+            ).only('id','email','username','user_id')
+        )
+    elif audience==AdminNotification.Audience.ALL:
+        recipients['users']=list(
+            User.objects.filter(
+                role=User.Role.USER,
+                status=User.Status.ACTIVE,
+                is_active=True,
+                mentor_profile__isnull=True,
+            ).only('id','email','username')
+        )
+        recipients['mentors']=list(
+            Mentor.objects.filter(
+                is_active=True,
+                status=Mentor.Status.ACTIVE
+            ).only('id','email','username','user_id')
+        )
+    return recipients
+
+@transaction.atomic
+def send_admin_notification(admin_notification):
+    recipients=get_admin_notification_recipients(admin_notification)
+    in_app_user_ids={
+        user.id 
+        for user in recipients['users']
+    }
+    for mentor in recipients['mentors']:
+        if mentor.user_id and mentor.user.is_active:
+            in_app_user_ids.add(mentor.user_id)
+    created_notifications=[]
     if admin_notification.in_app:
-        for notification in created_notifications:
-            print('sending toast:',notification.id,notification.recipient_id)
-            send_notification_toast(notification)
-    admin_notification.status=(AdminNotification.Status.SENT)
+        notification_objects=[
+            Notification(
+                recipient_id=user_id,
+                notification_type=Notification.NotificationType.ADMIN_ANNOUNCEMENT,
+                title=admin_notification.title,
+                message=admin_notification.message,
+            )
+            for user_id in in_app_user_ids
+        ]
+        created_notifications=Notification.objects.bulk_create(
+            notification_objects
+        )
+    admin_notification.status=AdminNotification.Status.SENT
     admin_notification.sent_at=timezone.now()
     admin_notification.save(
-            update_fields=[
+    update_fields=[
                 'status',
                 'sent_at',
                 'updated_at',
             ]
         )
+    if admin_notification.email or admin_notification.push:
+        transaction.on_commit(
+                lambda:deliver_admin_notification.delay(
+                    admin_notification.id
+                )
+            )
+    if admin_notification.in_app:
+        for notification in created_notifications:
+                send_notification_toast(notification)
     return admin_notification

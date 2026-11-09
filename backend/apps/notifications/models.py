@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.conf import settings
 
 class Notification(models.Model):
@@ -230,3 +231,34 @@ class AdminNotification(models.Model):
         ordering=['-created_at']
     def __str__(self):
         return self.title
+
+class PushSubscription(models.Model):
+    user=models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='push_subscriptions'
+    )
+    mentor=models.ForeignKey(
+        'mentors.Mentor',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='push_subscriptions'
+    )
+    end_point=models.TextField(unique=True)
+    p256dh=models.CharField(max_length=255)
+    auth=models.CharField(max_length=255)
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    class Meta:
+        constraints=[
+            models.CheckConstraint(
+                condition=(
+                    Q(user__isnull=False,mentor__isnull=True)|
+                    Q(user__isnull=True,mentor__isnull=False)
+                ),
+                name='push_subscriptions_one_account'
+            )
+        ]
