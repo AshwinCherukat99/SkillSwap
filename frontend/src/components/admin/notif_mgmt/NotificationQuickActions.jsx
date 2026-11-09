@@ -1,13 +1,13 @@
 import React from "react";
 
 function NotificationQuickActions({
-    onGlobal,onSchedule,onPush,onEmail,onAnnouncement
+    onAction
 }){
     const actions=[
         {
             title:'Global Notification',
             icon:'bi-globe2',
-            onClick:onGlobal,
+            action:'GLOBAL',
         },
         {
             title:'Schedule Send',
