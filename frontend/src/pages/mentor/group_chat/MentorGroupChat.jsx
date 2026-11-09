@@ -129,19 +129,15 @@ const MentorGroupChat = () => {
     }
 
     const uploadFiles=async (files)=>{
-        if (!selectedGroup) return
+        if (!selectedGroup||!files?.length) return
         const formData=new FormData()
         files.forEach((file)=>{
             formData.append('files',file)
         })
-        const response=await mentorApi.post(
+        try{
+            const response=await mentorApi.post(
             `/chat/conversations/${selectedGroup.id}/attachments/upload/`,
             formData,
-            {
-                headers:{
-                    'Content-Type':'multipart/form-data',
-                }
-            }
         )
         const uploadedMessage=response.data
         setMessages((previous)=>{
@@ -151,6 +147,14 @@ const MentorGroupChat = () => {
             return [...previous,uploadedMessage]
         })
         return uploadedMessage
+        }catch(err){
+            console.error(
+                'attachment upload failed:',
+                err.response?.status,
+                err.response?.data||err.message
+            )
+            throw err
+        }
     }
 
     return (

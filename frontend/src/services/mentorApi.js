@@ -8,7 +8,8 @@ const mentorApi = axios.create({
 
 mentorApi.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("mentor_access_token");
+    const accessToken = localStorage.getItem("mentor_access_token")||
+    sessionStorage.getItem('mentor_access_token');
 
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
