@@ -4,9 +4,6 @@ import { API_BASE_URL } from "../config";
 
 const mentorApi = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 mentorApi.interceptors.request.use(

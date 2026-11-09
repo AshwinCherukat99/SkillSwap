@@ -84,11 +84,17 @@ const MentorGroupChat = () => {
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data)
-                if (data.type === 'message') {
-                    setMessages((previous) => [
-                        ...previous,
-                        data.message,
-                    ])
+                if (data.type === 'message' && data.message) {
+                    setMessages((previous) => {
+                        if (
+                            previous.some(
+                                (message)=>message.id===data.message.id
+                            )
+                        ){
+                            return previous
+                        }
+                        return [...previous,data.message]
+                    })
                 }
             } catch (error) {
                 console.error('invalid websocket message:', error)
@@ -120,6 +126,31 @@ const MentorGroupChat = () => {
                 })
             )
         }
+    }
+
+    const uploadFiles=async (files)=>{
+        if (!selectedGroup) return
+        const formData=new FormData()
+        files.forEach((file)=>{
+            formData.append('files',file)
+        })
+        const response=await mentorApi.post(
+            `/chat/conversations/${selectedGroup.id}/attachments/upload/`,
+            formData,
+            {
+                headers:{
+                    'Content-Type':'multipart/form-data',
+                }
+            }
+        )
+        uploadedMessage=response.data
+        setMessages((previous)=>{
+            if (previous.some((message)=>message.id===uploadedMessage.id)){
+                return previous
+            }
+            return [...previous,uploadedMessage]
+        })
+        return uploadedMessage
     }
 
     return (
@@ -176,6 +207,7 @@ const MentorGroupChat = () => {
                             currentUserType="MENTOR"
                             loadingMessages={loadingMessages}
                             onSend={sendMessage}
+                            onUploadFiles={uploadFiles}
                             connected={connected}
                         />
                     </div>

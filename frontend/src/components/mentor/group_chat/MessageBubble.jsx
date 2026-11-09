@@ -1,4 +1,5 @@
 import React from 'react'
+import { BACKEND_ORIGIN } from '../../../config'
 
 const MessageBubble=({message,currentUserId,currentUserType})=>{
     const senderId=message.sender?.id 
@@ -52,9 +53,42 @@ const MessageBubble=({message,currentUserId,currentUserType})=>{
         </div>
 
         <div className={`message-bubble ${isMine ? "my-message" : "other-message"}`}>
-    <span className="message-text">
+    {message.content&&(<span className="message-text">
         {message.content}
-    </span>
+    </span>)}
+    {message.attachments?.map((attachment)=>{
+      const fileUrl=attachment.file_url||attachment.file
+      const fullUrl=fileUrl?fileUrl.startsWith('http')?fileUrl:`${BACKEND_ORIGIN}${fileUrl}`:null
+      return (
+        <div
+                                key={attachment.id}
+                                className="message-attachment"
+                            >
+                                <i className="bi bi-file-earmark me-2" />
+
+                                {fullUrl ? (
+                                    <a
+                                        href={fullUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {attachment.original_name || 'View attachment'}
+                                    </a>
+                                ) : (
+                                    <span>
+                                        {attachment.original_name || 'Attachment unavailable'}
+                                    </span>
+                                )}
+
+                                <small className="text-muted ms-2">
+                                    {(
+                                        (attachment.file_size || 0) / 1024
+                                    ).toFixed(1)} KB
+                                </small>
+                            </div>
+                        );
+                    
+    })}
 </div>
       </div>
     </div>

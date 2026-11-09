@@ -10,6 +10,7 @@ const ChatWindow=({
     currentUserType,
     loadingMessages,
     onSend,
+    onUploadFiles,
     connected
 })=>{
     if (!group){
@@ -47,6 +48,7 @@ const ChatWindow=({
 
         <ChatInput
           onSend={onSend}
+          onUploadFiles={onUploadFiles}
           disabled={!connected}
         />
       </div>

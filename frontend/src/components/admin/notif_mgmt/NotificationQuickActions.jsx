@@ -12,22 +12,22 @@ function NotificationQuickActions({
         {
             title:'Schedule Send',
             icon:'bi-clock',
-            onClick:onSchedule,
+            action:'SCHEDULE',
         },
         {
             title:'Push Notification',
             icon:'bi-phone',
-            onClick:onPush,
+            action:'PUSH',
         },
         {
             title:'Email Campaign',
             icon:'bi-envelope',
-            onClick:onEmail,
+            action:'EMAIL',
         },
         {
             title:'New Announcement',
             icon:'bi-megaphone',
-            onClick:onAnnouncement,
+            action:'ANNOUNCEMENT',
         },
     ]
     return (
@@ -39,26 +39,26 @@ function NotificationQuickActions({
 
             <div className="row g-3">
 
-                {actions.map((action) => (
+                {actions.map((item) => (
                     <div
                         className="col-12 col-sm-6 col-lg"
-                        key={action.title}
+                        key={item.action}
                     >
 
                         <button
                             type="button"
                             className="notification-quick-action w-100"
-                            onClick={action.onClick}
+                            onClick={()=>onAction(item.action)}
                         >
 
                             <div className="notification-action-icon">
                                 <i
-                                    className={`bi ${action.icon}`}
+                                    className={`bi ${item.icon}`}
                                 />
                             </div>
 
                             <span>
-                                {action.title}
+                                {item.title}
                             </span>
 
                         </button>
