@@ -23,7 +23,7 @@ def send_push_notification(subscription,admin_notification):
         'url':'/notifications/',
     }
     private_key=base64.b64decode(
-        settings.VAPID_PRIVATE_KEY
+        settings.VAPID_PRIVATE_KEY_B64
     ).decode('utf-8')
     try:
         webpush(

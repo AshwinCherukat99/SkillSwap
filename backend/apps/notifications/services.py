@@ -8,7 +8,6 @@ from .models import (Notification,AdminNotification)
 from apps.mentors.models import Mentor
 from apps.accounts.models import User
 
-from .tasks import deliver_admin_notification
 
 def get_admin_notification_recipients(admin_notification):
     audience=admin_notification.audience
@@ -88,6 +87,7 @@ def send_admin_notification(admin_notification):
             ]
         )
     if admin_notification.email or admin_notification.push:
+        from .tasks import deliver_admin_notification
         transaction.on_commit(
                 lambda:deliver_admin_notification.delay(
                     admin_notification.id
