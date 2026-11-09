@@ -8,7 +8,7 @@ const ChatInput=({onSend,onUploadFiles,disabled})=>{
     const fileInputRef=useRef(null)
     const sendMessage=()=>{
       const trimmed=message.trim()
-      if (!disabled|trimmed) return
+      if (disabled||!trimmed) return
       onSend(trimmed)
       setMessage('')
     }

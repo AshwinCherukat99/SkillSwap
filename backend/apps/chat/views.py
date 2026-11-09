@@ -404,6 +404,11 @@ class ChatAttachmentUploadView(APIView):
     @transaction.atomic
     def post(self,request,conversation_id):
         user=request.user
+        print('user:',user)
+        print('user class:',user.__class__)
+        print('user model:',user._meta.label)
+        print('user id:',user.id)
+        print('is mentor:',isinstance(user,Mentor))
         uploaded_files=request.FILES.getlist('files')
         content=request.data.get('content','').strip()
         if not uploaded_files:
@@ -442,6 +447,18 @@ class ChatAttachmentUploadView(APIView):
             membership_filter['mentor']=mentor
         else:
             membership_filter['user']=user
+        print('conversation id:',conversation.id)
+        print('membership filter:',membership_filter)
+        print('ALL MEMBERS:',list(
+            ConversationMember.objects.filter(
+                conversation=conversation
+            ).values(
+                'id',
+                'user_id',
+                'mentor_id',
+                'is_active'
+            )
+        ))
         is_member=ConversationMember.objects.filter(
             **membership_filter
         ).exists()
