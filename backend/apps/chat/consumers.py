@@ -15,7 +15,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         print("CONVERSATION ID:", self.conversation_id)
         self.room_group_name=f'chat_{self.conversation_id}'
         user=self.scope.get('user')
+        account_type=self.scope.get('account_type')
         print("WEBSOCKET USER:", user)
+        print("USER CLASS:",user.__class__ if user else None)
+        print("USER ID:",user.id if user else None)
+        print("ACCOUNT TYPE:",account_type)
         print("IS ANONYMOUS:", user.is_anonymous if user else "NO USER")
         if not user or user.is_anonymous:
             print("REJECTING: USER NOT AUTHENTICATED")

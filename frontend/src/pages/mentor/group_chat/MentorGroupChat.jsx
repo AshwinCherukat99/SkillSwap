@@ -143,7 +143,7 @@ const MentorGroupChat = () => {
                 }
             }
         )
-        uploadedMessage=response.data
+        const uploadedMessage=response.data
         setMessages((previous)=>{
             if (previous.some((message)=>message.id===uploadedMessage.id)){
                 return previous
