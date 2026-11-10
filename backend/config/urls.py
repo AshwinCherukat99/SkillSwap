@@ -33,7 +33,8 @@ urlpatterns = [
     path('api/payments/',include('apps.payments.urls')),
     path('api/sessions/',include('apps.sessions_mgmt.urls')),
     path('api/certificates/',include('apps.certificates.urls')),    
-    path('api/reports/',include('apps.reports.urls')),
+    path('api/reports/',include('apps.reports.urls')), 
+    path('api/stories/',include('apps.stories.urls'))
 ] 
 if settings.DEBUG:
     urlpatterns+=static(

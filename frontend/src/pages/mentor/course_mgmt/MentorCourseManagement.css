@@ -297,41 +297,83 @@
 }
 
 .enrollment-chart {
-    height: 260px;
     display: flex;
     align-items: flex-end;
+    justify-content: space-around;
     gap: 12px;
+    height: 230px;
+    padding-top: 20px;
 }
 
 .enrollment-bar-column {
     flex: 1;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    height: 100%;
 }
 
 .enrollment-bar-container {
-    width: 100%;
-    height: calc(100% - 25px);
     display: flex;
     align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    height: 100%;
+    width: 100%;
+}
+
+.enrollment-bar,
+.completed-enrollment-bar {
+    width: 18px;
+    max-width: 40%;
+    min-height: 0;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
 }
 
 .enrollment-bar {
-    width: 100%;
-    min-height: 4px;
-    border-radius: 7px 7px 0 0;
-    background: #4f46e5;
-    transition: height 0.4s ease;
+    background: #6558e8;
+}
+
+.completed-enrollment-bar {
+    background: #20a779;
 }
 
 .enrollment-bar-column span {
-    font-size: 10px;
-    font-weight: 600;
-    color: #777587;
+    font-size: 11px;
+    color: #777;
+    white-space: nowrap;
+}
+
+.enrollment-chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 12px;
+    color: #777;
+}
+
+.enrollment-chart-legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.legend-enrollments,
+.legend-completed {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+}
+
+.legend-enrollments {
+    background: #6558e8;
+}
+
+.legend-completed {
+    background: #20a779;
 }
 
 .enrollment-empty-state {

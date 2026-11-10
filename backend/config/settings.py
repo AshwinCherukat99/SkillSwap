@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'apps.payments',
     'apps.certificates',
     'apps.reports',
+    'apps.stories'
 ]
 
 ASGI_APPLICATION='config.asgi.application'

@@ -22,6 +22,7 @@ const MentorCourseManagement=()=>{
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
     const [searchTerm,setSearchTerm]=useState("")
+    const [enrollmentPerformance,setEnrollmentPerformance]=useState([])
     useEffect(()=>{
         fetchCourses()
     },[])
@@ -30,13 +31,16 @@ const MentorCourseManagement=()=>{
             setLoading(true)
             setError("")
             const response=await mentorApi.get(
-                '/courses/mentor/management/'
+                `/courses/mentor/management/?months=${months}`
             )
             setCourses(
                 response.data.courses||[]
             )
             setStats(
                 response.data.stats||{}
+            )
+            setEnrollmentPerformance(
+                response.data.enrollment_performance||[]
             )
         }catch(error){
             console.error('failed to load mentor courses:',error)
@@ -65,8 +69,8 @@ const MentorCourseManagement=()=>{
             category.includes(search)||
             description.includes(search)
             )
-        },[courses,searchTerm])
-    })
+        })
+    },[courses,searchTerm])
     return (
         <div className="mentor-course-page">
 
@@ -130,7 +134,7 @@ const MentorCourseManagement=()=>{
                 <div className="col-12 col-lg-4">
 
                     <EnrollmentPerformance
-                        data={[]}
+                        data={enrollmentPerformance}
                     />
 
                     {/* AI Insights intentionally excluded */}

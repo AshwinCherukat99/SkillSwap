@@ -1,6 +1,6 @@
 from django.shortcuts import render,get_object_or_404
 from django.utils import timezone
-from datetime import timedelta
+from datetime import timedelta,datetime
 from rest_framework.views import APIView
 from .models import Course,CourseEnrollment,Assessment,CourseCategory,CourseModule,CourseLesson,AssessmentQuestion,AssessmentAnswer,AssessmentResult,LessonProgress
 from .serializers.course import CourseListSerializer,UserLessonSerializer
@@ -15,7 +15,8 @@ from apps.certificates.services import generate_certificate
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
-from django.db.models import Count
+from django.db.models import Count,Q
+from django.db.models.functions import TruncMonth
 from .services.course_progress import update_enrollment_progress
 from .services.assessment_service import generate_assessment_questions,evaluate_objective_answer,evaluate_subjective_answer,generate_assessment_summary
 import json
@@ -448,14 +449,80 @@ class MentorCourseManagementView(APIView):
         ).count()
         draft_courses=courses.filter(
             status=Course.Status.DRAFT
-        ).count()      
-        total_enrollments=sum(
-            course.enrollments.count()
-            for course in courses
-        )  
+        ).count()   
+        enrollments=CourseEnrollment.objects.filter(
+            course__mentor=mentor
+        )   
+        total_enrollments=enrollments.count()
+        completed_enrollments=enrollments.filter(
+            completed_at__isnull=False
+        ).count()
+        completion_rate=(
+            round(
+                (completed_enrollments/total_enrollments)*100,
+                1
+            )
+            if total_enrollments>0 else 0
+        )
+        months=request.query_params.get('months',6)
+        try:
+            months=int(months)
+        except (TypeError,ValueError):
+            months=6
+        if months not in [6,12]:
+            months=6
+        today=timezone.localdate()
+        current_month=today.replace(day=1)
+        month_starts=[]
+        for i in range(months-1,-1,-1):
+            month_index=current_month.month-i
+            year=current_month.year
+            while month_index<=0:
+                month_index+=12
+                year-=1
+            month_starts.append(
+                current_month.replace(
+                    year=year,
+                    month=month_index,
+                )
+            )
+        start_date=month_starts[0]
+        start_datetime=timezone.make_aware(
+            datetime.combine(
+                start_date,
+                datetime.min.time(),
+            )
+        )
+        monthly_data=enrollments.filter(
+            enrolled_at__gte=start_datetime
+        ).annotate(
+            month=TruncMonth('enrolled_at')
+        ).values(
+            'month'
+        ).annotate(
+            total=Count('id'),
+            completed=Count(
+                'id',
+                filter=Q(completed_at__isnull=False)
+            )
+        ).order_by('month')
+        monthly_lookup={
+            item['month'].strftime('%Y-%m'):item
+            for item in monthly_data
+        }
+        enrollment_performance=[]
+        for month in month_starts:
+            month_key=month.strftime('%Y-%m')
+            data=monthly_lookup.get(month_key,{})
+            enrollment_performance.append({
+                'month':month.strftime('%b-%Y'),
+                'enrollments':data.get('total',0),
+                'completed':data.get('completed',0)
+            })
         serializer=MentorCourseSerializer(
             courses,
-            many=True
+            many=True,
+            context={'request':request}
         )
         return Response(
             {
@@ -465,8 +532,10 @@ class MentorCourseManagementView(APIView):
                     'drafts':draft_courses,
                     'enrollments':total_enrollments,
                     'average_rating':mentor.rating,
-                    'completion_rate':None,
+                    'completion_rate':completion_rate,
+                    'completed_enrollments':completed_enrollments,
                 },
+                'enrollment_performance':enrollment_performance,
                 'courses':serializer.data,
             },
             status=status.HTTP_200_OK,

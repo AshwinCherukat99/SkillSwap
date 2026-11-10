@@ -1,6 +1,7 @@
 import React from 'react'
 
 const EnrollmentPerformance=({data=[],})=>{
+    const [period,setPeriod]=useState('6')
     const maxValue=data.length>0?Math.max(...data.map((item)=>item.enrollments),
 1):1
     return (
@@ -12,12 +13,14 @@ const EnrollmentPerformance=({data=[],})=>{
                     Enrollment Performance
                 </h4>
 
-                <select className="form-select form-select-sm enrollment-period-select">
-                    <option>
+                <select className="form-select form-select-sm enrollment-period-select"
+                value={period}
+                onChange={(e)=>setPeriod(e.target.value)}>
+                    <option value='6'>
                         Last 6 Months
                     </option>
 
-                    <option>
+                    <option value='12'>
                         Last Year
                     </option>
                 </select>
@@ -39,8 +42,10 @@ const EnrollmentPerformance=({data=[],})=>{
 
                     {data.map((item) => {
 
-                        const height =
+                        const enrollmentHeight =
                             (item.enrollments / maxValue) * 100;
+                        const completedHeight=
+                        (item.completed/maxValue)*100
 
                         return (
                             <div
@@ -53,9 +58,17 @@ const EnrollmentPerformance=({data=[],})=>{
                                     <div
                                         className="enrollment-bar"
                                         style={{
-                                            height: `${height}%`,
+                                            height: `${enrollmentHeight}%`,
                                         }}
                                         title={`${item.enrollments} enrollments`}
+                                    />
+
+                                    <div
+                                        className="completed-enrollment-bar"
+                                        style={{
+                                            height: `${completedHeight}%`,
+                                        }}
+                                        title={`${item.completed} enrollments`}
                                     />
 
                                 </div>
@@ -70,6 +83,17 @@ const EnrollmentPerformance=({data=[],})=>{
 
                 </div>
             )}
+
+            <div className='enrollment-chart-legend mt-3'>
+                <span>
+                    <i className='legend-enrollments'></i>
+                    Enrollments
+                </span>
+                <span>
+                    <i className='legend-completed'></i>
+                    Completed
+                </span>
+            </div>
 
         </div>
     )
