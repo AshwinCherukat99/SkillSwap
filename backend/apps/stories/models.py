@@ -74,3 +74,11 @@ class Story(models.Model):
                 raise ValidationError({
                     'text':'text story cannot be empty'
                 })
+        elif self.content_type in [
+            self.ContentType.IMAGE,
+            self.ContentType.VIDEO,
+        ]:
+            if not self.media:
+                raise ValidationError({
+                    'media':'media is required'
+                })
