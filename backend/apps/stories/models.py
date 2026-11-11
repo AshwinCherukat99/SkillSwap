@@ -82,3 +82,70 @@ class Story(models.Model):
                 raise ValidationError({
                     'media':'media is required'
                 })
+    def __str__(self):
+        return f'story by {self.user.username}'
+    @property
+    def is_expired(self):
+        return self.expires_at<=timezone.now()
+
+class StoryView(models.Model):
+    story=models.ForeignKey(
+        Story,
+        on_delete=models.CASCADE,
+        related_name='views'
+    )
+    user=models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='story_views',
+    )
+    viewed_at=models.DateTimeField(
+        auto_now_add=True
+    )
+    class Meta:
+        ordering=['-viewed_at']
+        constraints=[
+            models.UniqueConstraint(
+                fields=['story','user'],
+                name='unique_story_user_view',
+            )
+        ]
+        indexes=[
+            models.Index(
+                fields=['story','viewed_at'],
+                name='story_view_time_idx'
+            )
+        ]
+    def __str__(self):
+        return f'{self.user.username} viewed story {self.story_id}'
+
+class StoryReaction(models.Model):
+    class ReactionType(models.TextChoices):
+        LIKE='LIKE','Like'
+        LOVE='LOVE','Love'
+        LAUGH='LAUGH','Laugh'
+        WOW='WOW','Wow'
+        CLAP='CLAP','Clap'
+    story=models.ForeignKey(
+        Story,
+        on_delete=models.CASCADE,
+        related_name='reactions'
+    )
+    user=models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='story_reactions'
+    )
+    reaction=models.CharField(
+        max_length=10,
+        choices=ReactionType.choices,
+        default=ReactionType.LIKE,
+    )
+    created_at=models.DateTimeField(auto_now_add=True)
+    updated_at=models.DateTimeField(auto_now=True)
+    class Meta:
+        ordering=['-created_at']
+        constraints=[models.UniqueConstraint(
+            fields=['story','user'],
+            name='unique_story_user_reaction',
+        )]
