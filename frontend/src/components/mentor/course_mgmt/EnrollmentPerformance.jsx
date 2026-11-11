@@ -1,7 +1,6 @@
 import React,{useState} from 'react'
 
-const EnrollmentPerformance=({data=[],})=>{
-    const [period,setPeriod]=useState('6')
+const EnrollmentPerformance=({data=[],months,setMonths})=>{
     const maxValue=data.length>0?Math.max(...data.map((item)=>item.enrollments),
 1):1
     return (
@@ -14,13 +13,13 @@ const EnrollmentPerformance=({data=[],})=>{
                 </h4>
 
                 <select className="form-select form-select-sm enrollment-period-select"
-                value={period}
-                onChange={(e)=>setPeriod(e.target.value)}>
-                    <option value='6'>
+                value={months}
+                onChange={(e)=>Number(e.target.value)}>
+                    <option value={6}>
                         Last 6 Months
                     </option>
 
-                    <option value='12'>
+                    <option value={12}>
                         Last Year
                     </option>
                 </select>

@@ -19,13 +19,14 @@ const MentorCourseManagement=()=>{
         average_rating:null,
         completion_rate:null,
     })
+    const [months,setMonths]=useState(6)
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
     const [searchTerm,setSearchTerm]=useState("")
     const [enrollmentPerformance,setEnrollmentPerformance]=useState([])
     useEffect(()=>{
         fetchCourses()
-    },[])
+    },[months])
     const fetchCourses=async ()=>{
         try{
             setLoading(true)
@@ -135,6 +136,8 @@ const MentorCourseManagement=()=>{
 
                     <EnrollmentPerformance
                         data={enrollmentPerformance}
+                        months={months}
+                        setMonths={setMonths}
                     />
 
                     {/* AI Insights intentionally excluded */}
