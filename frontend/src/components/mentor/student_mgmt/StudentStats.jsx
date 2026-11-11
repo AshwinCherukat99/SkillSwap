@@ -19,7 +19,7 @@ const StudentStats=({stats})=>{
         },
         {
             label: "Completed",
-            value: stats.completed ?? "--",
+            value: stats.completed_students ?? "--",
             icon: "bi-check-circle",
         },
         {

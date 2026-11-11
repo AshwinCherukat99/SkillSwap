@@ -6,7 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from django.conf import settings
 from django.utils import timezone
-from datetime import date,timedelta
+from datetime import date,timedelta,datetime
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from .authentication import MentorJWTAuthentication
@@ -988,6 +988,45 @@ class MentorStudentsView(APIView):
         ).select_related('user','course').order_by('-enrolled_at'))
         total_students=(enrollments.values('user_id').distinct().count())
         completed_students=(enrollments.filter(completed_at__isnull=False).values('user_id').distinct().count())
+        active_now=(
+            enrollments.filter(
+                completed_at__isnull=True
+            ).values('user_id')
+            .distinct()
+            .count()
+        )
+        total_enrollments=enrollments.count()
+        completed_enrollments=enrollments.filter(
+            completed_at__isnull=False
+        ).count()
+        success_rate=(
+            round(
+                (completed_enrollments/total_enrollments)*100,
+                1
+            )
+            if total_enrollments>0 else 0
+        )
+        today=timezone.localdate()
+        week_start=today-timedelta(days=today.weekday())
+        next_week_start=week_start+timedelta(days=7)
+        start_datetime=timezone.make_aware(
+            datetime.combine(
+                week_start,
+                datetime.min().time()
+            )
+        )
+        end_datetime=timezone.make_aware(
+            datetime.combine(
+                next_week_start,
+                datetime.min().time()
+            )
+        )
+        sessions_this_week=CourseSession.objects.filter(
+            mentor=mentor,
+            status=CourseSession.Status.COMPLETED,
+            completed_at__gte=start_datetime,
+            completed_at__lt=end_datetime
+        ).count()
         search=request.query_params.get('search','').strip()
         if search:
             enrollments=enrollments.filter(
@@ -1023,10 +1062,10 @@ class MentorStudentsView(APIView):
                 'stats':{
                     'total_students':total_students,
                     'completed_students':completed_students,
-                    'active_now': 0,
-        'sessions_this_week': 0,
+                    'active_now':active_now,
+        'sessions_this_week':sessions_this_week,
         'average_rating': mentor.rating,
-        'success_rate': None,
+        'success_rate':success_rate,
                 }
             },
             status=status.HTTP_200_OK,
