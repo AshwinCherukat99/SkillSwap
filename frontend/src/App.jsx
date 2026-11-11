@@ -87,6 +87,7 @@ import MentorNotifications from './pages/mentor/notifications/MentorNotification
 import CertificateView from './pages/user/certificates/CertificateView'
 import BadgeDetail from './pages/admin/badge_mgmt/BadgeDetail'
 import CourseCategoryManagement from './pages/admin/course_category/CourseCategoryManagement'
+import StoriesPage from './pages/user/stories/StoriesPage'
 import ProtectedVideoCallRoute from './ProtectedVideoCallRoute'
 
 function App(){
@@ -271,6 +272,11 @@ function App(){
         <Route path='/courses/:courseId/assessment/:assessmentId/result' element={
           <ProtectedRoute>
             <AssessmentResult/>
+          </ProtectedRoute>
+        }/>
+        <Route path='/stories' element={
+          <ProtectedRoute>
+            <StoriesPage/>
           </ProtectedRoute>
         }/>
         <Route path='/:userId/profile/' element={
