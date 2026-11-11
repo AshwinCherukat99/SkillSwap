@@ -970,7 +970,7 @@ class MentorReceivedReviewsView(APIView):
                     hidden_reviews,
                     many=True,
                     context=serializer_context
-                ),
+                ).data,
                 'total_reviews':visible_reviews.count(),
                 'hidden_reviews_count':hidden_reviews.count(),
             },
