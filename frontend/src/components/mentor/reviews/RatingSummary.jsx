@@ -1,11 +1,14 @@
 const RatingSummary=({
-    mentor,
-    ratingDistribution={}
+    rating=0,
+    totalReviews=0,
+    ratingDistribution=[]
 })=>{
-    const rating=Number(mentor?.rating||0)
-    const totalReviews=Number(mentor?.total_reviews||0)
     const getCount=(star)=>{
-        return Number(ratingDistribution?.[String(star)]||0)
+        return Number(
+            ratingDistribution.find(
+                (item)=>item.rating===star
+            )?.count||0
+        )
     }
     const percentage=(star)=>{
         if (!totalReviews){
@@ -24,7 +27,7 @@ const RatingSummary=({
                     <div className="rating-overview">
 
                         <div className="display-rating">
-                            {rating.toFixed(1)}
+                            {Number(rating).toFixed(1)}
                         </div>
 
                         <div className="rating-stars">
@@ -41,7 +44,7 @@ const RatingSummary=({
                         </div>
 
                         <div className="rating-review-count">
-                            {totalReviews.toLocaleString()} verified reviews
+                            {Number(totalReviews).toLocaleString()} verified reviews
                         </div>
 
                     </div>

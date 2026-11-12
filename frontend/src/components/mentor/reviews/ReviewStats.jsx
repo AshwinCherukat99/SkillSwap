@@ -1,52 +1,43 @@
 const ReviewStats=({
-    mentor,
-    summary,
-    ratingDistribution
+    stats={}
 })=>{
-    const stats=[
+    const growth=Number(stats.growth||0)
+    const statsList=[
         {
             label:'Overall Rating',
-            value:Number(mentor?.rating||0).toFixed(1),    
+            value:Number(stats.overall_rating||0).toFixed(2),    
             icon:'bi-star-fill',
             type:'primary',
         },
         {
             label:'Total Reviews',
-            value:Number(mentor?.total_reviews||0).toLocaleString(),    
+            value:Number(stats.total_reviews||0).toLocaleString(),    
             icon:'bi-chat-square-text-fill',
             type:'primary',
         },
         {
             label:'Learners',
-            value:Number(summary?.learners||0).toLocaleString(),    
+            value:Number(stats.learners||0).toLocaleString(),    
             icon:'bi-people-fill',
             type:'primary',
         },
         {
             label:'5-Star',
-            value:Number(ratingDistribution?.['5']||0).toLocaleString(),    
+            value:Number(stats.five_star||0).toLocaleString(),    
             icon:'bi-star-fill',
             type:'secondary',
         },
         {
-            label: "Recommend",
-            value: `${Number(
-                summary?.recommend_percentage || 0
-            )}%`,
-            icon: "bi-hand-thumbs-up-fill",
-            type: "primary",
-        },
-        {
             label:'Growth',
-            value:`${Number(summary?.growth||0)>=0?'+':''}${Number(summary?.growth || 0).toFixed(1)}`,    
-            icon:'bi-graph-up-arrow',
+            value:`${growth>=0?'+':'-'}${growth.toFixed(2)}`,    
+            icon:growth>=0?'bi-graph-up-arrow':'bi-graph-down-arrow',
             type:'secondary',
         },
     ]
     return (
         <section className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 mb-4">
 
-            {stats.map((stat) => (
+            {statsList.map((stat) => (
 
                 <div
                     className="col"

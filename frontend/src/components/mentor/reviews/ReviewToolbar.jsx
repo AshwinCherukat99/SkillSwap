@@ -5,6 +5,8 @@ const ReviewToolbar=({
     setSearch,
     course,
     setCourse,
+    rating,
+    setRating,
     sort,
     setSort,
     courses=[],
@@ -67,6 +69,32 @@ const ReviewToolbar=({
 
                     <select
                         className="form-select review-filter"
+                        value={rating}
+                        onChange={(e) =>
+                            setRating(e.target.value)
+                        }
+                    >
+
+                        <option value="all">
+                            All Ratings
+                        </option>
+
+                        {[5,4,3,2,1].map((star)=>(
+                            <option 
+                            key={star}
+                            value={star}>
+                                {star} Stars
+                            </option>
+                        ))}
+
+                    </select>
+
+                </div>
+
+                <div className="col-12 col-md-auto">
+
+                    <select
+                        className="form-select review-filter"
                         value={sort}
                         onChange={(e) =>
                             setSort(e.target.value)
@@ -75,6 +103,10 @@ const ReviewToolbar=({
 
                         <option value="newest">
                             Newest First
+                        </option>
+
+                        <option value="oldest">
+                            Oldest First
                         </option>
 
                         <option value="highest">

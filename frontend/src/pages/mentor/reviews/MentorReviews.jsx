@@ -16,16 +16,26 @@ const MentorReviews=()=>{
     const [error,setError]=useState("")
     const [search,setSearch]=useState("")
     const [course,setCourse]=useState('all')
+    const [rating,setRating]=useState('all')
     const [sort,setSort]=useState('newest')
+    const [months,setMonths]=useState(6)
     const [replyLoading,setReplyLoading]=useState(null)
     const [replyError,setReplyError]=useState("")
-    const [loadingMore,setLoadingMore]=useState(false)
-    const fetchReviews=async ()=>{
+    const fetchReviews=useCallback(async ()=>{
         try{
             setLoading(true)
             setError("")
             const response=await mentorApi.get(
-                '/mentors/reviews/'
+                '/mentors/reviews/',
+                {
+                    params:{
+                        search:search,
+                        course:course,
+                        rating:rating,
+                        sort:sort,
+                        months:months
+                    }
+                }
             )   
             console.log("MENTOR REVIEWS RESPONSE:", response.data)
             setData(response.data)
@@ -35,10 +45,10 @@ const MentorReviews=()=>{
         }finally{
             setLoading(false)
         }
-    }
+    },[search,course,rating,sort,months])
     useEffect(()=>{
         fetchReviews()
-    },[])
+    },[fetchReviews])
     const handleReply=async (reviewId,message)=>{
         if (!message.trim()){
             return
@@ -49,7 +59,7 @@ const MentorReviews=()=>{
             await mentorApi.post(
                 `/reviews/mentor/${reviewId}/reply/`,
                 {
-                    message:message.trim()
+                    mentor_reply:message.trim()
                 }
             )
             await fetchReviews()
@@ -63,15 +73,7 @@ const MentorReviews=()=>{
             setReplyLoading(null)
         }
     }
-    const handleLoadMore=async ()=>{
-        try{
-            setLoadingMore(true)
-            console.log('load more reviews')
-        }finally{
-            setLoading(false)
-        }
-    }
-    if (loading){
+    if (loading && !data){
         return (
             <div className="mentor-reviews-page">
                 <div className="container-fluid py-5">
@@ -89,7 +91,7 @@ const MentorReviews=()=>{
             </div>
         )
     }
-    if (error){
+    if (error && !data){
         return (
             <div className="mentor-reviews-page">
                 <div className="container-fluid py-5">
@@ -107,12 +109,16 @@ const MentorReviews=()=>{
             </div>
         )
     }
-    const mentor=data?.mentor||{}
-    const summary=data?.summary||{}
+    const stats=data?.stats||[]
+    const ratingDistribution=data?.rating_distribution||[]
+    const monthlyTrends=data?.monthly_trends||[]
+    const reviews=data?.reviews||[]
+    const courses=data?.courses||[]
+    const hiddenReviews=data?.hidden_reviews||[]
     return (
         <div className="mentor-reviews-page">
 
-            <ReviewsHeader mentor={mentor} />
+            <ReviewsHeader mentor={data?.mentor||{}} />
 
 
             <main className="mentor-reviews-content">
@@ -122,19 +128,18 @@ const MentorReviews=()=>{
 
                     <div className="col-12 col-lg-8">
                         <RatingSummary
-                            mentor={mentor}
-                            ratingDistribution={
-                                data?.rating_distribution || {}
-                            }
+                            rating={stats.overall_rating||0}     
+                            totalReviews={stats.total_reviews||0}
+                            ratingDistribution={ratingDistribution}
                         />
                     </div>
 
                     <div className="col-12 col-lg-4">
                         <MonthlyTrends
-                            trends={
-                                data?.monthly_trends || []
-                            }
-                            growth={summary.growth}
+                            trends={monthlyTrends}
+                            growth={stats.growth||0}
+                            months={months}
+                            setMonths={setMonths}
                         />
                     </div>
 
@@ -143,11 +148,8 @@ const MentorReviews=()=>{
 
                 {/* KPI Cards */}
                 <ReviewStats
-                    mentor={mentor}
-                    summary={summary}
-                    ratingDistribution={
-                        data?.rating_distribution || {}
-                    }
+                    stats={stats}
+                    ratingDistribution={ratingDistribution}
                 />
 
 
@@ -161,23 +163,30 @@ const MentorReviews=()=>{
                             setSearch={setSearch}
                             course={course}
                             setCourse={setCourse}
+                            rating={rating}
+                            setRating={setRating}
                             sort={sort}
                             setSort={setSort}
-                            courses={data?.courses || []}
+                            courses={courses}
                         />
 
+                        {error&&(
+                            <div className='alert alert-danger mt-3'>
+                                {error}
+                            </div>
+                        )}
+
+                        {loading&&(
+                            <div className='text-center py-3'>
+                                <div className='spinner-border spinner-border-sm text-primary'/>
+                            </div>
+                        )}
 
                         <ReviewsList
-                            reviews={data?.reviews || []}
-                            search={search}
-                            course={course}
-                            sort={sort}
+                            reviews={reviews}
                             onReply={handleReply}
                             replyLoading={replyLoading}
                             replyError={replyError}
-                            onLoadMore={handleLoadMore}
-                            loadingMore={loadingMore}
-                            hasMore={data?.has_more || false}
                         />
 
                     </div>

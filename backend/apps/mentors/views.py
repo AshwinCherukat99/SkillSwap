@@ -19,7 +19,7 @@ from django.db.models import Count,Avg,Q
 from django.db.models.functions import TruncMonth
 from django.core.exceptions import ObjectDoesNotExist
 from .serializers.documents import MentorDocumentSerializer,MentorRegisterSerializer,VerifyMentorRegistrationOTPSerializer,MentorLoginSerializer,MentorForgotPasswordSerialzer,MentorVerifyResetOTPSerializer,MentorResetPasswordSerializer,MentorProfileUpdateSerializer
-from .serializers.reviews import MentorReviewSerializer
+from .serializers.reviews import MentorReviewSerializer,MentorReviewReplySerializer
 from .serializers.students import MentorStudentSerializer
 from .services import start_mentor_registration,verify_mentor_registration_otp,generate_mentor_tokens,resend_mentor_registration_otp,start_mentor_password_reset,reset_mentor_password,verify_mentor_password_reset_otp
 
@@ -948,6 +948,18 @@ class MentorReceivedReviewsView(APIView):
     permission_classes=[IsAuthenticated]
     def get(self,request):
         mentor=request.user
+        mentor_data={
+            'id':mentor.id,
+            'full_name':mentor.full_name,
+            'username':mentor.username,
+            'email':mentor.email,
+            'profile_image':(
+                request.build_absolute_uri(
+                    mentor.profile_image.url
+                ) if mentor.profile_image
+                else None
+            )
+        }
         if not mentor.user:
             return Response(
                 {
@@ -955,24 +967,223 @@ class MentorReceivedReviewsView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        reviews=(UserRating.objects.filter(rated_user=mentor.user).select_related('rated_by').order_by('-created_at'))
+        reviews=(UserRating.objects.filter(rated_user=mentor.user).select_related('rated_by'))
         visible_reviews=reviews.filter(is_hidden=False)
         hidden_reviews=reviews.filter(is_hidden=True)
+        search=request.query_params.get('search','').strip()
+        filtered_reviews=visible_reviews
+        if search:
+            filtered_reviews=filtered_reviews.filter(
+                Q(rated_by__username__icontains=search)|
+                Q(rated_by__full_name__icontains=search)
+            )
+        course_id=request.query_params.get('course')
+        if course_id and course_id!='all':
+            try:
+                course_id=int(course_id)
+            except (TypeError,ValueError):
+                return Response(
+                    {
+                        'error':'invalid course id'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            course_exists=Course.objects.filter(
+                id=course_id,
+                mentor=mentor
+            ).exists() 
+            if not course_exists:
+                return Response(
+                    {
+                        'error':'course not found'
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            filtered_reviews=filtered_reviews.filter(
+                rated_by__course_enrollments__course_id=course_id
+            ).distinct() 
+        rating_filter=request.query_params.get('rating')
+        if rating_filter and rating_filter!='all':
+            try:
+                rating_filter=int(rating_filter)
+            except (TypeError,ValueError):
+                return Response(
+                    {'error':'invalid rating value'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if rating_filter not in range(1,6):
+                return Response(
+                    {
+                        'error':'rating must be between 1 and 5'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            filtered_reviews=filtered_reviews.filter(rating=rating_filter)
+        sort=request.query_params.get('sort','newest')
+        sort_options={
+            'newest':'-created_at',
+            'oldest':'created_at',
+            'highest':'-rating',
+            'lowest':'rating',
+        }
+        if sort not in sort_options:
+            return Response(
+                {
+                    'error':'invalid sorting option'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        filtered_reviews=filtered_reviews.order_by(
+            sort_options[sort],
+            '-created_at'
+        )
+        total_reviews=filtered_reviews.count()
+        average_rating=visible_reviews.aggregate(
+            average=Avg('rating')
+        )['average'] or 0
+        average_rating=round(float(average_rating),2)
+        five_star=visible_reviews.filter(
+            rating=5
+        ).count()
+        learners=CourseEnrollment.objects.fiter(
+            course__mentor=mentor,
+            course__is_active=True,
+        ).values(
+            'user_id'
+        ).distinct().count()
+        distribution_data=visible_reviews.values(
+            'rating'
+        ).annotate(
+            count=Count('id')
+        )
+        distribution_lookup={
+            item['rating']:item['count']
+            for item in distribution_data
+        }
+        rating_distribution=[
+            {
+                'rating':star,
+                'count':distribution_lookup.get(star,0)
+            }
+            for star in range(5,0,-1)
+        ]
+        months=request.query_params.get('months','6')
+        try:
+            months=int(months)
+        except (TypeError,ValueError):
+            months=6
+        if months not in [6,12]:
+            months=6
+        today=timezone.localdate()
+        current_month=today.replace(day=1)
+        month_starts=[]
+        for i in range(months-1,-1,-1):
+            month_index=current_month.month-i
+            year=current_month.year
+            while month_index<=0:
+                month_index+=12
+                year-=1
+            month_starts.append(
+                current_month.replace(
+                    year=year,
+                    month=month_index
+                )
+            )
+        previous_month_index=current_month.month-1
+        previous_month_year=current_month.year
+        if previous_month_index==0:
+            previous_month_index=12
+            previous_month_year-=1
+        previous_month=current_month.replace(
+            year=previous_month_year,
+            month=previous_month_index,
+        )
+        trend_start_date=month_starts[0]
+        if previous_month<trend_start_date:
+            trend_start_date=previous_month
+        trend_start_datetime=timezone.make_aware(
+            datetime.combine(
+                trend_start_date,
+                time.min
+            )
+        )
+        monthly_data=visible_reviews.filter(
+            created_at__gte=trend_start_datetime
+        ).annotate(
+            month=TruncMonth('created_at')
+        ).values(
+            'month'
+        ).annotate(
+            average_rating=Avg('rating'),
+            total_reviews=Count('id')
+        ).order_by('month')
+        monthly_lookup={
+            item['month'].strftime('%Y-%m'):item
+            for item in monthly_data
+        }
+        monthly_trends=[]
+        for month in month_starts:
+            month_key=month.strftime('%Y-%m')
+            data=monthly_lookup.get(month_key,{})
+            monthly_trends.append({
+                'month':month.strftime('%b %Y'),
+                'average_rating':round(
+                    float(data.get('average_rating') or 0),2
+                ),
+                'total_reviews':data.get('total_reviews',0)
+            })
+        current_month_data=monthly_lookup.get(
+            current_month.strftime('%Y-%m')
+        )
+        previous_month_data=monthly_lookup.get(
+            previous_month.strftime('%Y-%m')
+        )
+        if current_month_data and previous_month_data:
+            growth=round(
+                float(current_month_data['average_rating'])-float(previous_month_data['average_rating']),2
+            )
+        else:
+            growth=0.00
+        courses=Course.objects.filter(
+            mentor=mentor
+        ).order_by('title').values(
+            'id',
+            'title'
+        )
         serializer_context={'request':request}
+        visible_serializer=MentorReviewSerializer(
+            filtered_reviews,
+            many=True,
+            context=serializer_context
+        )
+        hidden_serializer=MentorReviewSerializer(
+            hidden_reviews.order_by('-created_at'),
+            many=True,
+            context=serializer_context
+        )
         return Response(
             {
-                'reviews':MentorReviewSerializer(
-                    visible_reviews,
-                    many=True,
-                    context=serializer_context
-                ).data,
-                'hidden_reviews':MentorReviewSerializer(
-                    hidden_reviews,
-                    many=True,
-                    context=serializer_context
-                ).data,
-                'total_reviews':visible_reviews.count(),
+                'mentor':mentor_data,
+                'stats':{
+                    'overall_rating':average_rating,
+                    'total_reviews':total_reviews,
+                    'learners':learners,
+                    'five_star':five_star,
+                    'growth':growth
+                },
+                'rating_distribution':rating_distribution,
+                'monthly_trends':monthly_trends,
+                'reviews':visible_serializer.data,
+                'hidden_reviews':hidden_serializer.data,
                 'hidden_reviews_count':hidden_reviews.count(),
+                'courses':list(courses),
+                'filters':{
+                    'search':search,
+                    'course':course_id or 'all',
+                    'rating':rating_filter or 'all',
+                    'sort':sort,
+                    'months':months,
+                }
             },
             status=status.HTTP_200_OK,
         )
@@ -1012,13 +1223,13 @@ class MentorStudentsView(APIView):
         start_datetime=timezone.make_aware(
             datetime.combine(
                 week_start,
-                datetime.min().time()
+                datetime.min.time()
             )
         )
         end_datetime=timezone.make_aware(
             datetime.combine(
                 next_week_start,
-                datetime.min().time()
+                datetime.min.time()
             )
         )
         sessions_this_week=CourseSession.objects.filter(
@@ -1069,4 +1280,52 @@ class MentorStudentsView(APIView):
                 }
             },
             status=status.HTTP_200_OK,
+        )
+
+class MentorReviewReplyView(APIView):
+    permission_classes=[IsAuthenticated]
+    authentication_classes=[MentorJWTAuthentication]
+    def post(self,request,review_id):
+        mentor=request.user
+        if not mentor.user:
+            return Response(
+                {
+                    'error':'mentor account is not linked to a user account'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            review=UserRating.objects.get(
+                id=review_id,
+                rated_user=mentor.user
+            )
+        except UserRating.DoesNotExist:
+            return Response(
+                {
+                    'error':'review not found'
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        serializer=MentorReviewReplySerializer(
+            data=request.data
+        )
+        serializer.is_valid(raise_exception=True)
+        review.mentor_reply=serializer.validated_data['mentor_reply']
+        review.replied_at=timezone.now()
+        review.save(
+            update_fields=[
+                'mentor_reply',
+                'replied_at',
+            ]
+        )
+        return Response(
+            {
+                'message':'reply submitted successfully',
+                'reply':{
+                    'review_id':review.id,
+                    'mentor_reply':review.mentor_reply,
+                    'replied_at':review.replied_at,
+                }
+            },
+            status=status.HTTP_200_OK
         )

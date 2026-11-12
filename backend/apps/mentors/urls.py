@@ -1,4 +1,4 @@
-from .views import MentorDocumentListCreateView,MentorRegisterView,VerifyMentorRegistrationOTPView,ResendMentorRegistrationOTPView,MentorLoginView,MentorGoogleLoginView,MentorForgotPasswordView,MentorVerifyResetOTPView,MentorResetPasswordView,MentorDashboardView,MentorProfileUpdateView,UserMentorProfileView,UserMentorReviewView,MentorReceivedReviewsView,MentorStudentsView
+from .views import MentorDocumentListCreateView,MentorRegisterView,VerifyMentorRegistrationOTPView,ResendMentorRegistrationOTPView,MentorLoginView,MentorGoogleLoginView,MentorForgotPasswordView,MentorVerifyResetOTPView,MentorResetPasswordView,MentorDashboardView,MentorProfileUpdateView,UserMentorProfileView,UserMentorReviewView,MentorReceivedReviewsView,MentorStudentsView,MentorReviewReplyView
 from django.urls import path
 
 urlpatterns=[
@@ -77,4 +77,9 @@ urlpatterns=[
         MentorStudentsView.as_view(),
         name='mentor-students',
     ),
+    path(
+        'reviews/<int:review_id>/reply/',
+        MentorReviewReplyView.as_view(),
+        name='mentor-review-reply'
+    )
 ]

@@ -12,6 +12,8 @@ class MentorReviewSerializer(serializers.ModelSerializer):
         read_only=True
     )
     reviewer_image=serializers.SerializerMethodField()
+    mentor_reply=serializers.CharField(read_only=True)
+    replied_at=serializers.DateTimeField(read_only=True)
     class Meta:
         model=UserRating
         fields=[
@@ -23,7 +25,9 @@ class MentorReviewSerializer(serializers.ModelSerializer):
             'rating',
             'review',
             'created_at',
-            'is_hidden'
+            'is_hidden',
+            'mentor_reply',
+            'replied_at',
         ]
         read_only_fields=[
             'id',
@@ -47,3 +51,11 @@ class MentorReviewSerializer(serializers.ModelSerializer):
                     user.profile_image.url
                 )
         return None
+
+class MentorReviewReplySerializer(serializers.Serializer):
+    mentor_reply=serializers.CharField(
+        required=True,
+        allow_blank=False,
+        trim_whitespace=True,
+        max_length=2000
+    )

@@ -11,7 +11,9 @@ const ReviewCard=({review,onReply,replyLoading})=>{
     const [message,setMessage]=useState("")
     const [expanded,setExpanded]=useState(false)
     const profileImage=review?.reviewer_image?review.reviewer_image.startsWith('http')?review.reviewer_image:`${BACKEND_ORIGIN}${review.reviewer_image}`:null
-    const person=review.reviewer
+    const person={
+        id:review.reviewer_id
+    }
     const handleCloseReport=useCallback(()=>{
         setReportTarget(null)
     },[])
@@ -129,16 +131,8 @@ const onReportReview = () => {
         {review.reviewer_name}
       </h5>
 
-      {review.is_verified && (
-        <span className="verified-badge">
-          <i className="bi bi-patch-check-fill"></i>
-          Verified
-        </span>
-      )}
 
       <p className="review-meta mb-0">
-        {review.course_title}
-        {" • "}
         {formatDate(review.created_at)}
       </p>
     </div>
@@ -220,31 +214,11 @@ const onReportReview = () => {
                 </div>
 
 
-                {/* Tags */}
-                {review.tags?.length > 0 && (
-
-                    <div className="d-flex flex-wrap gap-2">
-
-                        {review.tags.map((tag) => (
-
-                            <span
-                                className="review-tag"
-                                key={tag}
-                            >
-                                #{tag}
-                            </span>
-
-                        ))}
-
-                    </div>
-
-                )}
-
             </div>
 
 
             {/* Existing Reply */}
-            {review.reply && (
+            {review.mentor_reply && (
 
                 <div className="mentor-reply">
 
@@ -265,7 +239,7 @@ const onReportReview = () => {
 
                                 <span className="review-meta">
                                     {formatDate(
-                                        review.reply.created_at
+                                        review.replied_at
                                     )}
                                 </span>
 
@@ -273,7 +247,7 @@ const onReportReview = () => {
 
 
                             <p className="mentor-reply-message mb-0">
-                                "{review.reply.message}"
+                                "{review.mentor_reply}"
                             </p>
 
                         </div>
@@ -286,13 +260,13 @@ const onReportReview = () => {
 
 
             {/* Reply Input */}
-            {!review.reply && (
+            {!review.mentor_reply && (
 
                 <div className="reply-box">
 
                     <textarea
                         className="form-control reply-textarea"
-                        placeholder={`Write a reply to ${review.student_name}...`}
+                        placeholder={`Write a reply to ${review.reviewer_name}...`}
                         value={message}
                         onChange={(e) =>
                             setMessage(e.target.value)

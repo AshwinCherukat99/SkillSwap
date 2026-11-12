@@ -76,6 +76,14 @@ class UserRating(models.Model):
     )
     rating=models.PositiveSmallIntegerField()
     review=models.TextField(blank=True)
+    mentor_reply=models.TextField(
+        blank=True,
+        null=True
+    )
+    replied_at=models.DateTimeField(
+        null=True,
+        blank=True,
+    )
     is_hidden=models.BooleanField(
         default=False
     )
