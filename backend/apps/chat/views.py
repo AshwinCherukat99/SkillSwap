@@ -18,7 +18,7 @@ from apps.courses.models import CourseEnrollment
 
 from .serializers import (MentorGroupSerializer,ChatMessageSerializer,ConversationMemberSerializer,ConversationSerializer)
 
-from apps.mentors.authentication import MentorJWTAuthentication,ChatJWTAuthentication
+from apps.mentors.authentication import MentorJWTAuthentication,ChatJWTAuthentication,DualAccountJWTAuthentication
 
 class MentorGroupListView(APIView):
     permission_classes=[IsAuthenticated]
@@ -518,7 +518,7 @@ class ChatAttachmentUploadView(APIView):
         )
 
 class VideoCallDetailsView(APIView):
-    authentication_classes=[MentorJWTAuthentication,JWTAuthentication]
+    authentication_classes=[DualAccountJWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request,conversation_id):
         try:
