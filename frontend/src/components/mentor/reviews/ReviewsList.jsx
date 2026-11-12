@@ -17,7 +17,7 @@ const ReviewsList=({
             )}
 
 
-            {filteredReviews.length === 0 ? (
+            {reviews.length === 0 ? (
 
                 <div className="glass-card empty-reviews">
 

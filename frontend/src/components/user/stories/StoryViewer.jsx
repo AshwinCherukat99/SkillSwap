@@ -66,7 +66,7 @@ const StoryViewer=({
         if (!reply.trim()) return
 
     }
-    const handeDelete=()=>{
+    const handleDelete=()=>{
         if (window.confirm('are you sure you want to delet this story?')){
             onDeleted(story.id)
         }

@@ -18,7 +18,7 @@ from apps.courses.models import CourseEnrollment
 
 from .serializers import (MentorGroupSerializer,ChatMessageSerializer,ConversationMemberSerializer,ConversationSerializer)
 
-from apps.mentors.authentication import MentorJWTAuthentication
+from apps.mentors.authentication import MentorJWTAuthentication,ChatJWTAuthentication
 
 class MentorGroupListView(APIView):
     permission_classes=[IsAuthenticated]
@@ -399,6 +399,7 @@ class MentorStartDirectChatView(APIView):
         )
 
 class ChatAttachmentUploadView(APIView):
+    authentication_classes=[ChatJWTAuthentication]
     parser_classes=[MultiPartParser,FormParser]
     permission_classes=[IsAuthenticated]
     @transaction.atomic

@@ -23,3 +23,20 @@ class MentorJWTAuthentication(JWTAuthentication):
                 code='user_not_found',
             )
         return mentor
+
+class ChatJWTAuthentication(JWTAuthentication):
+    def authenticate(self,request):
+        header=self.get_header(request)
+        if header is None:
+            return None
+        raw_token=self.get_raw_token(header)
+        if raw_token is None:
+            return None
+        validated_token=self.get_validated_token(raw_token)
+        account_type=validated_token.get('account_type')
+        if account_type=='MENTOR':
+            mentor_auth=MentorJWTAuthentication()
+            user=mentor_auth.get_user(validated_token)
+        else:
+            user=self.get_user(validated_token)
+        return (user,validated_token)
