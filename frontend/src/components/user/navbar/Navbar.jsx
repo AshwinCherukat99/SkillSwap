@@ -12,6 +12,7 @@ const mainNavItems=[
         {name:"Mentors",path:'/mentors'},
         { name: "Upcoming Sessions", path: "/upcoming_sessions" },
     { name: "Group Chats", path: "/chat" },
+    { name: "Stories", path: "/stories" },
     { name: "Recommendations", path: "/recommendations" },
     { name: "Friends", path: "/friends" },
     { name: "Courses", path: "/courses" },
