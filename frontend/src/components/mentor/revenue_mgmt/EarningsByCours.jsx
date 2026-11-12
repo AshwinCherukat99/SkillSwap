@@ -21,7 +21,7 @@ const EarningsByCourse=({transactions=[]})=>{
                 }
             }
             grouped[courseTitle].earnings+=Number(transaction.mentor_amount||0)
-            grouped[courseTitle].platform_fees+=Number(transaction.platform_fees||0)
+            grouped[courseTitle].platform_fees+=Number(transaction.platform_fee||0)
             grouped[courseTitle].transactions+=1
         })
         return Object.values(grouped).sort(

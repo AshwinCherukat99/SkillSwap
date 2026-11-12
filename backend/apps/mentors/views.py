@@ -1045,7 +1045,7 @@ class MentorReceivedReviewsView(APIView):
         five_star=visible_reviews.filter(
             rating=5
         ).count()
-        learners=CourseEnrollment.objects.fiter(
+        learners=CourseEnrollment.objects.filter(
             course__mentor=mentor,
             course__is_active=True,
         ).values(
