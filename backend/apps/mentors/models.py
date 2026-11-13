@@ -105,7 +105,8 @@ class MentorDocument(models.Model):
         related_name='documents',
     )
     document=models.FileField(
-        upload_to='mentor_documents/'
+        upload_to='mentor_documents/',
+        max_length=255,
     ) 
     external_url=models.URLField(
         blank=True,
