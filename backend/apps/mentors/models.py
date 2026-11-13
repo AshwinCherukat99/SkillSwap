@@ -165,6 +165,10 @@ class MentorVerification(models.Model):
     rejection_reason=models.TextField(
         blank=True,
     )
+    info_required_message=models.TextField(
+        blank=True,
+        null=True,
+    )
     created_at=models.DateTimeField(
         auto_now_add=True,
     )
