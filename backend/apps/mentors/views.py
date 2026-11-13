@@ -93,7 +93,7 @@ class MentorRegisterView(APIView):
     ]
     def post(self,request):
         data={
-            key:request.data.getList(key)
+            key:request.data.getlist(key)
             for key in request.data.keys()
         }
         data['documents']=request.FILES.getlist('documents')

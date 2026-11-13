@@ -16,7 +16,7 @@ const suggestions=[
 function BotIcon(){
     return (
         <span className="material-symbols-outlined">
-            smart-toy
+            smart_toy
         </span>
     )
 }
