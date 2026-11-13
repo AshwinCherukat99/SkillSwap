@@ -12,6 +12,12 @@ const VideoGrid = ({
     sessionTimeUp = false,
     isMentor,
     sessionType,
+    rating,
+    setRating,
+    submitRating,
+    ratingSubmitted,
+    ratingLoading,
+    ratingError
 }) => {
     const sharing = isScreenSharing || remoteScreenSharing;
     const remoteParticipantLabel=
@@ -117,6 +123,48 @@ const VideoGrid = ({
                             Your scheduled session has ended.
                             Thank you for participating!
                         </p>
+                        {sessionType==='SKILL_EXCHANGE'&&!isMentor&&(
+                            <div className="session-rating-section">
+                                {ratingSubmitted?(
+                                    <div className="rating-success">
+                                        <h3>Thankyou for your feedback</h3>
+                                        <p>Your rating has been submitted successfully</p>
+                                    </div>
+                                ):(
+                                    <>
+                                    <h3>Rate your skill partner</h3>
+                                    <div className="rating-stars">
+                                        {[1,2,3,4,5].map((star)=>(
+                                            <button
+                                            key={star}
+                                            type='button'
+                                            className={`rating-star ${rating>=star?'active':''}`}
+                                            onClick={()=>setRating(star)}
+                                            disabled={ratingLoading}>
+                                                ★
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <p className="rating-label">
+                                        {rating===0
+                                        ?'select your rating'
+                                    :`${rating} out of five stars`}
+                                    </p>
+                                    {ratingError&&(
+                                        <p className="rating-error">
+                                            {ratingError}
+                                        </p>
+                                    )}
+                                    <button
+                                    className="submit-rating-btn"
+                                    onClick={submitRating}
+                                    disabled={ratingLoading||rating===0}>
+                                        {ratingLoading?'Submitting...':'Submit Rating'}
+                                    </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

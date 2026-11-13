@@ -21,6 +21,10 @@ const ActiveVideoCall = ({
   accessToken,
 }) => {
   const navigate=useNavigate()
+  const [rating,setRating]=useState(0)
+  const [ratingSubmitted,setRatingSubmitted]=useState(false)
+  const [ratingLoading,setRatingLoading]=useState(false)
+  const [ratingError,setRatingError]=useState('')
   const [chatMessages, setChatMessages] = useState([]);
   const [sessionTimeUp,setSessionTimeUp]=useState(false)
   const [remainingSeconds,setRemainingSeconds]=useState(null)
@@ -92,7 +96,29 @@ const ActiveVideoCall = ({
       cancelled=true
     }
   },[conversationId,chatTokenKey])
-
+  const submitRating=async ()=>{
+    if (!rating){
+      setRatingError('please select a rating')
+      return
+    }
+    try{
+      setRatingLoading(true)
+      setRatingError('')
+      const response=await api.post(
+        `/sessions/${conversationId}/rating/`,
+        {
+          rating
+        }
+      )
+      setRatingSubmitted(true)
+    }catch(err){
+      setRatingError(
+        err.response?.data?.error||'unable to submit rating'
+      )
+    }finally{
+      setRatingLoading(false)
+    }
+  }
   const {
     localVideoRef,
     remoteVideoRef,
@@ -187,6 +213,12 @@ const ActiveVideoCall = ({
             remoteCameraThumbnailRef={remoteCameraThumbnailRef}
             isMentor={isMentor}
             sessionType={sessionDetails?.session_type}
+            rating={rating}
+            setRating={setRating}
+            submitRating={submitRating}
+            ratingSubmitted={ratingSubmitted}
+            ratingLoading={ratingLoading}
+            ratingError={ratingError}
           />
           <SessionProgress duration={sessionDetails?.duration_minutes}
           scheduledStart={sessionDetails?.scheduled_start}/>

@@ -589,6 +589,7 @@ class VideoCallDetailsView(APIView):
         return Response(
             {
                 'conversation_id':conversation.id,
+                'session_id':session.id,
                 'session_type':session_type,
                 'duration_minutes':session.duration_minutes,
                 'scheduled_start':session.scheduled_start,

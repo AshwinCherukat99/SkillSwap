@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView,AdminSessionManagementView,SessionRequestSkillOptionsView,AdminSessionActionView
+from .views import MentorScheduleCourseSessionView,SessionHistoryView,UpcomingSessionsView,SessionRequestQueueView,SessionRequestActionView,MentorUpcomingSessionsView,MentorCancelSessionView,SendSessionRequestView,ReceivedSessionRequestsView,AcceptSessionRequestView,RejectSessionRequestView,MentorCourseSessionHistoryView,AdminSessionManagementView,SessionRequestSkillOptionsView,AdminSessionActionView,SkillExchangeRatingView
 
 urlpatterns=[
     path(
@@ -78,4 +78,9 @@ urlpatterns=[
         AdminSessionActionView.as_view(),
         name='admin-session-action',
     ),
+    path(
+        '<int:conversation_id>/rating/',
+        SkillExchangeRatingView.as_view(),
+        name='skill-exchange-rating'
+    )
 ]

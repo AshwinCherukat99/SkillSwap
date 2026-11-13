@@ -1,7 +1,7 @@
 from django.shortcuts import render,get_object_or_404
 from django.utils import timezone
 from django.db.models import Q
-from django.db import transaction
+from django.db import transaction,IntegrityError
 
 from datetime import timedelta
 
@@ -9,16 +9,20 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from .models import CourseSession,SkillExchangeSession
 from apps.courses.models import CourseEnrollment
 from apps.accounts.models import User
 from apps.skills.models import Skill,UserSkill
+from apps.chat.models import Conversation
+from apps.mentors.models import Mentor
 from .serializers.course_session import MentorCourseSessionCreateSerializer
 from .serializers.session_history import SkillExchangeSessionHistorySerializer,CourseSessionHistorySerializer,MentorCourseSessionHistorySerializer
 from .serializers.upcoming_session import UpcomingSkillExchangeSerializer,UpcomingCourseSessionSerializer,MentorUpcomingSessionSerializer
 from .serializers.session_request import FriendSessionRequestSerializer,RecievedSessionRequestSerializer
 from .serializers.admin import AdminCourseSessionSerializer,AdminSkillExchangeSessionSerializer
+from .serializers.rating import SkillExchangeRatingSerializer
 
 from apps.chat.services import create_skill_conversation,create_course_conversation
 
@@ -1179,4 +1183,84 @@ class AdminSessionActionView(APIView):
                 'detail':'invalid action'
             },
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+class SkillExchangeRatingView(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def post(self,request,conversation_id):
+        try:
+            conversation=Conversation.objects.select_related(
+                'skill_exchange_session__requester',
+                'skill_exchange_session__recipient'
+            ).get(id=conversation_id)
+        except Conversation.DoesNotExist:
+            return Response(
+                {
+                    'error':'conversation not found'
+                },
+                status=status.HTTP_404_NOT_FOUND
+            )
+        if not conversation.skill_exchange_session_id:
+            return Response(
+                {
+                    'error':'this conversation is not linked to a skill exchange session'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if isinstance(request.user,Mentor):
+            return Response(
+                {
+                    'error':'mentors cannot submit skill exchange ratings'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        session=conversation.skill_exchange_session
+        if request.user.id==session.requester_id:
+            rated_user=session.recipient
+        elif request.user.id==session.recipient_id:
+            rated_user=session.requester
+        else:
+            return Response(
+                {
+                    'error':'you are not a participant in this session'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        if not session.actual_started_at:
+            return Response(
+                {
+                    'error':'you cannot rate a session that has not started'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer=SkillExchangeRatingSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            with transaction.atomic():
+                rating=serializer.save(
+                    rated_by=request.user,
+                    rated_user=rated_user,
+                    session_id=session.id
+                )
+        except IntegrityError:
+            return Response(
+                {
+                    'error':'you have already submitted a rating for this session'
+                },
+                status=status.HTTP_409_CONFLICT
+            )
+        return Response(
+            {
+                'message':'your rating has been submitted successfully',
+                'rating':{
+                    'id':rating.id,
+                    'session_id':rating.session_id,
+                    'rated_by':rating.rated_by.username,
+                    'rated_user':rating.rated_user.username,
+                    'rating':rating.rating,
+                    'created_at':rating.created_at
+                }
+            },
+            status=status.HTTP_201_CREATED
         )

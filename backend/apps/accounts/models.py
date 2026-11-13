@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q,F
 from django.contrib.auth.models import AbstractUser 
 from .managers import UserManager
 from django.utils import timezone 
@@ -74,6 +75,11 @@ class UserRating(models.Model):
         on_delete=models.CASCADE,
         related_name='given_rating'
     )
+    session_id=models.PositiveBigIntegerField(
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     rating=models.PositiveSmallIntegerField()
     review=models.TextField(blank=True)
     mentor_reply=models.TextField(
@@ -90,6 +96,22 @@ class UserRating(models.Model):
     created_at=models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f'{self.rated_by}->{self.rated_user}({self.rating})'
+    class Meta:
+        constraints=[
+            models.UniqueConstraint(
+                fields=['session_id','rated_by','rated_user'],
+                condition=Q(session_id__isnull=False),
+                name='unique_rating_per_user_per_session'
+            ),
+            models.CheckConstraint(
+                condition=Q(rating__gte=1)&Q(rating__lte=5),
+                name='user_rating_between_1_and_5'
+            ),
+            models.CheckConstraint(
+                condition=~Q(rated_by=F('rated_user')), 
+                name='user_cannot_rate_self'
+            )
+        ]
 
 class Friendship(models.Model):
     class Status(models.TextChoices):

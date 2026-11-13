@@ -1145,3 +1145,66 @@
 .open-whiteboard-button:hover {
     background: #4338ca;
 }
+
+.session-rating-section {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid #ddd;
+}
+
+.session-rating-section h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+}
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.rating-star {
+    background: none;
+    border: none;
+    font-size: 35px;
+    color: #777;
+    cursor: pointer;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.rating-star.active {
+    color: #f5b400;
+}
+
+.rating-star:hover {
+    transform: scale(1.15);
+}
+
+.rating-label {
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.rating-error {
+    color: #dc3545;
+    font-size: 13px;
+}
+
+.submit-rating-btn {
+    margin-top: 12px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+}
+
+.submit-rating-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.rating-success {
+    color: #16a34a;
+}
