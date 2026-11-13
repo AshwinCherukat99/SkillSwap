@@ -60,6 +60,10 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 {'error':'this account is inactive'}
             )
+        if hasattr(user,'mentor_profile'):
+            raise serializers.ValidationError({
+                'error':'please use mentor login portal'
+            })
         attrs['user']=user
         return attrs
 
