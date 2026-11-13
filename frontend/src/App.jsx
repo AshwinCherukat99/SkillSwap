@@ -106,9 +106,9 @@ function App(){
         }
         />
         <Route path='/login/' element={
-          <PublicRoute>
+          
             <Login/>
-          </PublicRoute>
+          
           }/>
           <Route path='/forgot-password/' element={
             <PublicRoute>
@@ -121,14 +121,14 @@ function App(){
             </PublicRoute>
           }/>
         <Route path='/register' element={
-          <PublicRoute>
+          
             <Register/>
-          </PublicRoute>
+          
         }/>
         <Route path='/verify-email/' element={
-          <PublicRoute>
+          
             <VerifyEmail/>
-          </PublicRoute>
+         
         }/>
         <Route
   path="/video-call/:roomName/:conversationId"
