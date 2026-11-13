@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
+from django.http import QueryDict
 from django.conf import settings
 from django.utils import timezone
 from datetime import date,timedelta,datetime,time
@@ -91,17 +92,12 @@ class MentorRegisterView(APIView):
         FormParser,
     ]
     def post(self,request):
-        data = request.data.copy()
-
-        data.setlist(
-            "documents",
-            request.FILES.getlist("documents")
-        )
-
-        data.setlist(
-            "document_types",
-            request.data.getlist("document_types")
-        )
+        data={
+            key:request.data.getList(key)
+            for key in request.data.keys()
+        }
+        data['documents']=request.FILES.getlist('documents')
+        data['document_types']=request.FILES.getlist('document_types')
         serializer=MentorRegisterSerializer(
             data=data
         )

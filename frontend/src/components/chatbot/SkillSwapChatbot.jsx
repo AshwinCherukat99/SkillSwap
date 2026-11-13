@@ -15,8 +15,8 @@ const suggestions=[
 
 function BotIcon(){
     return (
-        <span className="material-symbols-outlined ss-bot-icon">
-            auto-awesome
+        <span className="material-symbols-outlined">
+            smart-toy
         </span>
     )
 }
