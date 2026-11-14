@@ -96,7 +96,7 @@ const AdditionalDocumentsModal=({
                 formData.append('document_types',item.documentType)
             })  
             await mentorApi.post(
-                '/mentor/additional-documents/',
+                '/mentors/additional-documents/',
                 formData
             )  
             await onSuccess()
