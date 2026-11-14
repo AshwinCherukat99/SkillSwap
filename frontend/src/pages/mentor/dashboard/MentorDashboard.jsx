@@ -355,7 +355,7 @@ function MentorDashboard() {
             </main>
             {showAdditionalDocumentsModal&&(
                 <AdditionalDocumentsModal
-                message={document.verification.info_required_mesage}
+                message={dashboard.verification.info_required_message}
                 onClose={()=>setShowAdditionalDocumentsModal(false)}
                 onSuccess={async ()=>{
                     const response=await mentorApi.get(

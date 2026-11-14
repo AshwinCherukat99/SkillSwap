@@ -1,14 +1,13 @@
 import { useState } from "react";
 import mentorApi from '../../../services/mentorApi'
 
-const DODUMENT_TYPES=[
-    "Identity Proof",
-    "Degree Certificate",
-    "Professional Certification",
-    "Work Experience Proof",
-    "Portfolio",
-    "Other",
-]
+const DOCUMENT_CATEGORIES = [
+    { value: "IDENTITY", label: "Identity" },
+    { value: "EDUCATION", label: "Education" },
+    { value: "CERTIFICATION", label: "Certification" },
+    { value: "PORTFOLIO", label: "Portfolio" },
+    { value: "OTHER", label: "Other" },
+];
 
 const MAX_FILE_SIZE=10*1024*1024
 
@@ -20,6 +19,7 @@ const AdditionalDocumentsModal=({
     const [documents,setDocuments]=useState([
         {
             id:Date.now(),
+            category:'',
             documentType:'',
             file:null,
         }
@@ -38,7 +38,8 @@ const AdditionalDocumentsModal=({
             ...previous,
             {
                 id:Date.now()+Math.random(),
-                doumentType:'',
+                category:'',
+                documentType:'',
                 file:null,
             }
         ])
@@ -54,36 +55,44 @@ const AdditionalDocumentsModal=({
             setError('please select at least one document')
             return
         }
-        for (const item of documents){
-            if (!item.documentType||!item.file){
-                setError(
-                    'please select a document type and file for each document'
-                )
-                return
-            }
-            const validTypes=[
-                'application/pdf',
-                'image/jpeg',
-                'image/png',
-            ]
-            if (!validTypes.includes(item.file.type)){
-                setError(
-                    `${item.file.name}:only pdf,jpeg and png files are allowed`
-                )
-                return
-            } 
-            if (item.file_size>MAX_FILE_SIZE){
-                setError(
-                    `${item.file.name} exceeds 10 mb limit`
-                )
-                return
-            }
-        }
+        for (const item of documents) {
+    if (
+        !item.category ||
+        !item.documentType.trim() ||
+        !item.file
+    ) {
+        setError(
+            "Please select a category, enter a document type, and select a file for each document."
+        );
+        return;
+    }
+
+    const validTypes = [
+        "application/pdf",
+        "image/jpeg",
+        "image/png",
+    ];
+
+    if (!validTypes.includes(item.file.type)) {
+        setError(
+            `${item.file.name}: Only PDF, JPEG and PNG files are allowed.`
+        );
+        return;
+    }
+
+    if (item.file.size > MAX_FILE_SIZE) {
+        setError(
+            `${item.file.name} exceeds the 10 MB limit.`
+        );
+        return;
+    }
+}
         try{
             setLoading(true)
             const formData=new FormData()
             documents.forEach((item)=>{
                 formData.append('documents',item.file)        
+                formData.append("categories", item.category)
                 formData.append('document_types',item.documentType)
             })  
             await mentorApi.post(
@@ -100,17 +109,41 @@ const AdditionalDocumentsModal=({
     }  
     return (
         <div
-            className="modal d-block"
-            tabIndex="-1"
+    className="modal d-block"
+    tabIndex="-1"
+    style={{
+        position: "fixed",
+        inset: 0,
+        background: "rgba(0,0,0,0.6)",
+        zIndex: 1060,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "16px",
+        overflowY: "auto",
+    }}
+>
+    <div
+        className="modal-dialog modal-lg"
+        style={{
+            width: "100%",
+            maxWidth: "800px",
+            margin: 0,
+            maxHeight: "calc(100vh - 32px)",
+        }}
+    >
+        <div
+            className="modal-content border-0 shadow"
             style={{
-                background: "rgba(0,0,0,0.6)",
-                zIndex: 1060,
+                maxHeight: "calc(100vh - 32px)",
+                display: "flex",
+                flexDirection: "column",
+                overflow: "hidden",
             }}
         >
-            <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                <div className="modal-content border-0 shadow">
 
-                    <div className="modal-header">
+                    <div className="modal-header"
+                    style={{ flexShrink: 0 }}>
                         <div>
                             <h5 className="modal-title fw-bold">
                                 Additional Documents Required
@@ -129,9 +162,21 @@ const AdditionalDocumentsModal=({
                         />
                     </div>
 
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={handleSubmit}
+                    style={{
+        display: "flex",
+        flexDirection: "column",
+        flex: "1 1 auto",
+        minHeight: 0,
+        overflow: "hidden",
+    }}>
 
-                        <div className="modal-body">
+                        <div className="modal-body"
+                        style={{
+        flex: "1 1 auto",
+        minHeight: 0,
+        overflowY: "auto",
+    }}>
 
                             <div className="alert alert-warning">
                                 <div className="fw-semibold mb-1">
@@ -177,37 +222,61 @@ const AdditionalDocumentsModal=({
                                         )}
                                     </div>
 
-                                    <div className="mb-3">
-                                        <label className="form-label">
-                                            Document Type
-                                        </label>
+                                    {/* DOCUMENT CATEGORY */}
+<div className="mb-3">
+    <label className="form-label">
+        Document Category
+    </label>
 
-                                        <select
-                                            className="form-select"
-                                            value={item.documentType}
-                                            disabled={loading}
-                                            onChange={(e) =>
-                                                handleDocumentChange(
-                                                    item.id,
-                                                    "documentType",
-                                                    e.target.value
-                                                )
-                                            }
-                                        >
-                                            <option value="">
-                                                Select document type
-                                            </option>
+    <select
+        className="form-select"
+        value={item.category}
+        disabled={loading}
+        required
+        onChange={(e) =>
+            handleDocumentChange(
+                item.id,
+                "category",
+                e.target.value
+            )
+        }
+    >
+        <option value="">Select category</option>
 
-                                            {DOCUMENT_TYPES.map((type) => (
-                                                <option
-                                                    key={type}
-                                                    value={type}
-                                                >
-                                                    {type}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
+        {DOCUMENT_CATEGORIES.map((category) => (
+            <option
+                key={category.value}
+                value={category.value}
+            >
+                {category.label}
+            </option>
+        ))}
+    </select>
+</div>
+
+{/* DOCUMENT TYPE */}
+<div className="mb-3">
+    <label className="form-label">
+        Document Type
+    </label>
+
+    <input
+        type="text"
+        className="form-control"
+        placeholder="e.g. Bachelor's Degree Certificate"
+        value={item.documentType}
+        maxLength={100}
+        disabled={loading}
+        required
+        onChange={(e) =>
+            handleDocumentChange(
+                item.id,
+                "documentType",
+                e.target.value
+            )
+        }
+    />
+</div>
 
                                     <div>
                                         <label className="form-label">
@@ -258,7 +327,12 @@ const AdditionalDocumentsModal=({
 
                         </div>
 
-                        <div className="modal-footer">
+                        <div className="modal-footer"
+                        style={{
+        flexShrink: 0,
+        background: "#fff",
+        borderTop: "1px solid #dee2e6",
+    }}>
                             <button
                                 type="button"
                                 className="btn btn-light"
