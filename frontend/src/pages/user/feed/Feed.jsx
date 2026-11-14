@@ -35,6 +35,15 @@ function Feed(){
     console.log("Suggested mentors state:", suggestedMentors);
     console.log("Sidebar loading:", loadingSidebar);
 }, [trendingSkills, suggestedMentors, loadingSidebar]);
+const getMentorProfileImage = (image) => {
+    if (!image) return "/default-avatar.png";
+
+    if (image.startsWith("http")) {
+        return image;
+    }
+
+    return `${BACKEND_ORIGIN}${image.startsWith("/") ? "" : "/"}${image}`;
+};
     const profileImage = user?.profile_image
     ? user.profile_image.startsWith("http")
         ? user.profile_image
@@ -334,7 +343,7 @@ function Feed(){
                     {mentor.profile_image ? (
 
                         <img
-                            src={mentor.profile_image}
+                            src={getMentorProfileImage(mentor.profile_image)}
                             alt={mentor.full_name}
                             className="rounded-circle border"
                             style={{

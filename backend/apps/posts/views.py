@@ -193,7 +193,7 @@ class FeedSidebarView(APIView):
                 'total_reviews':mentor.total_reviews,
                 'profile_image':(
                     request.build_absolute_uri(
-                    mentor.profile_image
+                    mentor.profile_image.url
                 ) if mentor.profile_image else None
                 )
             })

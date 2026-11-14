@@ -31,6 +31,8 @@ const ActiveVideoCall = ({
   const endCallTriggered=React.useRef(false)
   const [sessionDetails,setSessionDetails]=useState(null)
   const [sessionDetailsError,setSessionDetailsError]=useState('') 
+  const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
+  const isMentor=chatTokenKey==='mentor_access_token'
   useEffect(() => {
   console.log("VIDEO CALL PARTICIPANT DEBUG:", {
     isMentor,
@@ -42,8 +44,6 @@ const ActiveVideoCall = ({
     remoteUsername: sessionDetails?.remote_username,
   });
 }, [isMentor, chatTokenKey, conversationId, sessionDetails]);
-  const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
-  const isMentor=chatTokenKey==='mentor_access_token'
   const [showWhiteboard,setShowWhiteboard]=useState(false)
   const handleWhiteboardVisibility=useCallback((isOpen)=>{
     setShowWhiteboard(isOpen)
