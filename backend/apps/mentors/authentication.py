@@ -52,11 +52,11 @@ class DualAccountJWTAuthentication(JWTAuthentication):
         validated_token=self.get_validated_token(raw_token)
         account_type=validated_token.get('account_type')
         if account_type=='MENTOR':
-            user=MentorJWTAuthentication.get_user(
+            user=MentorJWTAuthentication().get_user(
                 validated_token
             )
         else:
-            user=JWTAuthentication.get_user(
+            user=super().get_user(
                 validated_token
             )
         return (user,validated_token)
