@@ -85,7 +85,7 @@ const DocumentVerification=()=>{
         try{
             setActionLoading(true)
             await adminApi.post(
-                `/admin/mentors/${mentorId}/verification/request-info`,
+                `/admin/mentors/${mentorId}/verification/request-info/`,
                 {
                     message,
                 }
@@ -245,6 +245,16 @@ const DocumentVerification=()=>{
                                     mentor={mentor}
                                     verification={verification}
                                 />
+
+                                {verification?.status === "INFO_REQUIRED" &&
+    verification?.info_required_message && (
+        <div className="alert alert-warning">
+            <h6>Additional Information Requested</h6>
+            <p className="mb-0">
+                {verification.info_required_message}
+            </p>
+        </div>
+    )}
 
                                 <VerificationChecklist
                                     verification={verification}

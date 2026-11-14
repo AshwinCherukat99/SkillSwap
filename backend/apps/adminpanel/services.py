@@ -56,12 +56,12 @@ def request_mentor_info(mentor,message):
         mentor=mentor
     ) 
     verification.status=MentorVerification.Status.INFO_REQUIRED
-    verification.rejection_reason=message
+    verification.info_required_message=message
     verification.reviewed_at=timezone.now()
     verification.save(
         update_fields=[
             'status',
-            'rejection_reason',
+            'info_required_message',
             'reviewed_at',
         ]
     ) 

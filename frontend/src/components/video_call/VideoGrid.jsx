@@ -23,7 +23,7 @@ const VideoGrid = ({
     const remoteParticipantLabel=
     sessionType==='COURSE'
     ?(isMentor?'Student':'Mentor')
-    :'Skill Partner'
+    :sessionType==='SKILL_EXCHANGE'?'Skill Partner':'Loading...'
     return (
         <div className={`video-grid ${sharing ? "screen-sharing-active" : ""}`}>
 

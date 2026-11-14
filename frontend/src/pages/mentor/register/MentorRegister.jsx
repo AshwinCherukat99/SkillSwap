@@ -84,13 +84,21 @@ function MentorRegister() {
                 (file) => ({
                     file,
                     category:
-                        "Professional Certificate",
+                        "",
+                    documentType:'',
                     uploadProgress: 100,
                     uploaded: true,
                 })
             ),
         ]);
     };
+
+    const updateDocumentType=(index,documentType)=>{
+        setDocuments((previous)=>
+        previous.map((item,itemIndex)=>
+        itemIndex===index
+    ?{...item,documentType}:item))
+    }
 
     const removeDocument = (
         index
@@ -284,9 +292,14 @@ function MentorRegister() {
             );
 
             formDataToSend.append(
-                "document_types",
+                "document_categories",
                 item.category
             );
+
+            formDataToSend.append(
+                'document_types',
+                item.documentType
+            )
         });  
 
         if (formData.password!==formData.password2){
@@ -303,6 +316,37 @@ function MentorRegister() {
     "EMAIL BEING SENT:",
     formData.email
 );
+
+const requiredCategories = [
+    "IDENTITY",
+    "EDUCATION",
+    "CERTIFICATION",
+    "PORTFOLIO",
+];
+
+const submittedCategories = new Set(
+    documents.map((item) => item.category)
+);
+
+const missingCategories = requiredCategories.filter(
+    (category) => !submittedCategories.has(category)
+);
+
+if (missingCategories.length > 0) {
+    setError(
+        `Please upload documents for all required categories. Missing: ${missingCategories.join(", ")}`
+    );
+    return;
+}
+
+const incompleteDocuments = documents.some(
+    (item) => !item.category || !item.documentType?.trim()
+);
+
+if (incompleteDocuments) {
+    setError("Please select a category and document type for every document.");
+    return;
+}
 
         const response = await fetch(
             `${API_BASE_URL}/mentors/register/`,
@@ -1057,48 +1101,28 @@ function MentorRegister() {
                                                                     )
                                                                 }
                                                             >
-                                                                <option>
-                                                                    Professional
-                                                                    Certificate
-                                                                </option>
-
-                                                                <option>
-                                                                    University
-                                                                    Degree
-                                                                </option>
-
-                                                                <option>
-                                                                    Diploma
-                                                                </option>
-
-                                                                <option>
-                                                                    Award
-                                                                </option>
-
-                                                                <option>
-                                                                    Competition
-                                                                    Achievement
-                                                                </option>
-
-                                                                <option>
-                                                                    Industry
-                                                                    Certification
-                                                                </option>
-
-                                                                <option>
-                                                                    Government
-                                                                    License
-                                                                </option>
-
-                                                                <option>
-                                                                    Portfolio
-                                                                </option>
-
-                                                                <option>
-                                                                    Other
-                                                                </option>
+                                                                <option value="">Select Category</option>
+                                                                <option value="IDENTITY">Identity</option>
+                                                                <option value="EDUCATION">Education</option>
+                                                                <option value="CERTIFICATION">Certification</option>
+                                                                <option value="PORTFOLIO">Portfolio</option>
+                                                                <option value="OTHER">Other</option>
                                                             </select>
                                                         </label>
+                                                        <label className="document-category-label">
+    Document Type
+
+    <input
+        type="text"
+        value={documentItem.documentType || ""}
+        onChange={(event) =>
+            updateDocumentType(index, event.target.value)
+        }
+        placeholder="e.g. Passport, University Degree"
+        maxLength={100}
+        required
+    />
+</label>
                                                     </div>
                                                 </div>
 

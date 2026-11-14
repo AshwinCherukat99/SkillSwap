@@ -94,7 +94,13 @@ class MentorProfile(models.Model):
     teaching_niche=models.TextField(blank=True,) 
     updated_at=models.DateTimeField(auto_now=True,)
 
-class MentorDocument(models.Model): 
+class MentorDocument(models.Model):
+    class Category(models.TextChoices):
+        IDENTITY='IDENTITY','Identity'
+        EDUCATION='EDUCATION','Education'
+        CERTIFICATION='CERTIFICATION','Certification'
+        PORTFOLIO='PORTFOLIO','Portfolio'
+        OTHER='OTHER','Other' 
     class Status(models.TextChoices):
         PENDING='PENDING','Pending'
         APPROVED='APPROVED','Approved' 
@@ -112,6 +118,11 @@ class MentorDocument(models.Model):
         blank=True,
         null=True,
     )
+    category=models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.OTHER
+    )
     document_type=models.CharField(
         max_length=100,
     )
@@ -122,6 +133,9 @@ class MentorDocument(models.Model):
     ) 
     rejection_reason=models.TextField(
         blank=True,
+    )                   
+    is_additional=models.BooleanField(
+        default=False
     )
     uploaded_at=models.DateTimeField(
         auto_now_add=True,

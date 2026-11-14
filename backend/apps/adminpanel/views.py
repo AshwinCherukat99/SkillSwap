@@ -148,6 +148,7 @@ class MentorVerificationDetailView(APIView):
                     'portfolio_verified':verification.portfolio_verified,
                     'internal_notes':verification.internal_notes,
                     'rejection_reason':verification.rejection_reason,
+                    'info_required_message':verification.info_required_message,
                     'created_at':verification.created_at,
                     'reviewed_at':verification.reviewed_at,
                 },
@@ -163,6 +164,7 @@ class MentorVerificationDetailView(APIView):
                         'document_type':document.document_type,
                         'status':document.status,
                         'rejection_reason':document.rejection_reason,
+                        'is_additional':document.is_additional,
                         'uploaded_at':document.uploaded_at,
                         'reviewed_at':document.reviewed_at,
                     }

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import mentorApi from "../../../services/mentorApi";
+import AdditionalDocumentsModal from "../../../components/mentor/verification/AdditionalDocumentsModal";
 import "./MentorDashboard.css";
 
 function MentorDashboard() {
     const navigate = useNavigate();
+    const [showAdditionalDocumentsModal,setShowAdditionalDocumentsModal]=useState(false)
     const [mentor, setMentor] = useState(null);
     const [dashboard, setDashboard] = useState(null);
     const [period,setPeriod]=useState('6')
@@ -27,6 +29,7 @@ function MentorDashboard() {
                 setMentor(response.data.mentor);
                 setDashboard(response.data);
                 setCourses(response.data.courses || []);
+                setShowAdditionalDocumentsModal(response.data.verification?.status==='INFO_REQUIRED')
             } catch (err) {
                 console.log("Failed to load mentor dashboard:", err);
                 if (err.response?.status === 401) {
@@ -350,6 +353,22 @@ function MentorDashboard() {
                     </div>
                 </div>
             </main>
+            {showAdditionalDocumentsModal&&(
+                <AdditionalDocumentsModal
+                message={document.verification.info_required_mesage}
+                onClose={()=>setShowAdditionalDocumentsModal(false)}
+                onSuccess={async ()=>{
+                    const response=await mentorApi.get(
+                        `/mentors/dashboard/?period=${period}`
+                    )         
+                    setMentor(response.data.mentor)
+                    setDashboard(response.data)
+                    setCourses(response.data.courses||[])       
+                    setShowAdditionalDocumentsModal(
+                        response.data.verification?.status==='INFO_REQUIRED'
+                    )
+                }}/>
+            )}
         </div>
     );
 }

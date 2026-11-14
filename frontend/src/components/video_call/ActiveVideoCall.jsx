@@ -30,7 +30,18 @@ const ActiveVideoCall = ({
   const [remainingSeconds,setRemainingSeconds]=useState(null)
   const endCallTriggered=React.useRef(false)
   const [sessionDetails,setSessionDetails]=useState(null)
-  const [sessionDetailsError,setSessionDetailsError]=useState('')
+  const [sessionDetailsError,setSessionDetailsError]=useState('') 
+  useEffect(() => {
+  console.log("VIDEO CALL PARTICIPANT DEBUG:", {
+    isMentor,
+    chatTokenKey,
+    conversationId,
+    sessionDetails,
+    sessionType: sessionDetails?.session_type,
+    currentUsername: sessionDetails?.current_username,
+    remoteUsername: sessionDetails?.remote_username,
+  });
+}, [isMentor, chatTokenKey, conversationId, sessionDetails]);
   const chatTokenKey=accessToken&&accessToken===localStorage.getItem('mentor_access_token')?'mentor_access_token':'access_token'
   const isMentor=chatTokenKey==='mentor_access_token'
   const [showWhiteboard,setShowWhiteboard]=useState(false)
@@ -52,10 +63,18 @@ const ActiveVideoCall = ({
         }
       }catch(err){
         console.error(
-          'failed to load video session details:',err.response?.data||err
+          console.error(
+            'session details error:',{
+              status:err.response?.status,
+              data:err.response?.data,
+              message:err.message,
+            }
+          )
         )
         if (!cancelled){
           setSessionDetailsError(
+            err.response?.data?.detail||
+            err.response?.data?.error||
             'unable to load session details'
           )
         }
@@ -67,7 +86,7 @@ const ActiveVideoCall = ({
     return ()=>{
       cancelled=true
     }
-  },[conversationId,chatTokenKey])
+  },[conversationId,chatTokenKey,isMentor])
 
   useEffect(()=>{
     let cancelled=false
@@ -225,7 +244,16 @@ const ActiveVideoCall = ({
         </section>
 
         <aside className="call-sidebar">
-          <CallSidebar 
+          {sessionDetailsError?(
+            <div className="text-danger p-3">
+              {sessionDetailsError}
+            </div>
+          ):!sessionDetails?(
+            <div className="p-3">
+              Loading session details...
+            </div>
+          ):(
+            <CallSidebar 
           sessionType={sessionDetails?.session_type}
           connected={callConnected}
           currentUsername={sessionDetails?.current_username}
@@ -233,6 +261,7 @@ const ActiveVideoCall = ({
           durationMinutes={sessionDetails?.duration_minutes}
           isMentor={isMentor}
           />
+          )}
           <InCallChat
             messages={chatMessages}
             onSendMessage={(message) => sendMessage({ message })}

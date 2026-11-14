@@ -11,7 +11,7 @@ const CallSidebar=({
     const remoteParticipantLabel=
     sessionType==='COURSE'
     ?(isMentor?'Student':'Mentor')
-    :'Skill Partner'
+    :sessionType==='SKILL_EXCHANGE'?'Skill Partner':'Loading...'
     return (
         <div className="call-sidebar-content">
 

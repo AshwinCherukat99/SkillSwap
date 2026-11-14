@@ -11,11 +11,12 @@ from datetime import date,timedelta,datetime,time
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from .authentication import MentorJWTAuthentication
-from .models import MentorDocument,Mentor,MentorProfile
+from .models import MentorDocument,Mentor,MentorProfile,MentorVerification
 from apps.sessions_mgmt.models import CourseSession
 from apps.chat.models import Conversation
 from apps.accounts.models import UserRating
 from apps.courses.models import Course,CourseEnrollment
+from django.db import transaction
 from django.db.models import Count,Avg,Q
 from django.db.models.functions import TruncMonth
 from django.core.exceptions import ObjectDoesNotExist
@@ -424,6 +425,9 @@ class MentorDashboardView(APIView):
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
+        verification=MentorVerification.objects.filter(
+            mentor=mentor
+        ).first()
         mentor_courses=Course.objects.filter(
             mentor=mentor,
             status=Course.Status.PUBLISHED,
@@ -557,7 +561,11 @@ class MentorDashboardView(APIView):
         }
         return Response(
             {
-                'mentor':mentor_data,
+                'mentor':mentor_data,       
+                'verification':{
+                    'status':verification.status,
+                    'info_required_message':verification.info_required_message,
+                } if verification else None,
                 'courses':courses,
                 'stats':{
                     'total_students':total_students,
@@ -1324,4 +1332,117 @@ class MentorReviewReplyView(APIView):
                 }
             },
             status=status.HTTP_200_OK
+        )
+
+class SubmitAdditionalDocumentsView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    parser_classes=[MultiPartParser,FormParser]
+    def post(self,request):
+        mentor=request.user
+        if not mentor.is_active:
+            return Response(
+                {
+                    'error':'mentor account is inactive'
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
+        documents=request.FILES.getlist('documents')
+        document_categories=request.data.getlist('document_categories')
+        document_types=request.data.getlist('document_types')
+        if not documents:
+            return Response(
+                {
+                    'error':'please upload at least one document'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not len(documents)==len(document_categories)==len(document_types):
+            return Response(
+                {
+                    'error':'each document must have a corresponding document category and document type'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if len(documents)>10:
+            return Response(
+                {
+                    'error':'you can upload a maximum of 10 documents at a time'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        allowed_categories={
+            value for value,label in MentorDocument.Category.choices
+        }
+        for file,category,document_type in zip(documents,document_categories,document_types):
+            if category not in allowed_categories:
+                return Response(
+                    {
+                        'error':f'invalid document category:{category}'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if not document_type.strip():
+                return Response(
+                    {
+                        'error':'document type cannot be empty'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if len(document_type.strip()>100):
+                return Response(
+                    {
+                        'error':'document type cannot exceed 100 characters'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if file.size>10*1024*1024:
+                return Response(
+                    {
+                        'error':f'{file.name} exceeds 10mb limit'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        with transaction.atomic():
+            verification=(MentorVerification.objects.select_for_update().filter(mentor=mentor).first())
+            if not verification:
+                return Response(
+                    {
+                        'error':'verification record not found'
+                    },
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            if verification.status!=MentorVerification.Status.INFO_REQUIRED:
+                return Response(
+                    {
+                        'error':'no additional information has been requested'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            created_documents=[]
+            for file,category,document_type in zip(documents,document_categories,document_types):
+                document=MentorDocument.objects.create(
+                    mentor=mentor,
+                    document=file,
+                    category=category,
+                    document_type=document_type,
+                    is_additional=True
+                )
+                created_documents.append(document.id)
+            verification.status=MentorVerification.Status.PENDING
+            verification.info_required_message=None
+            verification.save(
+                update_fields=[
+                    'status',
+                    'info_required_message'
+                ]
+            )
+        return Response(
+            {
+                'message':'additional documents submitted successfully',
+                'status':verification.status,
+                'uploaded_count':len(created_documents),
+                'document_ids':created_documents,
+            },
+            status=status.HTTP_201_CREATED
         )
