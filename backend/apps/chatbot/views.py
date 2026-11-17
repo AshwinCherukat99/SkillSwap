@@ -112,7 +112,7 @@ class ChatConversationDetailView(ChatbotBaseView):
             status=status.HTTP_200_OK
         )
 
-class ChatMessageCreateView(APIView):
+class ChatMessageCreateView(ChatbotBaseView):
     def post(self,request,conversation_id):
         conversation=self.get_conversation(
                 request,
