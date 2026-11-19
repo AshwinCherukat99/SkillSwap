@@ -22,7 +22,7 @@ class ChatbotBaseView(APIView):
         elif account_type=='USER':
             return {
                 'user':request.user,
-                account_type:'USER'
+                'account_type':'USER'
             }
         return None
     def get_conversation(self,request,conversation_id):
