@@ -29,7 +29,7 @@ class GeminiEmbeddingService:
         ]
     def _generate_embedding(self,text,task_type,title=None):
         if not text or not text.strip():
-            return ValueError(
+            raise ValueError(
                 'cannot generate embedding for empty text'
             )
         config=types.EmbedContentConfig(

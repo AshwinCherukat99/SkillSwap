@@ -9,7 +9,7 @@ class KnowledgeRetrievalService:
                 'top_k must be greater than zero'
             )
         self.top_k=top_k
-        self.embedding_service=GeminiEmbeddingService
+        self.embedding_service=GeminiEmbeddingService()
     def _get_allowed_audiences(self,account_type):
         if account_type=='USER':
             return ['BOTH','USER']
@@ -18,7 +18,7 @@ class KnowledgeRetrievalService:
         raise ValueError('invalid account type')
     def retrieve_relevant_chunks(self,query,account_type):
         if not query or not query.strip():
-            return ValueError(
+            raise ValueError(
                 'query cannot be empty'
             )
         query_embedding=(
