@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Q
 from django.conf import settings
+from pgvector.django import VectorField
 # Create your models here.
 
 class ChatConversation(models.Model):
@@ -80,3 +81,70 @@ class ChatMessage(models.Model):
         ordering=['created_at']
     def __str__(self):
         return f'{self.role}-{self.conversation_id}'
+
+class KnowledgeDocument(models.Model):
+    class Category(models.TextChoices):
+        GENERAL='GENERAL','General'
+        ACCOUNTS='ACCOUNTS','Accounts'
+        MENTORS='MENTORS','Mentors'
+        COURSES='COURSES','Courses'
+        SESSIONS='SESSIONS','Sessions'
+        PAYMENTS='PAYMENTS','Payments'
+        SKILLS='SKILLS','Skills'
+        POLICIES='POLICIES','Policies'
+    class Audience(models.TextChoices):
+        BOTH='BOTH','Both'
+        USER='USER','User'
+        MENTOR='MENTOR','Mentor'
+    title=models.CharField(
+        max_length=255
+    )
+    content=models.TextField()
+    category=models.CharField(
+        max_length=20,
+        choices=Category.choices,
+        default=Category.GENERAL
+    )
+    audience=models.CharField(
+        max_length=10,
+        choices=Audience.choices,
+        default=Audience.BOTH
+    )
+    is_active=models.BooleanField(
+        default=True
+    )
+    created_at=models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_at=models.DateTimeField(
+        auto_now=True
+    )
+    def __str__(self):
+        return self.title
+    class Meta:
+        ordering=['-created_at']
+
+class KnowledgeChunk(models.Model):
+    document=models.ForeignKey(
+        KnowledgeDocument,
+        on_delete=models.CASCADE,
+        related_name='chunks'
+    )
+    content=models.TextField()
+    embedding=VectorField(
+        dimensions=768
+    )
+    chunk_index=models.PositiveIntegerField()
+    created_at=models.DateTimeField(
+        auto_now_add=True
+    )
+    class Meta:
+        ordering=['chunk_index']
+        constraints=[
+            models.UniqueConstraint(
+                fields=['document','chunk_index'],
+                name='unique_document_chunk'
+            )
+        ]
+    def __str__(self): 
+        return f'{self.document.title} - Chunk {self.chunk_index}'
