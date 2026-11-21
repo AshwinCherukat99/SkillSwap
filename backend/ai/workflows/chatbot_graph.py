@@ -21,7 +21,7 @@ def retrieve_knowledge(state:ChatbotState):
         return {'retrieved context:',retrieved_context}
     except Exception:
         print('RAG retrieval failed')
-        return {'retrieved context:',[]}
+        return {'retrieved context:'[]}
 
 def run_agent(state:ChatbotState):
     response=run_chatbot_agent(
