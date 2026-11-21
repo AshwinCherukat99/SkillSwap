@@ -6,7 +6,8 @@ from rest_framework import status
 from .authentication import ChatbotJWTAuthentication
 from .models import ChatConversation,ChatMessage
 from .serializers import ChatConversationSerializer,ChatConversationCreateSerializer,ChatMessageCreateSerializer,ChatMessageSerializer
-from .services.gemini_service import generate_chat_response
+from .services.gemini_service import generate_chat_response  
+from .services.retrieval_service import retrieve_relevant_chunks
 # Create your views here.
 
 class ChatbotBaseView(APIView):
@@ -143,7 +144,16 @@ class ChatMessageCreateView(ChatbotBaseView):
             )
         )
         try:
-            assistant_content=generate_chat_response(history)
+            account_type=request.auth.get('account_type')
+            retrieved_context=retrieve_relevant_chunks(
+                query=user_content,
+                account_type=account_type,
+                top_k=5
+            )
+            assistant_content=generate_chat_response(
+                messages=history,
+                retrieved_context=retrieved_context
+            )
             assistant_message=ChatMessage.objects.create(
                 conversation=conversation,
                 role=ChatMessage.Role.ASSISTANT,
