@@ -56,6 +56,12 @@ def convert_chat_history(history):
 
 def run_chatbot_workflow(question,account_type,history):
     messages=convert_chat_history(history)
+    if (
+        not messages 
+        or not isinstance(messages[-1],HumanMessage) 
+        or messages[-1].content!=question
+    ):
+        messages.append(HumanMessage(content=question))
     result=chatbot_graph.invoke({
         'question':question,
         'account_type':account_type,
