@@ -21,7 +21,7 @@ def search_mentors(topic:str,limit:int=5)->list:
             is_active=True,
             is_verified=True,
             courses__status='PUBLISHED',
-            courses__isactive=True
+            courses__is_active=True
         )
         .filter(
             Q(courses__title__icontains=topic)

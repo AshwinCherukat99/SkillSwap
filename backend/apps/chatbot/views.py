@@ -8,6 +8,7 @@ from .models import ChatConversation,ChatMessage
 from .serializers import ChatConversationSerializer,ChatConversationCreateSerializer,ChatMessageCreateSerializer,ChatMessageSerializer
 from .services.gemini_service import generate_chat_response  
 from .services.retrieval_service import retrieve_relevant_chunks
+from ai.workflows.chatbot_graph import run_chatbot_workflow
 # Create your views here.
 
 class ChatbotBaseView(APIView):
@@ -145,26 +146,22 @@ class ChatMessageCreateView(ChatbotBaseView):
         )
         try:
             account_type=request.auth.get('account_type')
-            retrieved_context=retrieve_relevant_chunks(
-                query=user_content,
+            assistant_response=run_chatbot_workflow(
+                question=user_message.content,
                 account_type=account_type,
-                top_k=5
-            )
-            assistant_content=generate_chat_response(
-                messages=history,
-                retrieved_context=retrieved_context
+                history=history
             )
             assistant_message=ChatMessage.objects.create(
                 conversation=conversation,
                 role=ChatMessage.Role.ASSISTANT,
-                content=assistant_content
+                content=assistant_response
             )
             conversation.save()
         except Exception:
-            print('skillswap chatbot gemini request failed') 
+            print('chatbot response generation failed') 
             return Response(
                 {
-                    'error':'ai assistant is temporarily unavailable',
+                    'error':'unable to generate a response right now',
                     'user_message':ChatMessageSerializer(
                         user_message
                     ).data
