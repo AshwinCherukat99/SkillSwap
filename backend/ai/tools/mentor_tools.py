@@ -3,7 +3,14 @@ from langchain.tools import tool
 
 from apps.mentors.models import Mentor
 
-@tool
+@tool(
+        'search_mentors',
+        description=(
+            "Search for active, verified SkillSwap mentors who offer "
+            "published courses related to a topic. Use when a user "
+            "wants to find a mentor"
+        )
+)
 def search_mentors(topic:str,limit:int=5)->list:
     if not topic or not topic.strip():
         return []
@@ -47,7 +54,14 @@ def search_mentors(topic:str,limit:int=5)->list:
         }) 
     return results
 
-@tool
+@tool(
+        "search_courses",
+        description=(
+            "Search published and active SkillSwap courses by title, "
+            "description, category or difficulty level. Use when a "
+            "user wants to discover courses"
+        )
+)
 def search_courses(topic:str,level:str='',limit:int=5)->list:
     if not topic or not topic.strip():
         return []
