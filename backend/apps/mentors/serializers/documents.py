@@ -110,6 +110,13 @@ class MentorRegisterSerializer(serializers.Serializer):
         required=False,
         allow_empty=True
     )
+    document_categories=serializers.ListField(
+        child=serializers.ChoiceField(
+            choices=MentorDocument.Category.choices
+        ),
+        required=False,
+        allow_empty=True
+    )
     def validate_username(self,value):
         if Mentor.objects.filter(username=value).exists():
             raise serializers.ValidationError(
@@ -140,6 +147,11 @@ class MentorRegisterSerializer(serializers.Serializer):
             []
         )
 
+        document_categories=attrs.get(
+            'document_categories',
+            []
+        )
+
         if not documents:
 
             raise serializers.ValidationError({
@@ -147,11 +159,11 @@ class MentorRegisterSerializer(serializers.Serializer):
                     "At least one verification document is required."
             })
 
-        if len(documents) != len(document_types):
+        if not (len(documents) == len(document_types) == len(document_categories)):
 
             raise serializers.ValidationError({
                 "document_types":
-                    "Each document must have a document type."
+                    "Each document must have a document category and type."
             })
         return attrs
     def validate_documents(self, files):

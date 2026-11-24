@@ -93,12 +93,10 @@ class MentorRegisterView(APIView):
         FormParser,
     ]
     def post(self,request):
-        data={
-            key:request.data.getlist(key)
-            for key in request.data.keys()
-        }
+        data=request.data.dict()
         data['documents']=request.FILES.getlist('documents')
-        data['document_types']=request.FILES.getlist('document_types')
+        data['document_types']=request.data.getlist('document_types')
+        data['document_categories']=request.data.getlist('document_categories')
         serializer=MentorRegisterSerializer(
             data=data
         )
@@ -149,6 +147,11 @@ class MentorRegisterView(APIView):
                 "document_types",
                 [],
             ),
+
+            document_categories=serializer.validated_data.get(
+                'document_categories',
+                []
+            )
         )
         if not success:
             return Response(

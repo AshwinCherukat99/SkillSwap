@@ -24,21 +24,22 @@ def generate_mentor_tokens(mentor):
         'access':str(access),
     }
 
-def start_mentor_registration(full_name,username,email,password,phone_number,qualification,current_profession='',organization='',experience_years=None,professional_summary='',teaching_niche='',documents=None,document_types=None):
+def start_mentor_registration(full_name,username,email,password,phone_number,qualification,current_profession='',organization='',experience_years=None,professional_summary='',teaching_niche='',documents=None,document_types=None,document_categories=None):
     print(
     "SERVICE RECEIVED EMAIL:",
     email
 )
     documents = documents or []
     document_types = document_types or []
+    document_categories=document_categories or []
     if not check_otp_rate_limit(
         f'mentor_registration:{email}'
     ):
         return False,(
             'please wait before requesting another otp'
         )
-    if len(documents)!=len(document_types):
-        return False,'each document must have a document type'
+    if not (len(documents)==len(document_types)==len(document_categories)):
+        return False,'each document must have a document category and type'
     otp_code=generate_otp()
     OTP.objects.filter(
     email=email,
@@ -65,9 +66,10 @@ def start_mentor_registration(full_name,username,email,password,phone_number,qua
     print("MENTOR REGISTRATION OTP:", otp_code)
     saved_documents=[]
     try:
-        for document, document_type in zip(
+        for document, document_type, category in zip(
             documents,
-            document_types
+            document_types,
+            document_categories
         ):
             file_path = default_storage.save(
                 f"mentor_registration/{email}/{document.name}",
@@ -76,7 +78,8 @@ def start_mentor_registration(full_name,username,email,password,phone_number,qua
 
             saved_documents.append({
                 "file_path": file_path,
-                "document_type": document_type,
+                "document_type": document_type, 
+                'category':category
             })
 
         registration_data={
@@ -183,10 +186,27 @@ def verify_mentor_registration_otp(email,otp_code):
         raise ValueError(
             'mentor registration session has expired'
         )
+    existing_mentor=Mentor.objects.filter(
+        email__iexact=email
+    ).first()
+    if existing_mentor:
+        raise ValueError(
+            'A mentor account with this email already exists'
+    ).first()
     user=User.objects.filter(
         email__iexact=registration_data['email']
     ).first()
-    if not user:
+
+    if user:
+        if Mentor.objects.filter(user=user).exists():
+            raise ValueError(
+                'This user already has a mentor account'
+            )
+        if hasattr(user,'mentor_profile'):
+            raise ValueError(
+                'this user already has a mentor profile'
+            )
+    else:
         user = User.objects.create_user(
     username=registration_data["username"],
     email=registration_data["email"],
@@ -248,6 +268,7 @@ def verify_mentor_registration_otp(email,otp_code):
             mentor=mentor,
             document=document_data["file_path"],
             document_type=document_data["document_type"],
+            category=document_data.get('category',MentorDocument.Category.OTHER),
             status=MentorDocument.Status.PENDING,
         )
     otp.delete()
