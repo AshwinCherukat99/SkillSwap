@@ -1,16 +1,18 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from apps.accounts.permissions import IsAdmin
 from apps.mentors.authentication import MentorJWTAuthentication
 from rest_framework import status
 from django.utils import timezone
 from django.db.models import Q,Count
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from apps.accounts.models import User
 from apps.mentors.models import Mentor
 
-from .models import Notification,AdminNotification
+from .models import Notification,AdminNotification,PushSubscription
 
 from .serilaizers.adminnotif import AdminNotificationSerializer
 from .serilaizers.initialization import NotificationSerializer
@@ -370,4 +372,89 @@ class MentorNotificationClearReadView(APIView):
                 'message':'read notifications cleared',
                 'deleted_count':deleted_count,
             }
+        )
+
+class UserPushSubscriptionView(APIView):
+    authentication_classes=[JWTAuthentication]
+    permission_classes=[IsAuthenticated]
+    def post(self,request):
+        return self.save_subscription(request,user=request.user)
+    def save_subscription(self,request,user=None,mentor=None):
+        endpoint=request.data.get('endpoint')
+        keys=request.data.get('keys',{})
+        p256dh=keys.get('p256dh')
+        auth=keys.get('auth')
+        if not endpoint or not p256dh or not auth:
+            return Response(
+                {
+                    'detail':'endpoint, p256dh and auth are required'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        with transaction.atomic():
+            subscription,created=PushSubscription.objects.update_or_create(
+                endpoint=endpoint,
+                defaults={
+                    'user':user,
+                    'mentor':mentor,
+                    'p256dh':p256dh,
+                    'auth':auth
+                }
+            )
+        return Response(
+            {
+                'message':'push subscription registered'
+                if created else 'push subscription updated',
+                'subscription_id':subscription.id
+            },
+            status=(status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+        )
+    def delete(self,request):
+        endpoint=request.data.get('endpoint')
+        if not endpoint:
+            return Response(
+                {'detail':'endpoint is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        deleted_count,_=PushSubscription.objects.filter(
+            user=request.user,
+            end_point=endpoint
+        ).delete()
+        return Response(
+            {
+                'message':'push subscription removed',
+                'deleted':deleted_count>0
+            },
+            status=status.HTTP_200_OK
+        )
+
+class MentorPushSubscriptionView(UserPushSubscriptionView):
+    authentication_classes=[MentorJWTAuthentication]
+    def post(self,request):
+        mentor=request.user
+        if not mentor.user_id:
+            return Response(
+                {'detail':'no user account is linked to this mentor'},
+                status=status.HTTP_400_BAD_REQUEST
+            ) 
+        return self.save_subscription(request,mentor=mentor)
+    def delete(self,request):
+        endpoint=request.data.get('endpoint')
+        if not endpoint:
+            return Response(
+                {
+                    'message':'endpoint is required'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        deleted_count,_=PushSubscription.objects.filter(
+            mentor=request.user,
+            end_point=endpoint
+        ).delete()
+        return Response(
+            {
+                'message':'push subscription removed',
+                'deleted':deleted_count>0
+            },
+            status=status.HTTP_200_OK
         )

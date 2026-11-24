@@ -13,7 +13,9 @@ from .views import (
     MentorNotificationListView,
     MentorNotificationMarkReadView,
     MentorNotifcationMarkAllReadView,
-    MentorNotificationClearReadView
+    MentorNotificationClearReadView,
+    UserPushSubscriptionView,
+    MentorPushSubscriptionView
 )
 
 urlpatterns=[
@@ -81,5 +83,15 @@ urlpatterns=[
         'mentor/clear_read/',
         MentorNotificationClearReadView.as_view(),
         name='mentor-notification-clear-read',
+    ),
+    path(
+        'push/subscribe/',
+        UserPushSubscriptionView.as_view(),
+        name='user-push-subscribe'
+    ),
+    path(
+        'push/mentor/subscribe/',
+        MentorPushSubscriptionView.as_view(),
+        name='mentor-push-subscribe'
     )
 ]

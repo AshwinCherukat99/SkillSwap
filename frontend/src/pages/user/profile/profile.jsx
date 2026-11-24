@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./profile.css";
 import { BACKEND_ORIGIN, API_BASE_URL } from "../../../config";
+import PushNotificationSettings from "../../../components/PushNotificationSettings";
+import api from "../../../services/api";
 
 function Profile() {
   const navigate = useNavigate();
@@ -286,6 +288,10 @@ function Profile() {
                 </div>
               </div>
             </div>
+            <PushNotificationSettings
+            apiClient={api}
+            endpoint='/notifications/push/subscribe/'
+            />
           </div>
         </div>
       </main>

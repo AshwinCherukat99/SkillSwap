@@ -9,6 +9,7 @@ import ProfessionalInformation from '../../../components/mentor/profile/Professi
 import TeachingNiche from '../../../components/mentor/profile/TeachingNiche'
 
 import './MentorEditProfile.css'
+import PushNotificationSettings from '../../../components/PushNotificationSettings'
 
 function MentorEditProfile(){
     const navigate=useNavigate()
@@ -412,7 +413,10 @@ if (loading){
                 </div>
 
             </div>
-
+            <PushNotificationSettings
+            apiClient={mentorApi}
+            endpoint='/notifications/push/mentor/subscribe/'
+            />
         </div>
     )
 }

@@ -10,7 +10,7 @@ from .models import PushSubscription
 
 def send_push_notification(subscription,admin_notification):
     subscription_info={
-        'endpoint':subscription.endpoint,
+        'endpoint':subscription.end_point,
         'keys':{
             'p256dh':subscription.p256dh,
             'auth':subscription.auth,
