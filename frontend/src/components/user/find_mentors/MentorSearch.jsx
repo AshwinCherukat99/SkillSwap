@@ -2,12 +2,13 @@ import React from 'react'
 
 function MentorSearch({search,onSearch}){
     return (
-        <div className="mentor-search">
+        <div className="msb">
 
-            <i className="bi bi-search"></i>
+            <i className="bi bi-search msb-icon"></i>
 
             <input
                 type="text"
+                className='msb-input'
                 placeholder="Search mentors"
                 value={search}
                 onChange={(event) => onSearch(event.target.value)}
@@ -16,7 +17,7 @@ function MentorSearch({search,onSearch}){
             {search && (
                 <button
                     type="button"
-                    className="btn btn-link text-muted p-0"
+                    className='msb-clear'
                     onClick={() => onSearch("")}
                     aria-label="Clear search"
                 >

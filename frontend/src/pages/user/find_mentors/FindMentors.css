@@ -63,88 +63,89 @@
 /* ==========================================
    SEARCH BAR
 ========================================== */
-.mentor-search {
+.msb {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    max-width: 440px;
+    height: 48px;
+    padding: 0 14px;
     background: #ffffff;
     border: 1px solid #dee2e6;
     border-radius: 12px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    max-width: 440px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.mentor-search:focus-within {
+.msb:focus-within {
     border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
 }
 
-/* 1. Lowers both icons (search & close) so they are vertically centered with the text */
-.mentor-search i {
-    position: static !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 16px !important;
-    width: 16px !important;
-    min-width: 16px !important;
-    height: 16px !important;
+/* Search icon */
+.msb .msb-icon {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    font-size: 17px;
+    line-height: 1;
     color: #94a3b8;
-    line-height: 1 !important;
-    flex-shrink: 0 !important;
-    margin: 0 !important;
-    transform: translateY(2px); /* Moves icons down to match text baseline */
+    flex-shrink: 0;
 }
 
-/* 2. Text input */
-.mentor-search input {
-    border: none !important;
-    outline: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+/* Input: strip every border/padding/shadow a global input style may add */
+.msb .msb-input {
+    flex: 1 1 auto;
+    width: auto !important;
+    min-width: 0;
+    height: 100%;
     padding: 0 !important;
     margin: 0 !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-    font-size: 14px;
-    line-height: 1.4;
+    border: none !important;
+    border-radius: 0 !important;
+    outline: none !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    font-size: 16px;
+    line-height: normal;
     color: #1e293b;
 }
 
-.mentor-search input::placeholder {
+.msb .msb-input::placeholder {
     color: #94a3b8;
 }
 
-/* 3. Removes Bootstrap's link underline and outlines from the close button */
-.mentor-search button,
-.mentor-search .btn-link {
-    text-decoration: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    border: none !important;
-    background: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    color: #94a3b8 !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* Clear button */
+.msb .msb-clear {
+    position: static;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
     cursor: pointer;
     flex-shrink: 0;
-    line-height: 1 !important;
 }
 
-.mentor-search button:hover,
-.mentor-search .btn-link:hover,
-.mentor-search button:focus,
-.mentor-search .btn-link:focus {
-    text-decoration: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    color: #64748b !important;
+.msb .msb-clear i {
+    position: static;
+    font-size: 17px;
+    line-height: 1;
+    color: #94a3b8;
+}
+
+.msb .msb-clear:hover i {
+    color: #64748b;
 }
 
 /* FILTERS */

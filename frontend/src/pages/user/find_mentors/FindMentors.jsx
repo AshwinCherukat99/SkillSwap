@@ -202,8 +202,8 @@ function FindMentors(){
 
             }
             return true
+            })
         },[mentors,search,filters])
-    })
     const clearFilters=()=>{
         setFilters({
             experience:"",
