@@ -5,7 +5,7 @@ from django.db import transaction
 from apps.notifications.models import Notification
 
 class NotificationService:
-    @classmethod
+    @staticmethod
     def create_notification(
         recipient,
         notification_type,
