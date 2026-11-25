@@ -1,8 +1,9 @@
-from typing import TypedDict,Literal
+from typing import TypedDict,Literal,Any
+from langchain_core.messages import BaseMessage
 
 class ChatbotState(TypedDict,total=False):
     question:str
     account_type:Literal['USER','MENTOR']
-    messages:list
-    retrieved_context:list
+    messages:list[BaseMessage]
+    retrieved_context:list[dict[str,Any]]
     response:str
