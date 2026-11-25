@@ -18,7 +18,7 @@ def retrieve_knowledge(state:ChatbotState):
         print('RAG retrieval completed')
         print('account type=',account_type)
         print('chunks=',len(retrieved_context))
-        return {'retrieved context:',retrieved_context}
+        return {'retrieved_context:',retrieved_context}
     except Exception:
         print('RAG retrieval failed')
         return {'retrieved context':[]}
