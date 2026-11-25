@@ -80,10 +80,15 @@ def verify_registration_otp(email,otp_code):
     return user  
 
 def generate_tokens(user):
-    refresh=RefreshToken.for_user(user)  
+    refresh=RefreshToken.for_user(user)   
+    refresh['account_type']='USER'
+    refresh['user_id']=user.id
+    access=refresh.access_token
+    access['account_type']='USER'
+    access['user_id']=user.id
     return {
         'refresh':str(refresh),
-        'access':str(refresh.access_token)
+        'access':str(access)
     }
 
 def start_password_reset(email):
