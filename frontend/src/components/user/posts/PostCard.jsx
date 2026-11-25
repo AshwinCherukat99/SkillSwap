@@ -14,6 +14,7 @@ function PostCard({
     onComment,
     onEdit,
     onDelete,
+    onRequestSession
 }) {
     const [liked,setLiked]=useState(post.liked_by_me||false)
         const [likesCount,setLikesCount]=useState(post.likes_count||0)
@@ -393,6 +394,7 @@ const handleLike=async ()=>{
                     <button
                         type="button"
                         className="post-action"
+                        onClick={()=>onRequestSession?.(author)}
                     >
                         <span className="material-symbols-outlined">
                             event

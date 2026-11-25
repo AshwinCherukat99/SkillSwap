@@ -2,7 +2,8 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status
+from rest_framework.pagination import PageNumberPagination
+from rest_framework import status,generics
 from django.db.models import Count
 from rest_framework.parsers import MultiPartParser, FormParser
 from apps.notifications.models import Notification
@@ -12,6 +13,11 @@ from apps.badges.services import BadgeService
 
 from .models import Post,PostComment,PostLike
 from .serializers.initialize import PostSerializer,CreatePostSerializer,PostCommentSerializer,CreateCommentSerialzer
+
+class FeedPagination(PageNumberPagination):
+    page_size=10
+    page_size_query_param='page_size'
+    max_page_size=20
 
 class MyPostsView(APIView):
     permission_classes=[IsAuthenticated]
@@ -123,23 +129,29 @@ class EditPostView(APIView):
 
 class FeedPostsView(APIView):
     permission_classes=[IsAuthenticated]
+    pagination_class=FeedPagination
     def get(self,request):
         posts=Post.objects.select_related(
             'user_author',
             'mentor_author'
         ).annotate(
             likes_count=Count('likes', distinct=True),
-            comments_count=Count('comments', distinct=True)).order_by('-created_at')
-        serializer=PostSerializer(
+            comments_count=Count('comments', distinct=True)).order_by('-created_at','id')
+        paginator=self.pagination_class()
+        paginated_posts=paginator.paginate_queryset(
             posts,
+            request,
+            view=self
+        )
+        serializer=PostSerializer(
+            paginated_posts,
             many=True,
             context={
                 'request':request
             }
         )
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
+        return paginator.get_paginated_response(
+            serializer.data
         )
 
 class FeedSidebarView(APIView):

@@ -92,6 +92,7 @@ const RequestSessionModal=({
         }
         if (!date||!time){
             setError('please select a date and time')
+            return
         }
         const scheduledStart=`${date}T${time}:00`
     const selectedDateTime=new Date(scheduledStart)
@@ -125,7 +126,7 @@ const RequestSessionModal=({
         const data=err.response?.data
         if (data){
             if (typeof data==='object'){
-                const messages=Oject.values(data).flat().join(' ')
+                const messages=Object.values(data).flat().join(' ')
                 setError(messages||data.detail||data.error||'failed to send session request')
             }else{
                 setError(data||'failed to send session request')

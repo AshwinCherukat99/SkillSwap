@@ -1,4 +1,4 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useState,useCallback,useRef} from 'react'
 import {useNavigate,Link} from 'react-router-dom'
 import {useDispatch,useSelector} from 'react-redux'
 import { updateUser } from '../../../store/slices/authSlice'
@@ -14,6 +14,8 @@ import CreatePost from '../../../components/user/feed/CreatePost'
 import PostCard from '../../../components/user/posts/PostCard'
 import EditPost from '../../../components/user/feed/EditPost'
 
+import RequestSessionModal from '../request_session/RequestSessionModal'
+
 import './Feed.css'
 
 function Feed(){
@@ -28,6 +30,14 @@ function Feed(){
     const [loadingSidebar,setLoadingSidebar]=useState(true)
     const [editingPost,setEditingPost]=useState(null)
     const [posts,setPosts]=useState([])
+    const [showRequestModal,setShowRequestModal]=useState(false)
+    const [selectedRecipient,setSelectedRecipient]=useState(null)
+    const [page,setPage]=useState(1)
+    const [hasMore,setHasMore]=useState(true)
+    const [loadingMore,setLoadingMore]=useState(false)
+    const [loadingMoreError,setLoadingMoreError]=useState('') 
+    const observerTarget=useRef(null)
+    const loadingMoreRef=useRef(false)
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState("")
     useEffect(() => {
@@ -100,9 +110,9 @@ const getMentorProfileImage = (image) => {
         post.id===updatedPost.id?updatedPost:post))
     }
     useEffect(()=>{
-        fetchPosts()
+        fetchPosts(1,false)
         fetchSidebarData()
-    },[])
+    },[fetchPosts])
     useEffect(() => {
     const fetchUserProfile = async () => {
         try {
@@ -118,27 +128,87 @@ const getMentorProfileImage = (image) => {
 
     fetchUserProfile();
 }, [dispatch]);
-    const fetchPosts=async ()=>{
+    const fetchPosts=useCallback(async (pageNumber=1,append=false)=>{
+      if (append&&loadingMoreRef.current){
+        return
+      }
+      if (append){
+        loadingMoreRef.current=true
+        setLoadingMore(true)
+        setLoadingMoreError('')
+      }else{
         setLoading(true)
-        setError("")
-        try{
-            const response=await api.get(
-                '/posts/feed/'
-            )
-            setPosts(response.data)
-        }catch(error){
-            console.error(
-                'error fetching feed:',
-                error
-            )
-            setError(
-                error?.response?.data?.detail||
-                'failed to load feed'
-            )
-        }finally{
-            setLoading(false)
+        setError('')
+      }
+      try{
+        const response=await api.get('/posts/feed/',{
+          params:{
+            page:pageNumber,
+            page_size:10,
+          }
+        })
+        const newPosts=response.data.results||[]
+        if (append){
+          setPosts(
+            (currentPosts)=>{
+              const existingIds=new Set(
+                currentPosts.map((post)=>post.id)
+              )
+              const uniqueNewPosts=newPosts.filter(
+                (post)=>!existingIds.has(post.id)
+              ) 
+              return [...currentPosts,...uniqueNewPosts]
+            }
+          )
+        }else{
+          setPosts(newPosts)
         }
-    }
+        setHasMore(Boolean(response.data.next))
+        setPage(pageNumber)
+      }catch(err){
+        console.error('error fetching feed:',err)
+        if (append){
+          setLoadingMoreError(
+            err.response?.data?.detail||
+            'failed to load more posts'
+          )
+        }else{
+          setError(
+            err.response?.data?.detail||
+            'failed to load feed'
+          )
+        }
+      }finally{
+        if (append){
+          loadingMoreRef.current=false
+          setLoadingMore(false)
+        }else{
+          setLoading(false)
+        }
+      }
+    },[])
+    useEffect(()=>{
+      const target=observerTarget.current
+      if (!target||!hasMore||loading||loadingMore){
+        return
+      }
+      const observer=new IntersectionObserver(
+        (entries)=>{
+          if (entries[0].isIntersecting){
+            fetchPosts(page+1,true)
+          }
+        },
+        {
+          root:null,
+          rootMargin:'300px',
+          threshold:0,
+        }
+      )
+      observer.observe(target)
+      return ()=>{
+        observer.disconnect()
+      }
+    },[page,hasMore,loading,loadingMore,fetchPosts])
     const handlePostCreated=(createdPost)=>{
         setPosts((currentPosts)=>[
             createdPost,
@@ -151,6 +221,22 @@ const getMentorProfileImage = (image) => {
             (post)=>post.id!==postId
         ))
 };
+const handleRequestSession=(author)=>{
+  if (!author?.id){
+    console.error('post author information is missing')
+    return
+  }
+  setSelectedRecipient(author)
+  setShowRequestModal(true)
+}
+const handleCloseRequestModal=()=>{
+  setShowRequestModal(false)
+  setSelectedRecipient(null)
+} 
+const handleSessionRequestSuccess=(data)=>{
+  console.log('session request sent successfully:',data)
+  handleCloseRequestModal()
+}
     
     return (
   <div className="container feed-container py-4">
@@ -263,8 +349,65 @@ const getMentorProfileImage = (image) => {
               currentUser={user}
               onEdit={handlePostEdit}
               onDelete={handlePostDeleted}
+              onRequestSession={handleRequestSession}
             />
           ))}
+
+          {/* Infinite scroll loading indicator */}
+
+{!loading && posts.length > 0 && hasMore && (
+    <div
+        ref={observerTarget}
+        className="text-center py-4"
+    >
+        {loadingMore ? (
+            <>
+                <div
+                    className="spinner-border spinner-border-sm text-primary"
+                    role="status"
+                />
+
+                <p className="text-muted small mt-2 mb-0">
+                    Loading more posts...
+                </p>
+            </>
+        ) : (
+            <p className="text-muted small mb-0">
+                Scroll to load more
+            </p>
+        )}
+    </div>
+)}
+
+{/* Pagination error */}
+
+{loadingMoreError && (
+    <div className="text-center py-3">
+
+        <p className="text-danger small">
+            {loadingMoreError}
+        </p>
+
+        <button
+            type="button"
+            className="btn btn-outline-primary btn-sm"
+            onClick={() => fetchPosts(page + 1, true)}
+        >
+            Try Again
+        </button>
+
+    </div>
+)}
+
+{/* End of feed */}
+
+{!loading && posts.length > 0 && !hasMore && (
+    <div className="text-center py-4">
+        <p className="text-muted small mb-0">
+            You've reached the end of your feed.
+        </p>
+    </div>
+)}
 
         {editingPost && (
           <EditPost
@@ -409,6 +552,12 @@ const getMentorProfileImage = (image) => {
         </div>
       </div>
     </div>
+    <RequestSessionModal
+    show={showRequestModal}
+    onClose={handleCloseRequestModal}
+    recipient={selectedRecipient}
+    onSuccess={handleSessionRequestSuccess}
+    />
   </div>
 );
 }
