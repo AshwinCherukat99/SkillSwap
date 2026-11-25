@@ -109,25 +109,6 @@ const getMentorProfileImage = (image) => {
         currentPosts.map((post)=>
         post.id===updatedPost.id?updatedPost:post))
     }
-    useEffect(()=>{
-        fetchPosts(1,false)
-        fetchSidebarData()
-    },[fetchPosts])
-    useEffect(() => {
-    const fetchUserProfile = async () => {
-        try {
-            const response = await api.get("/auth/profile/");
-
-            console.log("PROFILE RESPONSE:", response.data);
-
-            dispatch(updateUser(response.data));
-        } catch (error) {
-            console.error("Failed to fetch user profile:", error);
-        }
-    };
-
-    fetchUserProfile();
-}, [dispatch]);
     const fetchPosts=useCallback(async (pageNumber=1,append=false)=>{
       if (append&&loadingMoreRef.current){
         return
@@ -187,6 +168,25 @@ const getMentorProfileImage = (image) => {
         }
       }
     },[])
+    useEffect(()=>{
+        fetchPosts(1,false)
+        fetchSidebarData()
+    },[fetchPosts])
+    useEffect(() => {
+    const fetchUserProfile = async () => {
+        try {
+            const response = await api.get("/auth/profile/");
+
+            console.log("PROFILE RESPONSE:", response.data);
+
+            dispatch(updateUser(response.data));
+        } catch (error) {
+            console.error("Failed to fetch user profile:", error);
+        }
+    };
+
+    fetchUserProfile();
+}, [dispatch]);
     useEffect(()=>{
       const target=observerTarget.current
       if (!target||!hasMore||loading||loadingMore){

@@ -8,6 +8,10 @@ class Notification(models.Model):
 
         SKILL_MATCH='SKILL_MATCH', 'Skill Match'
 
+        BADGE_EARNED='BADGE_EARNED','Badge Earned'
+
+        MILESTONE='MILESTONE','Milestone'
+
         # Admin
         ADMIN_ANNOUNCEMENT = (
             'ADMIN_ANNOUNCEMENT',

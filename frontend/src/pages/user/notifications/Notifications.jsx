@@ -107,13 +107,15 @@ function Notifications(){
             if (activeFilter==='Sessions'){
                 return notification.notification_type.includes('SESSION')
             }
-            if (activeFilter==='Ratings'){
-                return notification.notification_type.includes('RATING')
+            if (activeFilter==='Reviews'){
+                return notification.notification_type.includes('REVIEW')
             }
             if (activeFilter==='Achievements'){
                 return (
                     notification.notification_type.includes('STREAK')||
-                    notification.notification_type.includes('WELCOME')
+                    notification.notification_type.includes('WELCOME')||
+                    notification.notification_type.includes('BADGE_EARNED')||
+                    notification.notification_type.includes('MILESTONE')
                 )
             }
             return true

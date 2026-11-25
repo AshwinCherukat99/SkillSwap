@@ -10,7 +10,7 @@ function NotificationCard({notification,onMarkAsRead}){
         if (type.includes('MESSAGE')){
             return 'chat'
         }
-        if (type.includes('RATING')){
+        if (type.includes('REVIEW')){
             return 'star'
         } 
         if (type.includes('FRIEND')){
@@ -27,6 +27,9 @@ function NotificationCard({notification,onMarkAsRead}){
         }
         if (type.includes('WELCOME')){
             return 'waving_hand'
+        }
+        if (type.includes('BADGE')||type.includes('MILESTONE')){
+            return 'emoji_events'
         }
         return 'notifications'
     }

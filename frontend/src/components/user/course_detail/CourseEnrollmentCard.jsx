@@ -166,87 +166,60 @@ function CourseEnrollmentCard({
                     
 
                     {/* Highlights */}
-                    <div className="border-top mt-4 pt-4">
+<div className="border-top mt-4 pt-4">
 
-                        <div className="course-benefit">
-                            <i className="bi bi-award text-primary"></i>
-                            <span>
-                                Certificate of Completion included
-                            </span>
-                        </div>
+    <div className="d-flex align-items-center gap-3 mb-3">
+        <i className="bi bi-award text-primary fs-5"></i>
+        <span>Certificate of Completion included</span>
+    </div>
 
-                        <div className="course-benefit">
-                            <i className="bi bi-person-video3 text-primary"></i>
-                            <span>
-                                Learn from a verified mentor
-                            </span>
-                        </div>
+    <div className="d-flex align-items-center gap-3 mb-3">
+        <i className="bi bi-person-video3 text-primary fs-5"></i>
+        <span>Learn from a verified mentor</span>
+    </div>
 
-                        <div className="course-benefit">
-                            <i className="bi bi-infinity text-primary"></i>
-                            <span>
-                                Lifetime course access
-                            </span>
-                        </div>
+    <div className="d-flex align-items-center gap-3">
+        <i className="bi bi-infinity text-primary fs-5"></i>
+        <span>Lifetime course access</span>
+    </div>
 
-                    </div>
+</div>
 
-                    {/* Specifications */}
-                    <div className="border-top mt-4 pt-4">
+                    <div className='border-top mt-4 pt-4'>
+                    <div className="d-flex justify-content-between align-items-center mb-3">
+    <span className="text-secondary">
+        <i className="bi bi-bar-chart me-2"></i>
+        Level
+    </span>
+    <strong>{course.level}</strong>
+</div>
 
-                        <div className="small text-uppercase fw-bold text-muted mb-3">
-                            Specifications
-                        </div>
+<div className="d-flex justify-content-between align-items-center mb-3">
+    <span className="text-secondary">
+        <i className="bi bi-clock me-2"></i>
+        Duration
+    </span>
+    <strong>{formatDuration(course.estimated_duration)}</strong>
+</div>
 
-                        <div className="course-spec-row">
-                            <span>
-                                <i className="bi bi-bar-chart me-2"></i>
-                                Level
-                            </span>
+<div className="d-flex justify-content-between align-items-center mb-3">
+    <span className="text-secondary">
+        <i className="bi bi-folder me-2"></i>
+        Category
+    </span>
+    <strong>{course.category?.name || course.category}</strong>
+</div>
 
-                            <strong>
-                                {course.level}
-                            </strong>
-                        </div>
-
-                        <div className="course-spec-row">
-                            <span>
-                                <i className="bi bi-clock me-2"></i>
-                                Duration
-                            </span>
-
-                            <strong>
-                                {formatDuration(
-                                    course.estimated_duration
-                                )}
-                            </strong>
-                        </div>
-
-                        <div className="course-spec-row">
-                            <span>
-                                <i className="bi bi-folder me-2"></i>
-                                Category
-                            </span>
-
-                            <strong>
-                                {course.category?.name ||
-                                    course.category}
-                            </strong>
-                        </div>
-
-                        <div className="course-spec-row">
-                            <span>
-                                <i className="bi bi-person me-2"></i>
-                                Mentor
-                            </span>
-
-                            <strong>
-                                @{mentor.username}
-                            </strong>
-                        </div>
+<div className="d-flex justify-content-between align-items-center">
+    <span className="text-secondary">
+        <i className="bi bi-person me-2"></i>
+        Mentor
+    </span>
+    <strong>@{mentor.username}</strong>
+</div>
 
                     </div>
-
+                    
                 </div>
 
             </div>
