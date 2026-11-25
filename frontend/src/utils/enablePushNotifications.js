@@ -25,9 +25,9 @@ export async function enablePushNotifications(apiClient,endpoint){
         '/service-worker.js'
     )
     await navigator.serviceWorker.ready
-    let subscription=await register.pushManager.getSubscription()
+    let subscription=await registration.pushManager.getSubscription()
     if (!subscription){
-         const subscription=await registration.pushManager.subscribe({
+        subscription=await registration.pushManager.subscribe({
         userVisibleOnly:true,
         applicationServerKey:urlBase64ToUint8Array(
             vapidPublicKey
@@ -47,15 +47,15 @@ export async function disablePushNotifications(apiClient,endpoint){
             'service workers are not supported'
         )
     }
-    const registration=await navigator.serviceWorker.register(
+    const registration=await navigator.serviceWorker.getRegistration(
         '/service-worker.js'
     ) 
     if (!registration){
         return false
     }
-    let subscription=await navigator.pushManager.getSubscription()
+    let subscription=await registration.pushManager.getSubscription()
     if (!subscription){
-        return False
+        return false
     }
     const subscriptionData=subscription.toJSON()
     await apiClient.delete(endpoint,{

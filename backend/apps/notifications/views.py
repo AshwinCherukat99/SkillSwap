@@ -393,7 +393,7 @@ class UserPushSubscriptionView(APIView):
             )
         with transaction.atomic():
             subscription,created=PushSubscription.objects.update_or_create(
-                endpoint=endpoint,
+                end_point=endpoint,
                 defaults={
                     'user':user,
                     'mentor':mentor,

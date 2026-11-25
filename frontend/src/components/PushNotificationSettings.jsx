@@ -14,11 +14,11 @@ function PushNotificationSettings({apiClient,endpoint}){
                     setError('your browser does not support push notifications')
                     return
                 }
-                const registration=navigator.serviceWorker.getRegistration(
+                const registration=await navigator.serviceWorker.getRegistration(
                     '/service-worker.js'
                 )
                 if (registration){
-                    subscription=await registration.pushManager.getSubscription()
+                    const subscription=await registration.pushManager.getSubscription()
                     setEnabled(Boolean(subscription))
                 }
             }catch(err){
