@@ -9,8 +9,10 @@ from .serializers import ChatConversationSerializer,ChatConversationCreateSerial
 from .services.gemini_service import generate_chat_response  
 from .services.retrieval_service import retrieve_relevant_chunks
 from ai.workflows.chatbot_graph import run_chatbot_workflow
+import logging
 # Create your views here.
 
+logger=logging.getLogger(__name__)
 class ChatbotBaseView(APIView):
     authentication_classes=[ChatbotJWTAuthentication]
     permission_classes=[IsAuthenticated]
@@ -158,7 +160,7 @@ class ChatMessageCreateView(ChatbotBaseView):
             )
             conversation.save()
         except Exception:
-            print('chatbot response generation failed') 
+            logger.exception('chatbot response generation failed')
             return Response(
                 {
                     'error':'unable to generate a response right now',
