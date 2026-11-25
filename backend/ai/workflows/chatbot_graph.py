@@ -44,11 +44,13 @@ chatbot_graph=build_chatbot_graph()
 def convert_chat_history(history):
     messages=[]
     for message in history:
-        if message.role=='USER':
+        role=message.get('role')
+        content=message.get('content','')
+        if role=='USER':
             messages.append(
                 HumanMessage(content=message.content)
             )
-        elif message.role=='ASSISTANT':
+        elif role=='ASSISTANT':
             messages.append(
                 AIMessage(content=message.content)
             )
