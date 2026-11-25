@@ -48,11 +48,11 @@ def convert_chat_history(history):
         content=message.get('content','')
         if role=='USER':
             messages.append(
-                HumanMessage(content=message.content)
+                HumanMessage(content=content)
             )
         elif role=='ASSISTANT':
             messages.append(
-                AIMessage(content=message.content)
+                AIMessage(content=content)
             )
     return messages
 
