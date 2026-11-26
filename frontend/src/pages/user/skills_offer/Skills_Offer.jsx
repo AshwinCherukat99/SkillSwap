@@ -189,7 +189,7 @@ function Skills_Offer(){
             setSuccess("")
             console.log("Skill id being removed:", userSkillId);
             const response=await fetch(
-                `${API_BASE_URL}/api/skills/offer/${userSkillId}/`,
+                `${API_BASE_URL}/skills/offer/${userSkillId}/`,
                 {
                     method:'DELETE',
                     headers:{
