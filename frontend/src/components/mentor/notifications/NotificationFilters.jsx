@@ -59,7 +59,8 @@ export function getNotificationCategory(type){
     if ([
         'SESSION_CANCELLED',
         'SESSION_REMINDER',
-        'SESSION_COMPLETED'
+        'SESSION_COMPLETED',
+        'SESSION_SCHEDULED'
     ].includes(type)){
         return 'Sessions'
     }
@@ -75,6 +76,12 @@ export function getNotificationCategory(type){
         'PAYMENT_PENDING'
     ].includes(type)){
         return "Payout"
+    }
+    if ([
+        'ENROLLMENT',
+        'STUDENT_ENROLLED'
+    ].includes(type)){
+        return 'Enrollment'
     }
     return "Other"
 }

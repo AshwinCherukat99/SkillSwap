@@ -12,6 +12,8 @@ from apps.mentors.authentication import MentorJWTAuthentication
 from apps.chat.models import Conversation,ConversationMember
 from apps.mentors.models import Mentor
 from apps.certificates.services import generate_certificate
+from apps.notifications.models import Notification
+from apps.notifications.notification_service import NotificationService
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework import status
@@ -899,12 +901,26 @@ class CourseEnrollView(APIView):
                     'enrollment_id':existing_enrollment.id,
                 },
                 status=status.HTTP_400_BAD_REQUEST,
-            )
-        enrollment=CourseEnrollment.objects.create(
+            ) 
+        with transaction.atomic():
+            enrollment=CourseEnrollment.objects.create(
             user=request.user,
             course=course,
             progress=0,
         )
+            NotificationService.create_notification(
+                recipient=request.user,
+                notification_type=Notification.NotificationType.COURSE_ENROLLED,
+                title='Course Enrollment Confirmed',
+                message=f'you have successfully enrolled in {course.title}'
+            )
+            if course.mentor.user:
+                NotificationService.create_notification(
+                    recipient=course.mentor.user,
+                    notification_type=Notification.NotificationType.COURSE_ENROLLED,
+                    title='New Student Enrollment',
+                    message=f'{request.user.username} enrolled in your course {course.title}'
+                )
         return Response(
             {
                 'message':'successfully enrolled in the course',

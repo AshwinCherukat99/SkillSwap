@@ -65,7 +65,11 @@ class SkillExchangeSession(models.Model):
     cancelled_at=models.DateTimeField(
         blank=True,
         null=True
-    )  
+    )   
+    reminder_sent_at=models.DateTimeField(
+        blank=True,
+        null=True
+    )
     class Meta:
         ordering=['-scheduled_start']
     def __str__(self):
@@ -119,6 +123,10 @@ class CourseSession(models.Model):
         blank=True
     )
     cancelled_at=models.DateTimeField(
+        null=True,
+        blank=True
+    )
+    reminder_sent_at=models.DateTimeField(
         null=True,
         blank=True
     )

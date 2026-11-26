@@ -290,6 +290,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'apps.notifications.tasks.send_due_admin_notifications',
         'schedule': 60.0,
     },
+    'send-session-reminders-every-minute':{
+        'task':'apps.sessions_mgmt.tasks.send_session_reminders',
+        'schedule': 60.0,
+    }
 }
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

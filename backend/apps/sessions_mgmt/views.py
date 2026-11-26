@@ -17,6 +17,8 @@ from apps.accounts.models import User
 from apps.skills.models import Skill,UserSkill
 from apps.chat.models import Conversation
 from apps.mentors.models import Mentor
+from apps.notifications.models import Notification
+from apps.notifications.notification_service import NotificationService
 from .serializers.course_session import MentorCourseSessionCreateSerializer
 from .serializers.session_history import SkillExchangeSessionHistorySerializer,CourseSessionHistorySerializer,MentorCourseSessionHistorySerializer
 from .serializers.upcoming_session import UpcomingSkillExchangeSerializer,UpcomingCourseSessionSerializer,MentorUpcomingSessionSerializer
@@ -109,6 +111,13 @@ class MentorScheduleCourseSessionView(APIView):
             conversation=create_course_conversation(session)
         response_serializer=MentorCourseSessionCreateSerializer(
             session
+        )
+        NotificationService.create_notification(
+            recipient=enrollment.user,
+            notification_type=Notification.NotificationType.SESSION_SCHEDULED,
+            title='New Session Scheduled',
+            message=f'your mentor {mentor.username} has scheduled a session '
+            f'for {timezone.localtime(session.scheduled_start).strftime("%d %b %Y at %I:%M %p")}'
         )
         return Response(
             {
@@ -501,7 +510,7 @@ class MentorCancelSessionView(APIView):
     permission_classes=[IsAuthenticated]
     def post(self,request,session_id):
         session=get_object_or_404(
-            CourseSession,
+            CourseSession.objects.select_related('enrollment__user'),
             id=session_id,
             mentor=request.user,
             status=CourseSession.Status.SCHEDULED,
@@ -516,6 +525,12 @@ class MentorCancelSessionView(APIView):
                 'cancelled_at',
                 'updated_at',
             ]
+        )
+        NotificationService.create_notification(
+            recipient=session.enrollment.user,
+            notification_type=Notification.NotificationType.SESSION_CANCELLED,
+            title='Session Cancelled',
+            message=f'Your mentor {request.user.username} cancelled your session'
         )
         return Response(
             {
@@ -626,6 +641,12 @@ class SendSessionRequestView(APIView):
             requester=request.user,
             status=SkillExchangeSession.Status.REQUESTED,
         )
+        NotificationService.create_notification(
+            recipient=session.recipient,
+            notification_type=Notification.NotificationType.SESSION_REQUEST,
+            title='New Session Request',
+            message=f'{session.requester.username} sent you a session request'
+        )
         return Response(
             FriendSessionRequestSerializer(
                 session,
@@ -679,6 +700,12 @@ class AcceptSessionRequestView(APIView):
                 'updated_at',
             ]
         )
+        NotificationService.create_notification(
+            recipient=session.requester,
+            notification_type=Notification.NotificationType.SESSION_ACCEPTED,
+            title='Session Request Accepted',
+            message=f'{session.recipient.username} accepted your session request'
+        )
         return Response(
             {
                 'detail':'session request accepted',
@@ -713,6 +740,12 @@ class RejectSessionRequestView(APIView):
                 'rejection_reason',
                 'updated_at',
             ]
+        )  
+        NotificationService.create_notification(
+            recipient=session.requester,
+            notification_type=Notification.NotificationType.SESSION_REJECTED,
+            title='Session Rejected',
+            message=f'{session.recipient.username} rejected your session request'
         )
         return Response(
             {

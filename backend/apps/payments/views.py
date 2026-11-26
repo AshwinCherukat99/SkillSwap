@@ -15,6 +15,8 @@ from django.db.models import Sum,Count,Q
 from django.db.models.functions import TruncDate
 from apps.mentors.authentication import MentorJWTAuthentication
 from apps.accounts.permissions import IsAdmin
+from apps.notifications.models import Notification
+from apps.notifications.notification_service import NotificationService
 from rest_framework import status
 
 class CreateCoursePaymentOrderView(APIView):
@@ -144,6 +146,19 @@ class VerifyCoursePaymentView(APIView):
                 f'Course Purchase:{payment.course.title}'
             )
         )
+        NotificationService.create_notification(
+            recipient=payment.student,
+            notification_type=Notification.NotificationType.PAYMENT_SUCCESS,
+            title='Payment Successful',
+            message=f'your payment of Rs. {payment.amount} for {payment.course.title} was successful. you have now enrolled in the course'
+        )
+        if payment.mentor.user:
+            NotificationService.create_notification(
+                recipient=payment.mentor.user,
+                notification_type=Notification.NotificationType.PAYMENT_SUCCESS,
+                title='New Course Purchase',
+                message=f'{payment.student.username} purchased your course {payment.course.title}. Rs. {payment.mentor_amount} has been credited to your wallet'
+            )
         return Response({
             'detail':'payment verified successfully',
             'payment_id':payment.id,
@@ -236,7 +251,14 @@ class MentorRequestPayoutView(APIView):
             mentor=mentor,
             amount=amount,
             status=MentorPayout.Status.REQUESTED,
-        )        
+        )          
+        if mentor.user:
+            NotificationService.create_notification(
+                recipient=mentor.user,
+                notification_type=Notification.NotificationType.PAYMENT_PENDING,
+                title='Payout Request Submitted',
+                message=f'your payout request of Rs. {payout.amount} (payout #{payout.id}) has been submitted and is awaiting admin approval'
+            )
         return Response({
             'message':'payout request submitted successfully',
             'payout':{
@@ -529,7 +551,14 @@ class AdminApproveMentorPayoutView(APIView):
             )
         payout.status=MentorPayout.Status.APPROVED
         payout.approved_at=timezone.now()
-        payout.save(update_fields=['status','updated_at'])
+        payout.save(update_fields=['status','updated_at','approved_at'])
+        if payout.mentor.user:
+            NotificationService.create_notification(
+                recipient=payout.mentor.user,
+                notification_type=Notification.NotificationType.PAYMENT_SUCCESS,
+                title='Payout Approved',
+                message=f'your payout request of Rs. {payout.amount} (payout #{payout.id}) has been approved and is awaiting payment processing'
+            )
         return Response(
             {
                 'message':'payout approved successfully',
@@ -605,6 +634,13 @@ class AdminRejectMentorPayoutView(APIView):
             balance_after=wallet.available_balance,
             description=f'Payout #{payout.id} rejected, amount returned to available balance',
         )
+        if payout.mentor.user:
+            NotificationService.create_notification(
+                recipient=payout.mentor.user,
+                notification_type=Notification.NotificationType.PAYMENT_FAILED,
+                title='Payout Request Rejected',
+                message=f'Your payout request of Rs. {payout.amount} (payout #{payout.id}) has been rejected, the amount has been returned to your available wallet balance'
+            )
         return Response(
             {
                 'message':'payout rejected and amount returned to available balance',

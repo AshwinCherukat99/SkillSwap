@@ -4,6 +4,8 @@ from django.conf import settings
 
 class Notification(models.Model):
     class NotificationType(models.TextChoices):
+        COURSE_ENROLLED='COURSE_ENROLLED','Course Enrolled'
+
         WELCOME = 'WELCOME', 'Welcome'
 
         SKILL_MATCH='SKILL_MATCH', 'Skill Match'
@@ -73,6 +75,11 @@ class Notification(models.Model):
         SESSION_COMPLETED = (
             'SESSION_COMPLETED',
             'Session Completed'
+        )
+
+        SESSION_SCHEDULED=(
+            'SESSION_SCHEDULED',
+            'Session Scheduled'
         )
 
         # Reviews

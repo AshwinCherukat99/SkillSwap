@@ -16,6 +16,8 @@ from apps.sessions_mgmt.models import CourseSession
 from apps.chat.models import Conversation
 from apps.accounts.models import UserRating
 from apps.courses.models import Course,CourseEnrollment
+from apps.notifications.models import Notification
+from apps.notifications.notification_service import NotificationService
 from django.db import transaction
 from django.db.models import Count,Avg,Q
 from django.db.models.functions import TruncMonth
@@ -919,7 +921,14 @@ class UserMentorReviewView(APIView):
             rated_by=request.user,
             rating=rating,
             review=review,
-        )
+        ) 
+        if mentor.user:
+            NotificationService.create_notification(
+                recipient=mentor.user,
+                notification_type=Notification.NotificationType.REVIEW_RECEIVED,
+                title='New Review Received',
+                message=f'{request.user.username} gave you a {rating}-star review'
+            )
         rating_data=UserRating.objects.filter(
             rated_user=mentor.user,
         ).aggregate(
