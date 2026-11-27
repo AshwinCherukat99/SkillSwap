@@ -551,7 +551,7 @@ class AdminApproveMentorPayoutView(APIView):
         WalletTransaction.objects.create(
             wallet=wallet,
             transaction_type=WalletTransaction.TransactionType.PAYOUT,
-            direction=WalletTransaction.direction.DEBIT,
+            direction=WalletTransaction.Direction.DEBIT,
             amount=payout.amount,
             balance_after=wallet.pending_balance,
             description=(
