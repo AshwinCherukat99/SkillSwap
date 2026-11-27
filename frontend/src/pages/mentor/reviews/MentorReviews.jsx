@@ -57,7 +57,7 @@ const MentorReviews=()=>{
             setReplyLoading(reviewId)
             setReplyError("")  
             await mentorApi.post(
-                `/reviews/mentor/${reviewId}/reply/`,
+                `/mentors/reviews/${reviewId}/reply/`,
                 {
                     mentor_reply:message.trim()
                 }

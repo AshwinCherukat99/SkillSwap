@@ -19,9 +19,12 @@ const RevenueAnalytics=({transactions=[]})=>{
                         return false
                     }
                     const date=new Date(transaction.date)
+                    if (Number.isNaN(date.getTime())){
+                        return False
+                    }
                     return (
                         date.getMonth()===now.getMonth() &&
-                        date.getYear()===now.getYear()
+                        date.getFullYear()===now.getFullYear()
                     )
                 }
             )
@@ -29,10 +32,13 @@ const RevenueAnalytics=({transactions=[]})=>{
         if (period==='year'){
             filteredTransactions=transactions.filter(
                 (transaction)=>{
-                    if (!transaction.data){
+                    if (!transaction.date){
                         return false
                     }
                     const date=new Date(transaction.date)
+                    if (Number.isNaN(date.getTime())){
+                        return False
+                    }
                     return date.getFullYear()===now.getFullYear()
                 }
             )

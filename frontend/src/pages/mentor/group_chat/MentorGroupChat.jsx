@@ -183,9 +183,6 @@ const MentorGroupChat = () => {
                             />
                         </div>
 
-                        <button className="btn btn-light rounded-circle chat-icon-btn" title="Notifications">
-                            <i className="bi bi-bell"></i>
-                        </button>
                     </div>
                 </div>
 

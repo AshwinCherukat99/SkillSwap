@@ -27,26 +27,6 @@ const ChatHeader=({group})=>{
         </div>
       </div>
 
-      <div className="d-flex gap-2">
-        <button className="btn btn-primary rounded-pill px-3">
-          <i className="bi bi-camera-video me-2"></i>
-          Join Call
-        </button>
-
-        <button
-          className="btn btn-light rounded-circle"
-          title="Share"
-        >
-          <i className="bi bi-share"></i>
-        </button>
-
-        <button
-          className="btn btn-light rounded-circle"
-          title="More"
-        >
-          <i className="bi bi-three-dots-vertical"></i>
-        </button>
-      </div>
     </div>
     )
 }

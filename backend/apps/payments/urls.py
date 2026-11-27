@@ -9,7 +9,8 @@ from .views import (
     AdminTransactionListView,
     AdminApproveMentorPayoutView,
     AdminRejectMentorPayoutView,
-    AdminMentorPayoutListView
+    AdminMentorPayoutListView,
+    MentorPayoutProfileView
 )
 
 urlpatterns=[
@@ -57,5 +58,10 @@ urlpatterns=[
         'admin/payouts/<int:payout_id>/reject/',
         AdminRejectMentorPayoutView.as_view(),
         name='reject-mentor-payout',
+    ),
+    path(
+        'mentor/payout-profile/',
+        MentorPayoutProfileView.as_view(),
+        name='mentor-payout-profile'
     )
 ]

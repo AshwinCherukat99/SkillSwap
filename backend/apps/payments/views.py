@@ -6,8 +6,9 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from apps.courses.models import Course,CourseEnrollment
-from .models import CoursePayment,MentorWallet,WalletTransaction,MentorPayout
+from .models import CoursePayment,MentorWallet,WalletTransaction,MentorPayout,MentorPayoutProfile
 from .services.razorpay_service import create_course_order
+from .serializers import MentorPayoutProfileSerializer
 import hmac
 import hashlib
 from django.utils import timezone
@@ -740,4 +741,28 @@ class AdminMentorPayoutListView(APIView):
                 },
                 'payouts':results,
             }
+        ) 
+
+class MentorPayoutProfileView(APIView):
+    authentication_classes=[MentorJWTAuthentication]
+    def get(self,request):
+        profile=MentorPayoutProfile.objects.filter(
+            mentor=request.user
+        ).first()
+        if not profile:
+            return Response(
+                {
+                    'exists':False,
+                    'is_verified':False,
+                    'message':'payout profile has not been configured'
+                },
+                status=status.HTTP_200_OK
+            )
+        serializer=MentorPayoutProfileSerializer(profile)
+        return Response(
+            {
+                'exists':True,
+                'profile':serializer.data
+            },
+            status=status.HTTP_200_OK
         )
