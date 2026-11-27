@@ -673,7 +673,6 @@ class AdminMentorPayoutListView(APIView):
     def get(self,request):
         payouts=MentorPayout.objects.select_related(
             'mentor',
-            'mentor__payout_profile',
             'mentor__wallet',
         ).order_by('-requested_at')
         status_filter=request.query_params.get('status','').upper()
@@ -701,8 +700,7 @@ class AdminMentorPayoutListView(APIView):
         results=[]
         for payout in payouts:
             mentor=payout.mentor
-            wallet=getattr(mentor,'wallet',None)
-            profile=getattr(mentor,'payout_profile',None)
+            wallet=getattr(mentor,'wallet',None),
             results.append({
                 'id':payout.id,
                 'payout_id':f'PAYOUT-{payout.id:04d}',
@@ -717,8 +715,6 @@ class AdminMentorPayoutListView(APIView):
                 'status':payout.status,
                 'failure_reason':payout.failure_reason,
                 'payment_reference':payout.payment_reference,
-                'payout_profile_verified':bool(profile and profile.is_verified),
-                'payout_method_configured':bool(profile and profile.razorpay_fund_account_id),
             })
         all_payouts=MentorPayout.objects.all()
         month_payouts=all_payouts.filter(

@@ -65,10 +65,6 @@ function PayoutDetailsModal({payout,onClose}){
               value={formatDate(payout.completed_at)}
             />
             <DetailRow
-              label="Payout profile verified"
-              value={payout.payout_profile_verified ? "Yes" : "No"}
-            />
-            <DetailRow
               label="Payout method configured"
               value={payout.payout_method_configured ? "Yes" : "No"}
             />
