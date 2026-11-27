@@ -3,7 +3,7 @@ from apps.adminpanel.pagination import AdminPagination
 class AdminPaginationMixin:
     pagination_class=AdminPagination
     def paginate_queryset(self,queryset):
-        self.paginator=self.pagination_class
+        self.paginator=self.pagination_class()
         return self.paginator.paginate_queryset(
             queryset,
             self.request,
