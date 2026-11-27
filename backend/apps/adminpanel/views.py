@@ -69,7 +69,7 @@ class MentorVerificationListView(AdminPaginationMixin,APIView):
         verifications=(MentorVerification.objects.select_related('mentor').filter(status=MentorVerification.Status.PENDING).order_by('-created_at'))
         page=self.paginate_queryset(verifications)
         mentors=[]
-        for verification in verifications:
+        for verification in page:
             mentor=verification.mentor
             documents_count=MentorDocument.objects.filter(
                 mentor=mentor
