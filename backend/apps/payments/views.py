@@ -6,9 +6,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from apps.courses.models import Course,CourseEnrollment
-from .models import CoursePayment,MentorWallet,WalletTransaction,MentorPayout,MentorPayoutProfile
+from .models import CoursePayment,MentorWallet,WalletTransaction,MentorPayout
 from .services.razorpay_service import create_course_order
-from .serializers import MentorPayoutProfileSerializer
 import hmac
 import hashlib
 from django.utils import timezone
@@ -532,14 +531,6 @@ class AdminApproveMentorPayoutView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        profile=getattr(payout.mentor,'payout_profile',None)
-        if not profile or not profile.is_verified:
-            return Response(
-                {
-                    'detail':'mentor payout profile is not verified'
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         wallet,_=MentorWallet.objects.select_for_update().get_or_create(
             mentor=payout.mentor
         )
@@ -550,9 +541,23 @@ class AdminApproveMentorPayoutView(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
+        wallet.pending_balance-=payout.amount
+        wallet.save(
+            update_fields=['pending_balance','updated_at']
+        )
         payout.status=MentorPayout.Status.APPROVED
         payout.approved_at=timezone.now()
         payout.save(update_fields=['status','approved_at'])
+        WalletTransaction.objects.create(
+            wallet=wallet,
+            transaction_type=WalletTransaction.TransactionType.PAYOUT,
+            direction=WalletTransaction.direction.DEBIT,
+            amount=payout.amount,
+            balance_after=wallet.pending_balance,
+            description=(
+                f'payout #{payout.id} approved, amount deducted from pending payout balance'
+            )
+        )
         if payout.mentor.user:
             NotificationService.create_notification(
                 recipient=payout.mentor.user,
@@ -568,8 +573,13 @@ class AdminApproveMentorPayoutView(APIView):
                     'amount':str(payout.amount),
                     'status':payout.status,
                     'approved_at':payout.approved_at,
+                },
+                'wallet':{
+                    'available_balance':str(wallet.available_balance),
+                    'pending_balance':str(wallet.pending_balance)
                 }
-            }
+            },
+            status=status.HTTP_200_OK
         )
 
 class AdminRejectMentorPayoutView(APIView):
@@ -742,27 +752,3 @@ class AdminMentorPayoutListView(APIView):
                 'payouts':results,
             }
         ) 
-
-class MentorPayoutProfileView(APIView):
-    authentication_classes=[MentorJWTAuthentication]
-    def get(self,request):
-        profile=MentorPayoutProfile.objects.filter(
-            mentor=request.user
-        ).first()
-        if not profile:
-            return Response(
-                {
-                    'exists':False,
-                    'is_verified':False,
-                    'message':'payout profile has not been configured'
-                },
-                status=status.HTTP_200_OK
-            )
-        serializer=MentorPayoutProfileSerializer(profile)
-        return Response(
-            {
-                'exists':True,
-                'profile':serializer.data
-            },
-            status=status.HTTP_200_OK
-        )

@@ -24,6 +24,8 @@ function MentorPayouts(){
     const [selectedPayout,setSelectedPayout]=useState(null)
     const [detailsPayout,setDetailsPayout]=useState(null)
     const [rejectReason,setRejectReason]=useState('')
+    const [approvalPayout,setApprovalPayout]=useState(null)
+    const [approvalSuccess,setApprovalSuccess]=useState(false)
     const fetchPayouts=useCallback(async ()=>{
         setLoading(true)
         setError('')
@@ -69,22 +71,28 @@ function MentorPayouts(){
         setAmount('')
         setDate('')
     }
-    const handleApprove=async (payout)=>{
-        const confirmed=window.confirm(
-            `approve payout ${payout.payout_id||payout.id} for Rs.${payout.amount}?`
-        )
-        if (!confirmed) return
-        setActionLoading(payout.id)
+    const handleApprove=(payout)=>{
         setError('')
         setNotice('')
+        setApprovalSuccess(false)
+        setApprovalPayout(payout)
+    }
+    const confirmApproval=async ()=>{
+        if (!approvalPayout) return 
+        const payoutId=approvalPayout.id
+        setActionLoading(payoutId)
+        setError('')
         try{
             const response=await adminApi.post(
-                `/payments/admin/payouts/${payout.id}/approve/`
-            )
-            setNotice(response.data.message||"payout approved successfully")
+                `/payments/admin/payouts/${payoutId}/approve/`
+            ) 
+            setApprovalSuccess(true)
             await fetchPayouts()
+            setNotice(response.data.message||'payout approved successfully')
         }catch(err){
-            console.error('payout approval failed:',err.response?.data||err)
+            console.error(
+                'payout approval failed:',err.response?.data||err
+            )
             setError(
                 err.response?.data?.detail||
                 err.response?.data?.error||
@@ -93,6 +101,11 @@ function MentorPayouts(){
         }finally{
             setActionLoading(null)
         }
+    }
+    const closeApprovalModal=()=>{
+        if (actionLoading!==null) return
+        setApprovalPayout(null)
+        setApprovalSuccess(false)
     }
     const openRejectModal=(payout)=>{
         setError('')
@@ -203,6 +216,113 @@ function MentorPayouts(){
         payout={detailsPayout}
         onClose={() => setDetailsPayout(null)}
       />
+
+      {approvalPayout && (
+    <div
+        className="modal fade show d-block"
+        tabIndex="-1"
+        role="dialog"
+        aria-modal="true"
+        style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+    >
+        <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content border-0 shadow rounded-4">
+
+                <div className="modal-header">
+                    <h5 className="modal-title fw-bold">
+                        {approvalSuccess
+                            ? 'Payout Approved'
+                            : 'Confirm Payout Approval'}
+                    </h5>
+
+                    <button
+                        type="button"
+                        className="btn-close"
+                        onClick={closeApprovalModal}
+                        disabled={actionLoading !== null}
+                    />
+                </div>
+
+                <div className="modal-body text-center py-4">
+
+                    {approvalSuccess ? (
+                        <>
+                            <i className="bi bi-check-circle-fill text-success fs-1 mb-3 d-block"></i>
+
+                            <h5 className="fw-bold">
+                                Payout approved successfully!
+                            </h5>
+
+                            <p className="text-muted mb-0">
+                                Payout #{approvalPayout.id} for Rs.{' '}
+                                {approvalPayout.amount} has been approved.
+                            </p>
+                        </>
+                    ) : (
+                        <>
+                            <i className="bi bi-exclamation-circle text-warning fs-1 mb-3 d-block"></i>
+
+                            <p className="mb-2">
+                                Are you sure you want to approve this payout?
+                            </p>
+
+                            <h4 className="fw-bold">
+                                ₹{Number(approvalPayout.amount).toFixed(2)}
+                            </h4>
+
+                            <p className="text-muted small mb-0">
+                                The amount will be deducted from the
+                                mentor's pending payout balance.
+                            </p>
+                        </>
+                    )}
+
+                </div>
+
+                <div className="modal-footer">
+
+                    {approvalSuccess ? (
+                        <button
+                            type="button"
+                            className="btn btn-success"
+                            onClick={closeApprovalModal}
+                        >
+                            Done
+                        </button>
+                    ) : (
+                        <>
+                            <button
+                                type="button"
+                                className="btn btn-light"
+                                onClick={closeApprovalModal}
+                                disabled={actionLoading !== null}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={confirmApproval}
+                                disabled={actionLoading !== null}
+                            >
+                                {actionLoading === approvalPayout.id ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" />
+                                        Approving...
+                                    </>
+                                ) : (
+                                    'Confirm Approval'
+                                )}
+                            </button>
+                        </>
+                    )}
+
+                </div>
+            </div>
+        </div>
+    </div>
+)}
 
       <RejectPayoutModal
         payout={selectedPayout}

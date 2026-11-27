@@ -171,27 +171,3 @@ class MentorPayout(models.Model):
     )
     class Meta:
         ordering=['-requested_at'] 
-
-class MentorPayoutProfile(models.Model):
-    mentor=models.OneToOneField(
-        'mentors.Mentor',
-        on_delete=models.CASCADE,
-        related_name='payout_profile'
-    )
-    razorpay_contact_id=models.CharField(
-        max_length=100,
-        blank=True
-    )
-    razorpay_fund_account_id=models.CharField(
-        max_length=100,
-        blank=True
-    )
-    is_verified=models.BooleanField(
-        default=False
-    )
-    created_at=models.DateTimeField(
-        auto_now_add=True
-    )
-    updated_at=models.DateTimeField(
-        auto_now=True
-    )
