@@ -18,6 +18,7 @@ from apps.courses.models import Course,CourseCategory
 from apps.skills.models import Skill,SuggestedSkill
 from apps.reports.models import Report
 from apps.sessions_mgmt.models import SkillExchangeSession,CourseSession
+from apps.adminpanel.mixins import AdminPaginationMixin
 
 from apps.accounts.serializers.mentor import AdminUserRatingSerializer
 from .serializers.auth import AdminLoginSerializer
@@ -62,10 +63,11 @@ class AdminLoginView(APIView):
             status=status.HTTP_200_OK,
         )  
 
-class MentorVerificationListView(APIView):
+class MentorVerificationListView(AdminPaginationMixin,APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
         verifications=(MentorVerification.objects.select_related('mentor').filter(status=MentorVerification.Status.PENDING).order_by('-created_at'))
+        page=self.paginate_queryset(verifications)
         mentors=[]
         for verification in verifications:
             mentor=verification.mentor
@@ -113,6 +115,7 @@ class MentorVerificationListView(APIView):
             {
                 'stats':stats,
                 'mentors':mentors,
+                **self.get_pagination_metadata(),
             },
             status=status.HTTP_200_OK,
         )
@@ -314,7 +317,7 @@ class RejectMentorView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class AdminCourseManagementView(APIView):
+class AdminCourseManagementView(AdminPaginationMixin,APIView):
     permission_classes=[IsAuthenticated]
     authentication_classes=[JWTAuthentication]
     def get(self,request):
@@ -353,8 +356,9 @@ class AdminCourseManagementView(APIView):
         rejected_courses=courses.filter(
             status=Course.Status.ARCHIVED
         )
+        page=self.paginate_queryset(courses)
         serializer=AdminCourseListSerializer(
-            courses,
+            page,
             many=True,
         )
         return Response(
@@ -367,6 +371,7 @@ class AdminCourseManagementView(APIView):
                     'rejected':rejected_courses,
                 },
                 'courses':serializer.data,
+                **self.get_pagination_metadata()
             },
             status=status.HTTP_200_OK,
         )
@@ -459,23 +464,25 @@ class AdminCourseRejectView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class AdminSkillListCreateView(APIView):
+class AdminSkillListCreateView(AdminPaginationMixin,APIView):
     authentication_classes=[JWTAuthentication]
     permission_classes=[IsAuthenticated]
     def get(self,request):
         search=request.query_params.get('search','').strip()
-        skills=Skill.objects.all().order_by('name')
+        skills=Skill.objects.all().order_by('name')  
+        page=self.paginate_queryset(skills)
         if search:
             skills=skills.filter(
                 Q(name__icontains=search)|Q(slug__icontains=search)
             )
         serializer=AdminSkillSerializer(
-            skills,
+            page,
             many=True,
         )
         return Response(
             {
                 'skills':serializer.data,
+                **self.get_pagination_metadata()
             },
             status=status.HTTP_200_OK,
         )
@@ -635,7 +642,7 @@ class AdminRejectSuggestedSkillView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class AdminUserManagementView(APIView):
+class AdminUserManagementView(AdminPaginationMixin,APIView):
     permission_classes=[
         IsAdmin,
         IsAuthenticated
@@ -676,8 +683,9 @@ class AdminUserManagementView(APIView):
         suspended_users=all_users.filter(
             status=User.Status.SUSPENDED
         ).count()
+        page=self.paginate_queryset(users)
         serializer=AdminUserSerializer(
-            users,
+            page,
             many=True,
             context={
                 'request':request
@@ -692,7 +700,8 @@ class AdminUserManagementView(APIView):
                     'blocked_users':blocked_users,
                     'suspended_users':suspended_users,
                 }
-            }
+            },
+            **self.get_pagination_metadata()
         )
 
 class AdminUserDetailView(APIView):
@@ -823,7 +832,7 @@ class AdminActivateUserView(APIView):
             }
         )
 
-class AdminReviewManagementView(APIView):
+class AdminReviewManagementView(AdminPaginationMixin,APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
         reviews=(UserRating.objects.select_related('rated_by','rated_user').order_by('-created_at'))
@@ -855,8 +864,9 @@ class AdminReviewManagementView(APIView):
             reviews=reviews.filter(
                 is_hidden=True
             )
+        page=self.paginate_queryset(reviews)
         serializer=AdminReviewSerializer(
-            reviews,
+            page,
             many=True,
             context={
                 'request':request,
@@ -916,7 +926,8 @@ class AdminReviewManagementView(APIView):
                     'hidden_reviews':hidden_reviews,
                     'reported_reviews':reported_reviews,
                 }
-            }
+            },
+            **self.get_pagination_metadata()
         )
 
 class AdminHideReviewView(APIView):
@@ -1062,7 +1073,7 @@ class AdminReviewReportUpdateView(APIView):
                 serializer.data
             )
 
-class AdminMentorManagementView(APIView):
+class AdminMentorManagementView(AdminPaginationMixin,APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
         mentors=Mentor.objects.select_related('profile').all()
@@ -1088,8 +1099,9 @@ class AdminMentorManagementView(APIView):
         mentors=mentors.order_by('-created_at')
         print('MENTOR COUNT:',mentors.count())
         print('MENTOR STATUS:',list(mentors.values_list('id','username','status')))
+        page=self.paginate_queryset(mentors)
         serializer=AdminMentorListSerializer(
-            mentors,
+            page,
             many=True,
             context={
                 'request':request,
@@ -1098,6 +1110,7 @@ class AdminMentorManagementView(APIView):
         return Response(
             {
                 'mentors':serializer.data,
+                **self.get_pagination_metadata()
             },
             status=status.HTTP_200_OK,
         )
@@ -1539,17 +1552,19 @@ class AdminUserDetailView(APIView):
             context={'request':request},
         ).data)
 
-class AdminCourseCategoryView(APIView):
+class AdminCourseCategoryView(AdminPaginationMixin,APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
         categories=CourseCategory.objects.all().order_by('name')
+        page=self.paginate_queryset(categories)
         serializer=CourseCategorySerializer(
-            categories,
+            page,
             many=True,
         )
         return Response(
             serializer.data,
-            status=status.HTTP_200_OK,
+            status=status.HTTP_200_OK
+            **self.get_pagination_metadata()
         )
     def post(self,request):
         serializer=CourseCategorySerializer(

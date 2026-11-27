@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import {useEffect,useState,useCallback} from "react";
 
 import adminApi from '../../../services/adminApi'
 
@@ -10,6 +10,9 @@ import SkillSuggestionList from '../../../components/admin/skill_mgmt/SkillSugge
 import AddSkillModal from '../../../components/admin/skill_mgmt/AddSkillModal'
 import RejectSkillModal from '../../../components/admin/skill_mgmt/RejectSkillModal'
 
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
+
 const SkillManagement=()=>{
     const [skills,setSkills]=useState([])
     const [suggestions,setSuggestions]=useState([])
@@ -20,23 +23,38 @@ const SkillManagement=()=>{
     const [error,setError]=useState('')
     const [showAddModal,setShowAddModal]=useState(false)
     const [rejectSuggestion,setRejectSuggestion]=useState(null)
-    const fetchSkills=async ()=>{
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
+    const fetchSkills=useCallback(async ()=>{
         try{
             setLoadingSkills(true)
             const response=await adminApi.get(
                 '/admin/skills/',
                 {
-                    params:search
+                    params:{
+                        page:currentPage,
+                        page_size:pageSize,
+                        search
+                    }
                 }
             )
-            setSkills(response.data.skills||[])
+            setSkills(response.data.skills||[])  
+            updatePagination(response.data)
         }catch(error){
             console.error('failed to load skills:',error)
             setError('failed to load skills')
         }finally{
             setLoadingSkills(false)
         }
-    }
+    },[currentPage,pageSize,search,updatePagination])
     const fetchSuggestions=async ()=>{
         try{
             setLoadingSuggestions(true)
@@ -58,10 +76,14 @@ const SkillManagement=()=>{
     }
     useEffect(()=>{
         fetchSkills()
-    },[search])
+    },[fetchSkills])
     useEffect(()=>{
         fetchSuggestions()
     },[suggestionStatus])
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
     const handleAddSkill=async (data)=>{
         try{
             await adminApi.post(
@@ -131,7 +153,7 @@ const SkillManagement=()=>{
 
             <SkillManagementHeader
                 search={search}
-                setSearch={setSearch}
+                setSearch={handleSearchChange}
                 onAddSkill={() =>
                     setShowAddModal(true)
                 }
@@ -184,6 +206,17 @@ const SkillManagement=()=>{
                     />
 
                 </div>
+
+                {!error&&!loadingSkills&&(
+                    <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                    />
+                )}
 
             </div>
 

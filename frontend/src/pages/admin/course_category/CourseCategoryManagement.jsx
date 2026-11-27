@@ -1,4 +1,4 @@
-import { useEffect,useState,useMemo } from "react";
+import { useEffect,useState,useMemo,useCallback } from "react";
 
 import CategoryTable from "../../../components/admin/course_category/CategoryTable";
 import CategoryFormModal from "../../../components/admin/course_category/CategoryFormModal";
@@ -6,6 +6,11 @@ import DeleteCategoryModal from "../../../components/admin/course_category/Delet
 import './CourseCategoryManagement.css'
 
 import adminApi from "../../../services/adminApi";
+
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
+
+const CATEGORY_URL='/admin/course-categories/'
 
 const CourseCategoryManagement=()=>{
     const [categories,setCategories]=useState([])
@@ -20,24 +25,47 @@ const CourseCategoryManagement=()=>{
     const [saving,setSaving]=useState(false)
     const [deleting,setDeleting]=useState(false)
     const [error,setError]=useState('')
-    const CATEGORY_URL='/admin/course-categories/'
-    const fetchCategories=async ()=>{
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
+    const fetchCategories=useCallback(async ()=>{
         try{
             setLoading(true)
             setError('')
-            const response=await adminApi.get(CATEGORY_URL)
+            const response=await adminApi.get(
+                CATEGORY_URL,
+                {
+                    params:{
+                        page:currentPage,
+                        page_size:pageSize,
+                        search
+                    }
+                }
+            )
             const data=response.data
-            setCategories(Array.isArray(data)?data:data.categories||[])
+            setCategories(Array.isArray(data)?data:data.categories||[]) 
+            updatePagination(data)
         }catch(err){
             console.error('failed to fetch categories:',err)
             setError(err.response?.data?.detail||'failed to load course categories')
         }finally{
             setLoading(false)
         }
-    }
+    },[currentPage,pageSize,search,updatePagination])
     useEffect(()=>{
         fetchCategories()
-    },[])
+    },[fetchCategories])
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
     const getCourseCount=(category)=>{
         return Number(
             category.course_count??
@@ -145,7 +173,7 @@ const CourseCategoryManagement=()=>{
             console.error('category deletion failed:',err)
             alert(
                 err.response?.data?.error||
-                err.resposne?.data?.detail||
+                err.response?.data?.detail||
                 'failed to delete category'
             )
         }finally{
@@ -220,7 +248,7 @@ const CourseCategoryManagement=()=>{
                                     </p>
 
                                     <h2 className="fw-bold mb-2">
-                                        {loading ? "—" : categories.length}
+                                        {loading ? "—" : totalCount}
                                     </h2>
 
                                     <p className="text-muted small mb-0">
@@ -290,13 +318,24 @@ const CourseCategoryManagement=()=>{
                 <CategoryTable
                     categories={filteredCategories}
                     search={search}
-                    setSearch={setSearch}
+                    setSearch={handleSearchChange}
                     sort={sort}
                     setSort={setSort}
                     onEdit={openEditModal}
                     onDelete={openDeleteModal}
                 />
 
+            )}
+
+            {!loading&&!error&&(
+                <Pagination
+                currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                />
             )}
 
             {/* Create / Edit Modal */}

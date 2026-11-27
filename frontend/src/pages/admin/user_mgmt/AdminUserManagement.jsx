@@ -11,6 +11,9 @@ import './AdminUserManagement.css'
 
 import adminApi from '../../../services/adminApi'
 
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
+
 const AdminUserManagement = () => {
     const navigate = useNavigate()
     const [users, setUsers] = useState([])
@@ -31,6 +34,16 @@ const AdminUserManagement = () => {
     })
     const [actionLoading, setActionLoading] = useState(false)
     const [editingUser, setEditingUser] = useState(null)
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
 
     const fetchUsers = useCallback(
         async () => {
@@ -41,6 +54,8 @@ const AdminUserManagement = () => {
                     '/admin/users/',
                     {
                         params: {
+                            page:currentPage,
+                            page_size:pageSize,
                             search,
                             status: selectedStatus,
                         }
@@ -53,6 +68,7 @@ const AdminUserManagement = () => {
                     blocked_users: 0,
                     suspended_users: 0,
                 })
+                updatePagination(response.data)
             } catch (error) {
                 console.error('failed to fetch users:', error)
                 setError(error.response?.data?.detail || 'failed to load users')
@@ -60,7 +76,7 @@ const AdminUserManagement = () => {
                 setLoading(false)
             }
         },
-        [search, selectedStatus]
+        [currentPage,pageSize,search,selectedStatus,updatePagination]
     )
 
     useEffect(() => {
@@ -68,11 +84,13 @@ const AdminUserManagement = () => {
     }, [fetchUsers])
 
     const handleSearchChange = (value) => {
-        setSearch(value)
+        setSearch(value) 
+        resetPagination()
     }
 
     const handleStatusChange = (value) => {
-        setSelectedStatus(value)
+        setSelectedStatus(value) 
+        resetPagination()
     }
 
     const handleView = (user) => {
@@ -236,6 +254,17 @@ const AdminUserManagement = () => {
                         }
                     />
                 </div>
+
+                {!loading&&!error&&(
+                    <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                    />
+                )}
 
                 {/* Confirmation Modal */}
                 <ConfirmUserActionModal

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams,useNavigate } from 'react-router-dom'
 
 import adminApi from '../../../services/adminApi'
@@ -10,6 +10,9 @@ import CourseDetailsModal from "../../../components/admin/course_mgmt/CourseDeta
 import RejectCourseModal from "../../../components/admin/course_mgmt/RejectCourseModal";
 
 import "./AdminCourseManagement.css";
+
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
 
 const AdminCourseManagement = () => {
     const navigate=useNavigate()
@@ -29,8 +32,18 @@ const AdminCourseManagement = () => {
     const [error, setError] = useState('')
     const [selectedCourse, setSelectedCourse] = useState(null)
     const [rejectCourse, setRejectCourse] = useState(null)
+    const {
+        currentPage,
+    pageSize,
+    totalPages,
+    totalCount,
+    updatePagination,
+    changePage,
+    changePageSize,
+    resetPagination
+    }=useAdminPagination()
 
-    const fetchCourses = async () => {
+    const fetchCourses = useCallback(async () => {
         try {
             setLoading(true)
             setError('')
@@ -38,6 +51,8 @@ const AdminCourseManagement = () => {
                 '/admin/courses/',
                 {
                     params: {
+                        page:currentPage,
+                        page_size:pageSize,
                         search,
                         status: statusFilter,
                     }
@@ -45,13 +60,22 @@ const AdminCourseManagement = () => {
             )
             setCourses(response.data.courses || [])
             setStats(response.data.stats || [])
+            updatePagination(response.data)
         } catch (error) {
             console.error('failed to fetch courses:', error)
             setError(error.response?.data?.detail || 'failed to load courses')
         } finally {
             setLoading(false)
         }
-    }
+    },
+    [
+    currentPage,
+    pageSize,
+    search,
+    statusFilter,
+    updatePagination
+]
+)
 
     useEffect(() => {
         const timer = setTimeout(
@@ -59,7 +83,17 @@ const AdminCourseManagement = () => {
             300
         )
         return () => clearTimeout(timer)
-    }, [search, statusFilter])
+    }, [fetchCourses])
+
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
+
+    const handleStatusChange=(value)=>{
+        setStatusFilter(value)
+        resetPagination()
+    }
 
     const handleView = async (course) => {
         try {
@@ -149,9 +183,9 @@ const AdminCourseManagement = () => {
                 <div className="mb-4">
                     <CourseToolbar
                         search={search}
-                        setSearch={setSearch}
+                        setSearch={handleSearchChange}
                         status={statusFilter}
-                        setStatus={setStatusFilter}
+                        setStatus={handleStatusChange}
                     />
                 </div>
 
@@ -204,6 +238,16 @@ const AdminCourseManagement = () => {
                             />
                         )}
                     </div>
+                        {!loading&&!error&&(
+                            <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                            />
+                        )}
                 </div>
 
                 {/* Course Details Modal */}

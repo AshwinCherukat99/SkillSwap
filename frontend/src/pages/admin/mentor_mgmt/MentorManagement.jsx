@@ -1,4 +1,4 @@
-import React,{useCallback,useEffect,useState} from 'react'
+import {useCallback,useEffect,useState} from 'react'
 
 import {useNavigate} from 'react-router-dom'
 
@@ -11,6 +11,9 @@ import EditMentorModal from '../edit_mentor_modal/EditMentorModal'
 import adminApi from '../../../services/adminApi'
 
 import './MentorManagement.css'
+
+import Pagination from '../../../components/common/Pagination'
+import useAdminPagination from '../../../hooks/useAdminPagination'
 
 const MentorManagement=()=>{
     const navigate=useNavigate()
@@ -27,6 +30,17 @@ const MentorManagement=()=>{
     const [loading,setLoading]=useState(true)
     const [statsLoading,setStatsLoading]=useState(true)  
     const [editingMentor,setEditingMentor]=useState(null)
+    const [error,setError]=useState('')
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
     const fetchStats=async ()=>{
         try{
             setStatsLoading(true)
@@ -42,9 +56,12 @@ const MentorManagement=()=>{
         async ()=>{
             try{
                 setLoading(true)
+                setError('')
                 const data=await adminApi.get(
                     '/admin/mentor-management/',{
                         params:{
+                            page:currentPage,
+                            page_size:pageSize,
                             status:activeTab,
                             search
                         }
@@ -56,32 +73,26 @@ const MentorManagement=()=>{
 
 console.log('FULL RESPONSE:', data)
 
-console.log(
-    'data.mentors:',
-    data?.mentors
-)
+console.log('response data:',data.data)
 
 console.log(
-    'data.data:',
-    data?.data
-)
-
-console.log(
-    'data.data?.mentors:',
-    data?.data?.mentors
+    'mentors:',
+    data.data?.mentors
 )
 
 console.log(
     '======================================='
 )
                 setMentors(data.data.mentors||[])
+                updatePagination(data.data)
             }catch(err){
                 console.error('failed to load mentors:',err)
+                setError(err.response?.data?.detail||'failed to load mentors')
             }finally{
                 setLoading(false)
             }
         }
-    ,[activeTab,search])
+    ,[currentPage,pageSize,activeTab,search,updatePagination])
     useEffect(()=>{
         fetchStats()
     },[])
@@ -90,7 +101,15 @@ console.log(
             fetchMentors()
         },300)
         return ()=>clearTimeout(timeout)
-    },[fetchMentors])
+    },[fetchMentors])   
+    const handleTabChange=(tab)=>{
+        setActiveTab(tab)
+        resetPagination()
+    }
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
     const handleView=(
         mentor,
         destination=null
@@ -203,9 +222,9 @@ console.log(
 
                     <MentorFilters
                         activeTab={activeTab}
-                        setActiveTab={setActiveTab}
+                        setActiveTab={handleTabChange}
                         search={search}
-                        setSearch={setSearch}
+                        setSearch={handleSearchChange}
                         pendingCount={
                             stats.pending_verification
                         }
@@ -221,6 +240,17 @@ console.log(
                     />
 
                 </div>
+
+                {!loading&&(
+                    <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                    />
+                )}
 
             </div>
 

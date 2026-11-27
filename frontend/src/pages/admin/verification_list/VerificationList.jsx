@@ -10,6 +10,9 @@ import VerificationEmptyState from '../../../components/admin/verification_list/
 
 import adminApi from '../../../services/adminApi'
 
+import Pagination from '../../../components/common/Pagination'
+import useAdminPagination from '../../../hooks/useAdminPagination'
+
 const VerificationList=()=>{
     const navigate=useNavigate()
     const [mentors,setMentors]=useState([])
@@ -24,12 +27,29 @@ const VerificationList=()=>{
     const [sortBy,setSortBy]=useState('newest')
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
-    const fetchMentors=async ()=>{
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
+    const fetchMentors=useCallback(async ()=>{
         try{
             setLoading(true)
             setError('')
             const response=await adminApi.get(
-                '/admin/mentor-verification/'
+                '/admin/mentor-verification/',
+                {
+                    params:{
+                        page:currentPage,
+                        page_size:pageSize,
+                        search
+                    }
+                }
             )
             setMentors(response.data.mentors||[])
             setStats(response.data.stats||{
@@ -38,16 +58,23 @@ const VerificationList=()=>{
                 verified:0,
                 rejected:0,
             })
+            updatePagination(response.data)
         }catch(error){
             console.error('failed to fetch mentor verification list:',error)
             setError(error.response?.data?.error||error.response?.data?.detail||'failed to load mentor verification list')
         }finally{
             setLoading(false)
         }
-    }
+    },[currentPage,pageSize,search,updatePagination])
     useEffect(()=>{
         fetchMentors()
-    },[])
+    },[fetchMentors])                
+
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
+
     const filteredMentors=useMemo(()=>{
         let result=[...mentors]
         if (activeTab!=='ALL'){
@@ -95,7 +122,8 @@ const VerificationList=()=>{
         return result
     },[mentors,activeTab,search,sortBy])
     const handleTabChange=(tab)=>{
-        setActiveTab(tab)
+        setActiveTab(tab)  
+        resetPagination()
     }
     const handleViewDocuments=(mentorId)=>{
         navigate(`/admin/mentor-verification/${mentorId}/documents/`)
@@ -224,7 +252,7 @@ const VerificationList=()=>{
 
                 <VerificationFilters
                     search={search}
-                    setSearch={setSearch}
+                    setSearch={handleSearchChange}
                     documentStatus='all'
                     setDocumentStatus={()=>{}}
                     sort={sortBy}
@@ -260,6 +288,18 @@ const VerificationList=()=>{
                 )}
 
             </div>
+
+            {!error&&(
+                <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                    />
+
+            )}
 
         </div>
     )

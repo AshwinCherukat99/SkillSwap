@@ -1,4 +1,4 @@
-import React,{useEffect,useMemo,useState} from "react";
+import {useEffect,useCallback,useState} from "react";
 
 import adminApi from "../../../services/adminApi";
 
@@ -8,6 +8,9 @@ import ReviewStats from "../../../components/admin/review_mgmt/ReviewStats";
 import ReviewFilters from "../../../components/admin/review_mgmt/ReviewFilters";
 import ReviewList from "../../../components/admin/review_mgmt/ReviewList";
 import ReviewReportsModal from "../../../components/admin/review_mgmt/ReviewReportsModal";
+
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
 
 const AdminReviewManagement=()=>{
     const [reviews,setReviews]=useState([])
@@ -23,7 +26,17 @@ const AdminReviewManagement=()=>{
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
     const [selectedReview,setSelectedReview]=useState(null)
-    const fetchReviews=async ()=>{
+    const {
+        currentPage,
+        pageSize,
+        totalPages,
+        totalCount,
+        updatePagination,
+        changePage,
+        changePageSize,
+        resetPagination
+    }=useAdminPagination(10)
+    const fetchReviews=useCallback(async ()=>{
         try{
             setLoading(true)
             setError('')
@@ -39,7 +52,13 @@ const AdminReviewManagement=()=>{
             }
             const response=await adminApi.get(
                 '/admin/reviews/',
-                {params}
+                {
+                    params:{
+                        page:currentPage,
+                        page_size:pageSize,
+                        search
+                    }
+                }
             )
             setReviews(response.data.reviews||[])
             setStats(
@@ -49,20 +68,25 @@ const AdminReviewManagement=()=>{
                     hidden_reviews:0,
                     reported_reviews:0,
                 }
-            )
+            ) 
+            updatePagination(response.data)
         }catch(err){
             console.error('faile to fetch reviews:',err)
             setError(err.response?.data?.error||err.response?.data?.detail||'failed to load reviews')
         }finally{
             setLoading(false)
         }
-    }
+    },[currentPage,pageSize,search,rating,visibility,updatePagination])
     useEffect(()=>{
         const timer=setTimeout(()=>{
             fetchReviews()
         },300)
         return ()=>clearTimeout(timer)
-    },[search,rating,visibility])
+    },[fetchReviews])
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
     const hideReview=async (review)=>{
         const confirmed=window.confirm(
             'are you sure you want to hide this review?'
@@ -169,7 +193,7 @@ const AdminReviewManagement=()=>{
 
             <ReviewFilters
                 search={search}
-                setSearch={setSearch}
+                setSearch={handleSearchChange}
                 rating={rating}
                 setRating={setRating}
                 visibility={visibility}
@@ -186,6 +210,17 @@ const AdminReviewManagement=()=>{
                 onDelete={deleteReview}
                 onViewReports={viewReports}
             />
+
+            {!loading&&!error&&(
+                <Pagination
+                currentPage={currentPage}
+                    totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                />
+            )}
 
             {/* Reports modal */}
 
