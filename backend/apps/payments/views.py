@@ -700,7 +700,7 @@ class AdminMentorPayoutListView(APIView):
         results=[]
         for payout in payouts:
             mentor=payout.mentor
-            wallet=getattr(mentor,'wallet',None),
+            wallet=getattr(mentor,'wallet',None)
             results.append({
                 'id':payout.id,
                 'payout_id':f'PAYOUT-{payout.id:04d}',
