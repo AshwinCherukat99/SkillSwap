@@ -699,9 +699,10 @@ class AdminUserManagementView(AdminPaginationMixin,APIView):
                     'active_users':active_users,
                     'blocked_users':blocked_users,
                     'suspended_users':suspended_users,
-                }
+                },
+                **self.get_pagination_metadata()
             },
-            **self.get_pagination_metadata()
+            status=status.HTTP_200_OK
         )
 
 class AdminUserDetailView(APIView):
@@ -925,9 +926,9 @@ class AdminReviewManagementView(AdminPaginationMixin,APIView):
                     'visible_reviews':(total_reviews-hidden_reviews),
                     'hidden_reviews':hidden_reviews,
                     'reported_reviews':reported_reviews,
-                }
+                },
+                **self.get_pagination_metadata()
             },
-            **self.get_pagination_metadata()
         )
 
 class AdminHideReviewView(APIView):
@@ -1562,9 +1563,11 @@ class AdminCourseCategoryView(AdminPaginationMixin,APIView):
             many=True,
         )
         return Response(
-            serializer.data,
-            status=status.HTTP_200_OK
-            **self.get_pagination_metadata()
+            {
+                'categories':serializer.data,
+                **self.get_pagination_metadata()
+            },
+            status=status.HTTP_200_OK,
         )
     def post(self,request):
         serializer=CourseCategorySerializer(
