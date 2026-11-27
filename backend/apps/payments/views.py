@@ -527,7 +527,7 @@ class AdminApproveMentorPayoutView(APIView):
         if payout.status!=MentorPayout.Status.REQUESTED:
             return Response(
                 {
-                    'detail':'cannot approve a payout with status {payout.status}'
+                    'detail':f'cannot approve a payout with status {payout.status}'
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -551,7 +551,7 @@ class AdminApproveMentorPayoutView(APIView):
             )
         payout.status=MentorPayout.Status.APPROVED
         payout.approved_at=timezone.now()
-        payout.save(update_fields=['status','updated_at','approved_at'])
+        payout.save(update_fields=['status','approved_at'])
         if payout.mentor.user:
             NotificationService.create_notification(
                 recipient=payout.mentor.user,
@@ -597,7 +597,7 @@ class AdminRejectMentorPayoutView(APIView):
         if payout.status!=MentorPayout.Status.REQUESTED:
             return Response(
                 {
-                    'detail':'cannot reject a payout with status {payout.status}'
+                    'detail':f'cannot reject a payout with status {payout.status}'
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )

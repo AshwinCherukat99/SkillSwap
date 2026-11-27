@@ -31,7 +31,7 @@ function MentorPayouts(){
             const params={}
             if (status) params.status=status
             if (amount) params.amount=amount
-            if (date) params.data=date
+            if (date) params.date=date
             const response=await adminApi.get(
                 '/payments/admin/payouts/',
                 {
@@ -84,7 +84,12 @@ function MentorPayouts(){
             setNotice(response.data.message||"payout approved successfully")
             await fetchPayouts()
         }catch(err){
-            setError('unable to approve this payout')
+            console.error('payout approval failed:',err.response?.data||err)
+            setError(
+                err.response?.data?.detail||
+                err.response?.data?.error||
+                'unable to approve this payout'
+            )
         }finally{
             setActionLoading(null)
         }
@@ -102,7 +107,7 @@ function MentorPayouts(){
     }
     const handleReject=async (event)=>{
         event.preventDefault()
-        if (!selectedPayout()||!rejectReason.trim()){
+        if (!selectedPayout||!rejectReason.trim()){
             setError('enter a reason for rejecting this payout')
             return
         }
