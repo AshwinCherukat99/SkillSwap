@@ -470,11 +470,11 @@ class AdminSkillListCreateView(AdminPaginationMixin,APIView):
     def get(self,request):
         search=request.query_params.get('search','').strip()
         skills=Skill.objects.all().order_by('name')  
-        page=self.paginate_queryset(skills)
         if search:
             skills=skills.filter(
                 Q(name__icontains=search)|Q(slug__icontains=search)
             )
+        page=self.paginate_queryset(skills)
         serializer=AdminSkillSerializer(
             page,
             many=True,
