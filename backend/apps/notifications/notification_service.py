@@ -3,6 +3,7 @@ from channels.layers import get_channel_layer
 from django.db import transaction
 
 from apps.notifications.models import Notification
+from apps.chat.models import ConversationMember
 
 class NotificationService:
     @staticmethod
@@ -54,3 +55,46 @@ class NotificationService:
             ) 
         except Notification.DoesNotExist:
             return
+    @staticmethod
+    def notify_conversation_members(
+        conversation,
+        sender_user=None,
+        sender_mentor=None
+    ):
+        members=(
+            ConversationMember.objects.filter(
+                conversation=conversation,
+                is_active=True
+            )
+            .select_related(
+                'user',
+                'mentor__user'
+            )
+        )
+        sender_name=(
+            sender_mentor.username
+            if sender_mentor
+            else sender_user.username
+        ) 
+        notified_user_ids=set()
+        for member in members:
+            if sender_user and member.user_id==sender_user.id:
+                continue
+            if sender_mentor and member.user_id==sender_mentor.id:
+                continue
+            recipient=None
+            if member.user_id:
+                recipient=member.user
+            elif member.mentor_id:
+                recipient=member.mentor.user
+            if not recipient:
+                continue
+            if recipient.id in notified_user_ids:
+                continue
+            notified_user_ids.add(recipient.id)
+            NotificationService.create_notification(
+                recipient=recipient,
+                notification_type=Notification.NotificationType.NEW_MESSAGE,
+                title='New Message',
+                message=f'{sender_name} sent you a message'
+            )

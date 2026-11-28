@@ -61,7 +61,7 @@ export const setupAuthInterceptors=({
                         clearSession()
                         throw refreshError
                     })
-                    .finallly(()=>{
+                    .finally(()=>{
                         refreshPromise=null
                     })
                 }

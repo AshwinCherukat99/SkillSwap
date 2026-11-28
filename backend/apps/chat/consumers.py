@@ -4,6 +4,8 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 
+from apps.notifications.notification_service import NotificationService
+
 from .models import Conversation,ConversationMember,Message
 
 User=get_user_model()
@@ -125,6 +127,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 sender_mentor=mentor,
                 content=content,
             )
+            NotificationService.notify_conversation_members(
+                conversation=conversation,
+                sender_mentor=mentor
+            )
             sender={
                 'id':mentor.id,
                 'username':mentor.username,
@@ -135,6 +141,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 conversation=conversation,
                 sender_user=user,
                 content=content,
+            )
+            NotificationService.notify_conversation_members(
+                conversation=conversation,
+                sender_user=user
             )
             sender={
                 'id':user.id,

@@ -8,7 +8,7 @@ const api = axios.create({
 });
 
 setupAuthInterceptors({
-  api,
+  api:api,
   accessTokenKey:'access_token',
   refreshTokenKey:'refresh_token',
   userKey:'user',

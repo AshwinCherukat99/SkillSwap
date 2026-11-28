@@ -8,7 +8,7 @@ const adminApi = axios.create({
 });
 
 setupAuthInterceptors({
-  adminApi,
+  api:adminApi,
   accessTokenKey:'admin_access_token',
   refreshTokenKey:'admin_refresh_token',
   userKey:'admin',

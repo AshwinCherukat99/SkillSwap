@@ -19,6 +19,7 @@ from apps.courses.models import CourseEnrollment
 from .serializers import (MentorGroupSerializer,ChatMessageSerializer,ConversationMemberSerializer,ConversationSerializer)
 
 from apps.mentors.authentication import MentorJWTAuthentication,ChatJWTAuthentication,DualAccountJWTAuthentication
+from apps.notifications.notification_service import NotificationService
 
 class MentorGroupListView(APIView):
     permission_classes=[IsAuthenticated]
@@ -490,6 +491,16 @@ class ChatAttachmentUploadView(APIView):
                 conversation=conversation,
                 sender_user=user,
                 content=content,
+            )
+        if mentor:
+            NotificationService.notify_conversation_members(
+                conversation=conversation,
+                sender_mentor=mentor
+            )
+        else:
+            NotificationService.notify_conversation_members(
+                conversation=conversation,
+                sender_user=user
             )
         for file in uploaded_files:
             MessageAttachment.objects.create(
