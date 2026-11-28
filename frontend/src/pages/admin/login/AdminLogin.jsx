@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { adminLogin } from "../../../store/slices/authSlice";
 
 import "./AdminLogin.css";
 
-import { API_BASE_URL } from "../config";
+import { API_BASE_URL } from "../../../config";
 
 function AdminLogin() {
     const navigate = useNavigate();
+
+    const dispatch=useDispatch()
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -55,22 +59,13 @@ function AdminLogin() {
             );
         }
 
-        // Store admin authentication tokens
-        localStorage.setItem(
-            "admin_access_token",
-            data.tokens.access
-        );
-
-        localStorage.setItem(
-            "admin_refresh_token",
-            data.tokens.refresh
-        );
-
-        // Store admin user information
-        localStorage.setItem(
-            "admin_user",
-            JSON.stringify(data.user)
-        );
+        dispatch(
+            adminLogin({
+                admin:data.user,
+                accessToken:data.tokens.access,
+                refreshToken:data.tokens.refresh
+            })
+        )
 
         // Redirect to admin dashboard
         navigate("/admin/dashboard/");

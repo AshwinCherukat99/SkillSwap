@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { mentorLogin } from "../../../store/slices/authSlice";
 import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 
@@ -8,6 +10,8 @@ import { API_BASE_URL } from "../../../config";
 
 function MentorLogin() {
     const navigate = useNavigate();
+
+    const dispatch=useDispatch()
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -55,20 +59,13 @@ function MentorLogin() {
             );
         }
 
-        localStorage.setItem(
-            "mentor_access_token",
-            data.tokens.access
-        );
-
-        localStorage.setItem(
-            "mentor_refresh_token",
-            data.tokens.refresh
-        );
-
-        localStorage.setItem(
-            "mentor",
-            JSON.stringify(data.mentor)
-        );
+        dispatch(
+            mentorLogin({
+                mentor:data.mentor,
+                accessToken:data.tokens.access,
+                refreshToken:data.tokens.refresh
+            })
+        )
 
         navigate("/mentor/dashboard/");
 
@@ -129,20 +126,13 @@ function MentorLogin() {
             )
         }
 
-        localStorage.setItem(
-            "mentor_access_token",
-            data.tokens.access
-        )
-
-        localStorage.setItem(
-            "mentor_refresh_token",
-            data.tokens.refresh
-        )
-
-        localStorage.setItem(
-            "mentor",
-            JSON.stringify(data.mentor)
-        )
+        dispatch(
+    mentorLogin({
+        mentor: data.mentor,
+        accessToken: data.tokens.access,
+        refreshToken: data.tokens.refresh,
+    })
+);
 
         navigate("/mentor/dashboard/")
 
