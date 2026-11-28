@@ -113,7 +113,7 @@ class BadgeDashboardView(APIView):
         ]
         milestones=[]
         for key,title in milestone_definitions:
-            earned=earned_milestones.get('key')
+            earned=earned_milestones.get(key)
             milestones.append({
                 'key':key,
                 'title':title,

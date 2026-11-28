@@ -162,7 +162,6 @@ function MentorProfile(){
 
                             <MentorReviews
                                 mentor={mentor}
-                                onMessage={handleMessageMentor}
                             />
 
                         </div>
@@ -178,6 +177,7 @@ function MentorProfile(){
 
                             <BookingCard
                                 mentor={mentor}
+                                onMessage={handleMessageMentor}
                             />
 
                             <ProfessionalOverview

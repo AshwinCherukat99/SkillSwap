@@ -8,11 +8,16 @@ const milestoneColors=[
 ]
 
 function JourneyMilestones({milestones=[]}){
+    const completedCount=milestones.filter(
+        milestone=>milestone.completed
+    ).length
     const totalXP=milestones.reduce(
         (total,milestone)=>
-            total+(milestone.completed?milestone.xp:0),
+            total+(milestone.completed?(milestone.xp_awarded??milestone.xp??0):0),
         0
     )
+    const completionPercentage=milestones.length?
+    Math.round(completedCount/milestones.length*100):0
     return (
         <section className="journey-section">
 
@@ -35,77 +40,69 @@ function JourneyMilestones({milestones=[]}){
                         const color=milestoneColors[
                             index%milestoneColors.length
                         ]
+                        const xp = milestone.xp_awarded ?? milestone.xp ?? 500
                         return (
                             <div
-                            className="
-                                journey-item
-                            "
-                            key={milestone.key||index}
-                            style={{'--milestone-color':color}}
-                        >
-                            <div className="journey-segment">
-                                <div className="journey-node">
-                                    {milestone.completed?'✓':index+1}
-                                </div>
-                            </div>
-
-                            <div
-                                className="
-                                    journey-content
-                                "
+                                className={`journey-item ${
+                                    milestone.completed ? 'is-completed' : 'is-pending'
+                                }`}
+                                key={milestone.key || index}
+                                style={{ '--milestone-color': color }}
                             >
+                                <div className="journey-segment">
+                                    <div className="journey-node">
+                                        {milestone.completed ? '✓' : index + 1}
+                                    </div>
+                                </div>
 
-                               <h5>{milestone.title}</h5>
+                                <div className="journey-content">
+                                    <h5>{milestone.title}</h5>
 
-                               <span
-                               className={milestone.completed?'journey-completed':'journey-pending'}>
-                                {milestone.completed?'Completed':'Not Completed Yet'}
-                               </span>
-                                {milestone.completed&&milestone.date&&(
-                                    <small>
-                                        {new Date(
-                                            milestone.date
-                                        ).toLocaleDateString('en-IN',{
-                                            day:'numeric',
-                                            month:'short',
-                                            year:'numeric',
-                                        })}
-                                    </small>
-                                )}
-                                <div>
-                                    {milestone.completed
-                                    ?`+${milestone.xp} XP earned`
-                                :`Earn ${milestone.xp} XP`}
+                                    <span
+                                        className={
+                                            milestone.completed
+                                                ? 'journey-completed'
+                                                : 'journey-pending'
+                                        }
+                                    >
+                                        {milestone.completed
+                                            ? 'Completed'
+                                            : 'Not completed yet'}
+                                    </span>
+
+                                    {milestone.completed && milestone.date && (
+                                        <small>
+                                            {new Date(milestone.date).toLocaleDateString(
+                                                'en-IN',
+                                                {
+                                                    day: 'numeric',
+                                                    month: 'short',
+                                                    year: 'numeric',
+                                                }
+                                            )}
+                                        </small>
+                                    )}
+
+                                    <div className="journey-reward">
+                                        {milestone.completed
+                                            ? `+${xp} XP earned`
+                                            : `Earn ${xp} XP`}
+                                    </div>
                                 </div>
                             </div>
-
-                            
-                        </div>
-                        )
-                        }
-                )}
-
-            </div>
-
-            </div>
-
-                <div className="journey-footer">
-                    <span>
-                        {milestones.filter(m=>m.completed).length}
-                        {'/'}
-                        {milestones.length} milestones completed
-                    </span>
-                    <span>
-                        {milestones.length>0?
-                        Math.round(
-                            milestones.filter(m=>m.completed).length/
-                            milestones.length*100
-                        ):0} % completed
-                    </span>
+                        );
+                    })}
                 </div>
+            </div>
 
+            <div className="journey-footer">
+                <span>
+                    {completedCount}/{milestones.length} milestones completed
+                </span>
+
+                <span>{completionPercentage}% completed</span>
+            </div>
         </section>
-        
     )
 }
 
