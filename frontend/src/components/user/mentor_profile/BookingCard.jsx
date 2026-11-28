@@ -1,4 +1,4 @@
-function BookingCard({mentor}){
+function BookingCard({mentor,onMessage}){
     return (
         <section className="card border-primary shadow-sm">
 
@@ -22,18 +22,18 @@ function BookingCard({mentor}){
 
 
                 <p className="small text-muted">
-                    Book a dedicated mentoring session and get
-                    personalized guidance.
+                    Contact the mentor to know more about his courses
                 </p>
 
 
-                <button className="btn btn-primary w-100">
+                <button className="btn btn-primary w-100"
+                onClick={onMessage}>
 
                     <span className="material-symbols-outlined align-middle me-1">
-                        event_available
+                        chat
                     </span>
 
-                    Request Session
+                    Message
 
                 </button>
 

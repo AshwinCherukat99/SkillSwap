@@ -51,7 +51,7 @@ const PublicUserProfile=()=>{
     const handleMessage = async (profileUser) => {
       try{
         const response=await api.post(
-          '/chat/conversations/direct',
+          '/chat/conversations/direct/',
           {
             user_id:profileUser.id
           }
@@ -72,7 +72,7 @@ const PublicUserProfile=()=>{
       const response=await api.post(
         '/auth/friends/add/',
         {
-          receiver:profileUser.id
+          receiver_id:profileUser.id
         }
       )
       setFriendshipStatus('PENDING_SENT')
@@ -82,7 +82,7 @@ const PublicUserProfile=()=>{
       setFriendMessage(
         err.response?.data?.detail||
         err.response?.data?.message||
-        err.response?.data?.receiver[0]||
+        err.response?.data?.receiver?.[0]||
         'unable to send friend request, please try again'
       )
     }finally{

@@ -127,9 +127,6 @@ function MentorProfile(){
 
             <MentorProfileHeader
                 mentor={mentor}
-                onRequestSession={() => {
-                    // session request will be connected here
-                }}
                 onMessage={handleMessageMentor}
             />
 
@@ -165,6 +162,7 @@ function MentorProfile(){
 
                             <MentorReviews
                                 mentor={mentor}
+                                onMessage={handleMessageMentor}
                             />
 
                         </div>

@@ -132,44 +132,49 @@ class ConversationSerializer(serializers.ModelSerializer):
         current_user=request.user
         members=obj.members.filter(
             is_active=True
-        ).select_related('user','mentor')
-        mentor_profile=getattr(
-            current_user,'mentor_profile',None
-        )
-        current_mentor_id=getattr(
-            current_user,'id',None
+        ).select_related('user','mentor','mentor__user')
+        current_mentor=getattr(
+            current_user,
+            'mentor_profile',
+            None
         )
         for member in members:
             if member.user_id is not None:
                 if member.user_id==current_user.id:
                     continue
                 person=member.user
+                image=person.profile_image
                 return {
                     'id':person.id,
+                    'name':person.full_name or person.username,
                     'full_name':person.full_name or person.username,
                     'username':person.username,
                     'type':'USER',
                     'profile_image':(
                         request.build_absolute_uri(
-                            person.profile_image.url
+                            image.url
                         )
-                        if person.profile_image else None
+                        if image else None
                     )
                 }
             if member.mentor_id is not None:
-                if (mentor_profile and member.mentor_id==mentor_profile.id):
-                    continue
-                if (not mentor_profile and member.mentor_id==current_mentor_id):
+                if (current_mentor and member.mentor_id==current_mentor.id):
                     continue
                 person=member.mentor
+                username=getattr(person,'username','') or ''
+                full_name=(getattr(person,'full_name',None) or username)
+                image = (
+                getattr(person, 'profile_image', None)
+                or getattr(person, 'avatar', None)
+            )
                 return {
                     'id':person.id,
-                    'name':person.full_name or person.username,
-                    'username':getattr(person,'username',''),
+                    'name':full_name,
+                    'username':username,
                     'type':'MENTOR',
                     'avatar':request.build_absolute_uri(
-                        person.profile_image.url
+                        image.url
                     )
-                    if person.profile_image else None
+                    if image else None
                 }
         return None

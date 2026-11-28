@@ -1,9 +1,7 @@
 import { BACKEND_ORIGIN } from "../../../config"
 
 function MentorProfileHeader({
-    mentor,
-    onRequestSession,
-    onMessage
+    mentor
 }){
     const getImageUrl=(image)=>{
         if (!image){
@@ -94,40 +92,6 @@ function MentorProfileHeader({
                                     </div>
 
                                 </div>
-
-                            </div>
-
-                        </div>
-
-
-                        {/* Actions */}
-
-                        <div className="col-md-4">
-
-                            <div className="d-flex flex-column gap-2">
-
-                                <button
-                                    className="btn btn-primary"
-                                    onClick={onRequestSession}
-                                >
-                                    <span className="material-symbols-outlined align-middle me-1">
-                                        calendar_today
-                                    </span>
-
-                                    Request Session
-                                </button>
-
-
-                                <button className="btn btn-outline-secondary"
-                                onClick={onMessage}>
-
-                                    <span className="material-symbols-outlined align-middle me-1">
-                                        chat
-                                    </span>
-
-                                    Message
-
-                                </button>
 
                             </div>
 
