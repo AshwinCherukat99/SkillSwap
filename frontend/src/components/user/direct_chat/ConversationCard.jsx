@@ -20,7 +20,7 @@ const ConversationCard = ({
 
     const displayName=person?.name||person?.username||conversation.name||'conversation'
 
-    const avatar=person?.avatar||conversation.avatar||"/images/default-avatar.png";
+    const avatar=person?.profile_image||person?.avatar||conversation.avatar||"/images/default-avatar.png";
 
     return (
         <div
@@ -41,13 +41,16 @@ const ConversationCard = ({
                 ) : (
                     <img
                         src={
-                            avatar ||
-                            "/images/default-avatar.png"
+                            avatar
                         }
                         alt={
                             displayName ||
                             "Conversation"
                         }
+                        onError={(e)=>{
+                            e.currentTarget.onerror=null
+                            e.currentTarget.src='/images/default-avatar.png'
+                        }}
                     />
                 )}
 

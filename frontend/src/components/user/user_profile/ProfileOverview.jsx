@@ -1,4 +1,5 @@
-import React,{useState} from "react";
+import {useState} from "react";
+import { BACKEND_ORIGIN } from "../../../config";
 
 const ProfileOverview=({
     user,
@@ -6,10 +7,12 @@ const ProfileOverview=({
     onMessage,
     onReport,
     friendshipStatus='NONE',
+    friendLoading=false,
+    friendMessage=''
 })=>{
-    const [menuOpen,setMenuOpen]=useState(false)
     const displayName=user.full_name||user.username
     const image=user.profile_image
+    const imageUrl=image?image.startsWith('http')?image:`${BACKEND_ORIGIN}${image}`:null
     const friendLabel={
         NONE:'Add Friend',
         PENDING_SENT:'Request Sent',
@@ -25,7 +28,7 @@ const ProfileOverview=({
           <div className="d-flex flex-column flex-sm-row gap-4 flex-grow-1">
             {image ? (
               <img
-                src={image}
+                src={imageUrl}
                 alt={displayName}
                 className="ss-profile-avatar flex-shrink-0"
               />
@@ -78,11 +81,26 @@ const ProfileOverview=({
                     : "btn-primary"
                 }`}
                 onClick={() => onAddFriend?.(user)}
-                disabled={friendshipStatus === "PENDING_SENT"}
+                disabled={friendshipStatus === "PENDING_SENT"||friendshipStatus === 'ACCEPTED'}
               >
-                <i className="bi bi-person-plus me-2" />
+                {friendLoading?(
+                  <>
+                  <span className="spinner-border spinner-border-sm me-2" />
+                  Sending...
+                  </>
+                ):(
+                  <>
+                  <i className="bi bi-person-plus me-2" />
                 {friendLabel}
+                  </>
+                )}
               </button>
+
+              {friendMessage&&(
+                <div className="small mt-2 text-secondary">
+        {friendMessage}
+    </div>
+              )}
 
               <button
                 type="button"
@@ -92,47 +110,15 @@ const ProfileOverview=({
                 <i className="bi bi-chat-dots me-2" />
                 Message
               </button>
-
-              <div className="dropdown">
-                <button
-                  type="button"
-                  className="btn btn-light border"
-                  aria-label="More profile options"
-                  aria-expanded={menuOpen}
-                  onClick={() => setMenuOpen((open) => !open)}
-                >
-                  <i className="bi bi-three-dots-vertical" />
-                </button>
-
-                {menuOpen && (
-                  <div className="dropdown-menu dropdown-menu-end show ss-profile-menu">
-                    <button
-                      className="dropdown-item"
-                      onClick={async () => {
-                        await navigator.clipboard.writeText(
-                          window.location.href
-                        );
-                        setMenuOpen(false);
-                      }}
-                    >
-                      <i className="bi bi-share me-2" />
-                      Copy profile link
-                    </button>
-
-                    <button
-                      className="dropdown-item"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        onReport?.(user);
-                      }}
-                    >
-                      <i className="bi bi-flag me-2" />
-                      Report user
-                    </button>
-
-                  </div>
-                )}
-              </div>
+              <button
+  type="button"
+  className="btn btn-light btn-sm rounded-pill d-flex align-items-center gap-1"
+  aria-label="Report user"
+  onClick={() => onReport?.(user)}
+>
+  <i className="bi bi-exclamation-circle" />
+  <span>Report</span>
+</button>
             </div>
 
             <span className="small text-secondary">

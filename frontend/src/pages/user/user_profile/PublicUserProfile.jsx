@@ -1,5 +1,5 @@
 import React,{useEffect,useState,useCallback} from "react";
-import { Link,useParams } from "react-router-dom"; 
+import { useNavigate,Link,useParams } from "react-router-dom"; 
 
 import api from "../../../services/api";
 
@@ -9,11 +9,19 @@ import UserStats from "../../../components/user/user_profile/UserStats";
 import PersonalInformation from "../../../components/user/user_profile/PersonalInformation";
 import UserBadges from "../../../components/user/user_profile/UserBadges";
 
+import ReportModal from "../../report_modal/ReportModal";
+
 const PublicUserProfile=()=>{
+    const navigate=useNavigate()
     const {userId}=useParams()
     const [user,setUser]=useState(null)
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
+    const [friendshipStatus,setFriendshipStatus]=useState('NONE')
+    const [friendLoading,setFriendLoading]=useState(false)
+    const [friendMessage,setFriendMessage]=useState('')  
+    const [reportTarget,setReportTarget]=useState(null)
+    const [reportSuccess,setReportSuccess]=useState('')
     const loadProfile=useCallback(async ()=>{
         if (!userId||userId==='undefined'){
             setError('a valid user id is required')
@@ -40,19 +48,56 @@ const PublicUserProfile=()=>{
     useEffect(()=>{
         loadProfile()
     },[loadProfile])
-    const handleMessage = (profileUser) => {
-    // Connect this to your existing chat route/API.
-    console.info("Open conversation with user:", profileUser.id);
+    const handleMessage = async (profileUser) => {
+      try{
+        const response=await api.post(
+          '/chat/conversations/direct',
+          {
+            user_id:profileUser.id
+          }
+        )
+        const conversationId=response.data.id
+        navigate(`/direct-chat/?conversation=${conversationId}`)
+      }catch(err){
+        console.error('failed to open conversation:',err)
+        setError(err.response?.data?.detail||'unable to open conversation')
+      }
   };
 
-  const handleAddFriend = (profileUser) => {
-    // Connect this to your existing friendship request API.
-    console.info("Send friend request to user:", profileUser.id);
+  const handleAddFriend = async (profileUser) => {
+    if (!profileUser.id||friendLoading) return
+    try{
+      setFriendLoading(true)
+      setFriendMessage('')
+      const response=await api.post(
+        '/auth/friends/add/',
+        {
+          receiver:profileUser.id
+        }
+      )
+      setFriendshipStatus('PENDING_SENT')
+      setFriendMessage(response.data.message||'friend request sent successfully')
+    }catch(err){
+      console.error('failed to send friend request:',err) 
+      setFriendMessage(
+        err.response?.data?.detail||
+        err.response?.data?.message||
+        err.response?.data?.receiver[0]||
+        'unable to send friend request, please try again'
+      )
+    }finally{
+      setFriendLoading(false)
+    }
   };
 
   const handleReport = (profileUser) => {
-    // Connect this to your report-submission API.
-    console.info("Report user:", profileUser.id);
+    setReportSuccess('')
+    setReportTarget({
+      type:'USER',
+      id:profileUser.id,
+      reportedUserId:profileUser.id,
+      reportedMentorId:null
+    })
   };
   return (
     <>
@@ -103,11 +148,30 @@ const PublicUserProfile=()=>{
               </div>
 
               <div className="d-flex flex-column gap-4">
+                {reportSuccess&&(
+                  <div
+        className="alert alert-success alert-dismissible fade show"
+        role="alert"
+    >
+        <i className="bi bi-check-circle me-2" />
+        {reportSuccess}
+
+        <button
+            type="button"
+            className="btn-close"
+            onClick={() => setReportSuccess("")}
+            aria-label="Close"
+        />
+    </div>
+                )}
                 <ProfileOverview
                   user={user}
                   onAddFriend={handleAddFriend}
                   onMessage={handleMessage}
                   onReport={handleReport}
+                  friendshipStatus={friendshipStatus}
+                  friendLoading={friendLoading}
+                  friendMessage={friendMessage}
                 />
 
                 <UserStats user={user} />
@@ -125,6 +189,17 @@ const PublicUserProfile=()=>{
             </>
           ) : null}
         </div>
+        {reportTarget&&(
+          <ReportModal
+          target={reportTarget}
+          apiClient={api}
+          onClose={()=>setReportTarget(null)}
+          onSuccess={(message)=>{
+            setReportTarget(null)
+            setReportSuccess(message)
+          }}
+          />
+        )}
       </main>
     </>
   )
