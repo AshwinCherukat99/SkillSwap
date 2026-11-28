@@ -30,6 +30,7 @@ from apps.chat.services import create_skill_conversation,create_course_conversat
 
 from apps.accounts.permissions import IsAdmin
 from apps.mentors.authentication import MentorJWTAuthentication
+from apps.adminpanel.mixins import AdminPaginationMixin
 
 class MentorScheduleCourseSessionView(APIView):
     authentication_classes=[MentorJWTAuthentication]
@@ -782,7 +783,7 @@ class MentorCourseSessionHistoryView(APIView):
             status=status.HTTP_200_OK,
         )
 
-class AdminSessionManagementView(APIView):
+class AdminSessionManagementView(AdminPaginationMixin,APIView):
     permission_classes=[IsAdmin]
     def get(self,request):
         now=timezone.now()
@@ -961,6 +962,7 @@ class AdminSessionManagementView(APIView):
             key=lambda x:x.get('scheduled_start') or '',
             reverse=True,
         )
+        page=self.paginate_queryset(sessions)
         skill_queryset=SkillExchangeSession.objects.all()
         course_queryset=CourseSession.objects.all()
         total_sessions=(
@@ -1074,6 +1076,7 @@ class AdminSessionManagementView(APIView):
                     'total_sessions':total_sessions,
                     'upcoming':upcoming,
                     'ongoing':ongoing,
+                    'scheduled':scheduled,
                     'completed':completed,
                     'cancelled':cancelled,
                     'rejected':rejected,
@@ -1082,7 +1085,8 @@ class AdminSessionManagementView(APIView):
                     'average_rating':None,
                 },
                 'completion_trends':completion_trends,
-                'sessions':sessions,
+                'sessions':page,
+                **self.get_pagination_metadata(),
             },
             status=status.HTTP_200_OK,
         )

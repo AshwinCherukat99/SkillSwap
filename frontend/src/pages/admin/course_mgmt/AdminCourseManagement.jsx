@@ -41,7 +41,7 @@ const AdminCourseManagement = () => {
     changePage,
     changePageSize,
     resetPagination
-    }=useAdminPagination()
+    }=useAdminPagination(10)
 
     const fetchCourses = useCallback(async () => {
         try {

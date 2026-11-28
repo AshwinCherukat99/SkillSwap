@@ -1,4 +1,4 @@
-import React,{useEffect,useState} from "react";
+import React,{useEffect,useState,useCallback} from "react";
 import { useSearchParams } from "react-router-dom";
 
 import adminApi from '../../../services/adminApi'
@@ -10,6 +10,9 @@ import CompletionTrends from '../../../components/admin/session_mgmt/CompletionT
 import ActivityHeatmap from '../../../components/admin/session_mgmt/ActivityHeatmap'
 
 import './AdminSessionManagement.css'
+
+import Pagination from "../../../components/common/Pagination";
+import useAdminPagination from "../../../hooks/useAdminPagination";
 
 const AdminSessionManagement=()=>{
     const [searchParams]=useSearchParams()
@@ -49,16 +52,25 @@ const AdminSessionManagement=()=>{
     const [sessionType,setSessionType]=useState('ALL')
     const [loading,setLoading]=useState(true)
     const [error,setError]=useState('')
-    useEffect(()=>{
-        fetchSessions()
-    },[tab,status,sessionType,search])
-    const fetchSessions=async ()=>{
+    const {
+        currentPage,
+    pageSize,
+    totalPages,
+    totalCount,
+    updatePagination,
+    changePage,
+    changePageSize,
+    resetPagination
+    }=useAdminPagination(10)
+    const fetchSessions=useCallback(async ()=>{
         try{
             setLoading(true)
             setError('')
             const response=await adminApi.get(
                 '/sessions/admin/',{
                     params:{
+                        page:currentPage,
+                        page_size:pageSize,
                         tab,
                     status,
                     session_type:sessionType,
@@ -69,16 +81,40 @@ const AdminSessionManagement=()=>{
             setSessions(response.data.sessions||[])
             setStats(response.data.stats)
             setCompletionTrends(response.data.completion_trends)
+            updatePagination(response.data)
         }catch(err){
             console.error('failed to load sessions:',err)
             setError(err.response?.data?.detail||'failed to load sessions')
         }finally{
             setLoading(false)
         }
-    }
+    },
+[
+    currentPage,
+    pageSize,
+    search,
+    status,
+    tab,
+    sessionType,
+    updatePagination
+]
+)
+useEffect(()=>{
+        fetchSessions()
+    },[fetchSessions])
     const handleSearchSubmit=()=>{
         fetchSessions()
     }
+    const handleSearchChange=(value)=>{
+        setSearch(value)
+        resetPagination()
+    }
+
+    const handleStatusChange=(value)=>{
+        setStatus(value)
+        resetPagination()
+    }
+
     const handleCancel=async (session)=>{
         const reason=window.prompt('enter cancellation reason:')
         if (!reason||!reason.trim()){
@@ -260,10 +296,10 @@ const AdminSessionManagement=()=>{
             <SessionFilters
 
                 search={search}
-                setSearch={setSearch}
+                setSearch={handleSearchChange}
 
                 status={status}
-                setStatus={setStatus}
+                setStatus={handleStatusChange}
 
                 sessionType={sessionType}
                 setSessionType={
@@ -320,6 +356,17 @@ const AdminSessionManagement=()=>{
                     )}
 
                 </div>
+
+                    {!loading&&!error&&(
+                            <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                    totalCount={totalCount}
+                    pageSize={pageSize}
+                    onPageChange={changePage}
+                    onPageSizeChange={changePageSize}
+                            />
+                        )}
 
 
                 {/* SIDEBAR */}
